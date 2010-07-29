@@ -350,15 +350,14 @@ public class B4O
 	/* Settings */
 	private final static double ALPHA = 0.0005;
 	private final static double BETA = 0.1;
+	private final static double ALPHA_GRID[] = new double[]{ALPHA/10,ALPHA/5,ALPHA,ALPHA*5,ALPHA*10};
+	private final static double BETA_GRID[] = new double[]{BETA/2,BETA/1.5,BETA,BETA*1.5,BETA*2};
 	private final static int MAX_SAMPLES = 1;//100;
 	private final static boolean CONSIDER_FREQUENCIES_ONLY = false;
 	private final static String RESULT_NAME = "fnd-freq-only.txt";
 	private final static int SIZE_OF_SCORE_DISTRIBUTION = 5000;
 	private final static String [] evidenceCodes = null;//new String[]{"PCS","ICE"};
 	
-	private final static double ALPHAMAX = 0.1;
-	private final static double BETAMAX = 0.2;
-
 	/** False positives can be explained via inheritance */
 	private static int VARIANT_INHERITANCE_POSITIVES = 1<<0;
 
@@ -1488,8 +1487,6 @@ public class B4O
 	{
 		int i;
 		
-		double [] ALPHAS = new double[]{ALPHA/2,ALPHA,ALPHA*2};
-
 		Result res = new Result();
 		res.scores = new double[allItemList.size()];
 		res.marginals = new double[allItemList.size()];
@@ -1497,20 +1494,37 @@ public class B4O
 		
 		for (i=0;i<res.stats.length;i++)
 			res.stats[i] = new Stats();
+		for (i=0;i<res.scores.length;i++)
+			res.scores[i] = Math.log(0);
 
-		double [] scores = res.scores; 
+//		double [] scores = res.scores;
+		double [][][] scores = new double[allItemList.size()][ALPHA_GRID.length][BETA_GRID.length];
 		double [] marginals = res.marginals;
 
 		double normalization = Math.log(0);
 		
 		for (i=0;i<allItemList.size();i++)
 		{
-			scores[i] = score(i, ALPHA, BETA, observations, takeFrequenciesIntoAccount);
-			normalization = Util.logAdd(normalization, scores[i]);
+			WeightedStats stats = determineCasesForItem(i,observations,takeFrequenciesIntoAccount);
+			
+			for (int a=0;a<ALPHA_GRID.length;a++)
+			{
+				for (int b=0;b<BETA_GRID.length;b++)
+				{
+					scores[i][a][b] = stats.score(ALPHA_GRID[a], BETA_GRID[b]);
+					res.scores[i] = Util.logAdd(res.scores[i], scores[i][a][b]);
+				}
+			}
+			normalization = Util.logAdd(normalization, res.scores[i]);
+			
+//			for (int)
+			
+//			scores[i] = score(i, ALPHA, BETA, observations, takeFrequenciesIntoAccount);
+//			normalization = Util.logAdd(normalization, scores[i]);
 		}
 
 		for (i=0;i<allItemList.size();i++)
-			marginals[i] = Math.exp(scores[i] - normalization);
+			marginals[i] = Math.exp(res.scores[i] - normalization);
 	
 		return res;
 	}
