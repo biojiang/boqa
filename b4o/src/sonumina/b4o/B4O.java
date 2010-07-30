@@ -189,6 +189,26 @@ class Stats
 			c += stats[i];
 		return c;
 	}
+	
+	/**
+	 * Returns the false positive rate.
+	 * 
+	 * @return
+	 */
+	public double falsePositiveRate()
+	{
+		 return getCases(Stats.NodeCase.FALSE_POSITIVE)/(double)(getCases(Stats.NodeCase.FALSE_POSITIVE) + getCases(Stats.NodeCase.TRUE_NEGATIVE)); 
+	}
+
+	/**
+	 * Return false negative rate.
+	 * 
+	 * @return
+	 */
+	public double falseNegativeRate()
+	{
+		 return getCases(Stats.NodeCase.FALSE_NEGATIVE)/(double)(getCases(Stats.NodeCase.FALSE_NEGATIVE) + getCases(Stats.NodeCase.TRUE_POSITIVE)); 
+	}
 
 	/**
 	 * Returns the log score of the summarized configuration.
@@ -285,6 +305,19 @@ class WeightedStats implements Iterable<Tupel>
 	}
 }
 
+/**
+ * Class maintaining observations and stats regarding to
+ * true positives.
+ * 
+ * @author Sebastian Bauer
+ *
+ */
+class Observations
+{
+	int item;
+	boolean [] observations;
+	Stats observationStats;
+}
 
 public class B4O
 {
@@ -352,6 +385,7 @@ public class B4O
 	private final static double BETA = 0.1;
 	private final static double ALPHA_GRID[] = new double[]{ALPHA/10,ALPHA/5,ALPHA,ALPHA*5,ALPHA*10};
 	private final static double BETA_GRID[] = new double[]{BETA/2,BETA/1.5,BETA,BETA*1.5,BETA*2};
+	
 	private final static int MAX_SAMPLES = 1;//100;
 	private final static boolean CONSIDER_FREQUENCIES_ONLY = false;
 	private final static String RESULT_NAME = "fnd-freq-only.txt";
@@ -849,7 +883,7 @@ public class B4O
 	 * @param item
 	 * @return
 	 */
-	public static boolean [] generateObservations(int itemNr, Random rnd)
+	public static Observations generateObservations(int itemNr, Random rnd)
 	{
 		int i;
 		int [] falsePositive = new int[slimGraph.getNumberOfVertices()];
@@ -995,10 +1029,14 @@ public class B4O
 		
 		Stats stats = new Stats();
 		determineCases(observations, hidden, stats);
-		System.out.println("Number of modelled false postives " + stats.getCases(Stats.NodeCase.FALSE_POSITIVE) + " (alpha=" +  String.format("%g", stats.getCases(Stats.NodeCase.FALSE_POSITIVE)/(double)(stats.getCases(Stats.NodeCase.FALSE_POSITIVE) + stats.getCases(Stats.NodeCase.TRUE_NEGATIVE))) + "%)");
-		System.out.println("Number of modelled false negatives " + stats.getCases(Stats.NodeCase.FALSE_NEGATIVE) + " (beta=" +  String.format("%g",stats.getCases(Stats.NodeCase.FALSE_NEGATIVE)/(double)(stats.getCases(Stats.NodeCase.FALSE_NEGATIVE) + stats.getCases(Stats.NodeCase.TRUE_POSITIVE))) + "%)");
+		System.out.println("Number of modelled false postives " + stats.getCases(Stats.NodeCase.FALSE_POSITIVE) + " (alpha=" +  stats.falsePositiveRate() + "%)");
+		System.out.println("Number of modelled false negatives " + stats.getCases(Stats.NodeCase.FALSE_NEGATIVE) + " (beta=" +  stats.falseNegativeRate() + "%)");
 		
-		return observations;
+		Observations o = new Observations();
+		o.item = itemNr;
+		o.observations = observations;
+		o.observationStats = stats;
+		return o;
 	}
 
 
@@ -1497,7 +1535,6 @@ public class B4O
 		for (i=0;i<res.scores.length;i++)
 			res.scores[i] = Math.log(0);
 
-//		double [] scores = res.scores;
 		double [][][] scores = new double[allItemList.size()][ALPHA_GRID.length][BETA_GRID.length];
 		double [] marginals = res.marginals;
 
@@ -1810,7 +1847,9 @@ public class B4O
 	{
 		int i;
 		
-		boolean [] observations = generateObservations(item, rnd);
+		Observations obs = generateObservations(item, rnd);
+		
+		boolean [] observations = obs.observations;
 
 		System.out.println("Item " + allItemList.get(item));
 
