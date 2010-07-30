@@ -386,10 +386,10 @@ public class B4O
 	private final static double ALPHA_GRID[] = new double[]{ALPHA/10,ALPHA/5,ALPHA,ALPHA*5,ALPHA*10};
 	private final static double BETA_GRID[] = new double[]{BETA/2,BETA/1.5,BETA,BETA*1.5,BETA*2};
 	
-	private final static int MAX_SAMPLES = 1;//100;
+	private final static int MAX_SAMPLES = 2;
 	private final static boolean CONSIDER_FREQUENCIES_ONLY = false;
-	private final static String RESULT_NAME = "fnd-freq-only.txt";
-	private final static int SIZE_OF_SCORE_DISTRIBUTION = 5000;
+	private final static String RESULT_NAME = "fnd.txt";
+	private final static int SIZE_OF_SCORE_DISTRIBUTION = 10000;
 	private final static String [] evidenceCodes = null;//new String[]{"PCS","ICE"};
 	
 	/** False positives can be explained via inheritance */
@@ -704,8 +704,6 @@ public class B4O
 		/* We try each possible activity/inactivity combination of terms with explicit frequencies */
 		SubsetGenerator sg = new SubsetGenerator(numTermsWithExplicitFrequencies,numTermsWithExplicitFrequencies);//numTermsWithExplicitFrequencies);
 		SubsetGenerator.Subset s;
-		
-		if (item == 0) System.out.println(numTermsWithExplicitFrequencies);
 		
 		/* Tracks the hidden state configuration that matches the observed state best */
 //		double bestScore = Double.NEGATIVE_INFINITY;
@@ -1219,7 +1217,7 @@ public class B4O
 		{
 			for (i=0;i<allItemList.size();i++)
 			{
-				if (i != firstItemWithFrequencies) continue;
+//				if (i != firstItemWithFrequencies) continue;
 //				if (!itemHasFrequencies[i]) continue;
 
 				final long seed = rnd.nextLong();
@@ -1246,9 +1244,13 @@ public class B4O
 							builder.append("\t");
 							builder.append(res[0].marginals[j]);
 							builder.append("\t");
+							builder.append(res[0].marginalsIdeal[j]);
+							builder.append("\t");
 							builder.append(res[1].scores[j]);
 							builder.append("\t");
 							builder.append(res[1].marginals[j]);
+							builder.append("\t");
+							builder.append(res[1].marginalsIdeal[j]);
 							builder.append("\t");
 							builder.append(res[2].scores[j]);
 							builder.append("\t");
@@ -1500,6 +1502,7 @@ public class B4O
 	static public class Result
 	{
 		double [] marginals;
+		double [] marginalsIdeal;
 		double [] scores;
 		Stats [] stats;
 		
@@ -1521,13 +1524,14 @@ public class B4O
 	 * @param takeFrequenciesIntoAccount
 	 * @return
 	 */
-	private static Result assignMarginals(boolean [] observations, boolean takeFrequenciesIntoAccount)
+	private static Result assignMarginals(Observations observations, boolean takeFrequenciesIntoAccount)
 	{
 		int i;
 		
 		Result res = new Result();
 		res.scores = new double[allItemList.size()];
 		res.marginals = new double[allItemList.size()];
+		res.marginalsIdeal = new double[allItemList.size()];
 		res.stats = new Stats[allItemList.size()];
 		
 		for (i=0;i<res.stats.length;i++)
@@ -1536,13 +1540,14 @@ public class B4O
 			res.scores[i] = Math.log(0);
 
 		double [][][] scores = new double[allItemList.size()][ALPHA_GRID.length][BETA_GRID.length];
-		double [] marginals = res.marginals;
-
 		double normalization = Math.log(0);
+
+		double [] idealScores = new double[allItemList.size()];
+		double idealNormalization = Math.log(0);
 		
 		for (i=0;i<allItemList.size();i++)
 		{
-			WeightedStats stats = determineCasesForItem(i,observations,takeFrequenciesIntoAccount);
+			WeightedStats stats = determineCasesForItem(i,observations.observations,takeFrequenciesIntoAccount);
 			
 			for (int a=0;a<ALPHA_GRID.length;a++)
 			{
@@ -1554,6 +1559,19 @@ public class B4O
 			}
 			normalization = Util.logAdd(normalization, res.scores[i]);
 			
+			
+			/* Calculate ideal */
+			double fpr = observations.observationStats.falsePositiveRate();
+			double fnr = observations.observationStats.falseNegativeRate();
+			
+			if (fpr == 0)
+				fpr = 0.0000001;
+			if (fnr == 0)
+				fnr = 0.0000001;
+			
+			idealScores[i] = stats.score(fpr,fnr);
+			idealNormalization = Util.logAdd(idealNormalization, idealScores[i]);
+			
 //			for (int)
 			
 //			scores[i] = score(i, ALPHA, BETA, observations, takeFrequenciesIntoAccount);
@@ -1561,8 +1579,11 @@ public class B4O
 		}
 
 		for (i=0;i<allItemList.size();i++)
-			marginals[i] = Math.exp(res.scores[i] - normalization);
-	
+		{
+			res.marginals[i] = Math.exp(res.scores[i] - normalization);
+			res.marginalsIdeal[i] = Math.exp(idealScores[i]- idealNormalization);
+		}
+
 		return res;
 	}
 
@@ -1854,13 +1875,13 @@ public class B4O
 		System.out.println("Item " + allItemList.get(item));
 
 		/* First, without taking frequencies into account */
-		Result modelWithoutFrequencies = assignMarginals(observations, false);
+		Result modelWithoutFrequencies = assignMarginals(obs, false);
 		
 		/* Second, with taking frequencies into account */
-		Result modelWithFrequencies = assignMarginals(observations, true);
+		Result modelWithFrequencies = assignMarginals(obs, true);
 
 		/* Third, we apply the resnick sim measure */
-		Result resnick = resnickMaxScore(observations, true, rnd);
+		Result resnick = resnickMaxScore(obs.observations, true, rnd);
 		
 		/******** The rest is for debugging purposes ********/
 
