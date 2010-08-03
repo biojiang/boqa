@@ -65,14 +65,16 @@ evaluate<-function(d,v)
 
 
 v<-matrix(c("marg","Marg. Prob.", T,
+		    "marg.ideal", "Marg. Prob. (Ideal)", T,
 		    "marg.freq","Marg. Prob. (Freq)", T,
+		    "marg.freq.ideal", "Marg. Prob. (Freq,Ideal)", T,
             "resnick.avg", "Resnik",T,
 			"resnick.avg.rank", "Resnik (rank)",F,
 			"resnick.avg.p", "Resnik P",F),ncol=3,byrow=T)
 
 d<-read.table("fnd.txt",h=F,stringsAsFactors=F)
 #d<-read.table("fnd-freq-only.txt",h=F,stringsAsFactors=F)
-colnames(d)<-c("run","label","score","marg","score.freq","marg.freq", "resnick.avg", "resnick.avg.p","freq")
+colnames(d)<-c("run","label","score","marg","marg.ideal", "score.freq","marg.freq", "marg.freq.ideal", "resnick.avg", "resnick.avg.p","freq")
 d<-d[order(d$run),]
 resnick.avg.rank<-unlist(tapply(d$resnick.avg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
 d<-cbind(d,resnick.avg.rank)
@@ -99,7 +101,7 @@ save(res.list.freq.vs.freq,file="b4o_res.list.freq.vs.freq.RObj")
 
 
 
-col<-c("red","blue","cyan","green","gray")
+col<-c("red","blue","cyan","green","gray","orange","black")
 
 #pdf("b4o-precall.pdf")
 
@@ -108,6 +110,8 @@ lines(res.list[[2]]$recall.lines,res.list[[2]]$prec.lines,type="l",col=col[2])
 lines(res.list[[3]]$recall.lines,res.list[[3]]$prec.lines,type="l",col=col[3])
 lines(res.list[[4]]$recall.lines,res.list[[4]]$prec.lines,type="l",col=col[4])
 lines(res.list[[5]]$recall.lines,res.list[[5]]$prec.lines,type="l",col=col[5])
+lines(res.list[[6]]$recall.lines,res.list[[6]]$prec.lines,type="l",col=col[6])
+lines(res.list[[7]]$recall.lines,res.list[[7]]$prec.lines,type="l",col=col[7])
 
 legend(x="topright",as.character(lapply(res.list,function(x) x$name)),col=col,lty=1)
 
