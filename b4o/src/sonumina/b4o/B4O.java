@@ -384,7 +384,7 @@ public class B4O
 	private final static double ALPHA = 0.0005;
 	private final static double BETA = 0.1;
 	private final static double ALPHA_GRID[] = new double[]{ALPHA/10,ALPHA/5,ALPHA,ALPHA*5,ALPHA*10};
-	private final static double BETA_GRID[] = new double[]{BETA/2,BETA/1.5,BETA,BETA*1.5,BETA*2};
+	private final static double BETA_GRID[] = new double[]{BETA/4,BETA/2,BETA,BETA*2,BETA*4};
 	
 	private final static int MAX_SAMPLES = 2;
 	private final static boolean CONSIDER_FREQUENCIES_ONLY = false;
