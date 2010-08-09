@@ -73,7 +73,6 @@ v<-matrix(c("marg","Marg. Prob.", T,
 			"resnick.avg.p", "Resnik P",F),ncol=3,byrow=T)
 
 d<-read.table("fnd.txt",h=F,stringsAsFactors=F)
-#d<-read.table("fnd-freq-only.txt",h=F,stringsAsFactors=F)
 colnames(d)<-c("run","label","score","marg","marg.ideal", "score.freq","marg.freq", "marg.freq.ideal", "resnick.avg", "resnick.avg.p","freq")
 d<-d[order(d$run),]
 resnick.avg.rank<-unlist(tapply(d$resnick.avg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
@@ -91,7 +90,7 @@ save(res.list.freq.vs.all,file="b4o_res.list.freq.vs.all.RObj")
 
 # only freq vs freq
 d<-read.table("fnd-freq-only.txt",h=F,stringsAsFactors=F)
-colnames(d)<-c("run","label","score","marg","score.freq","marg.freq", "resnick.avg", "resnick.avg.p","freq")
+colnames(d)<-c("run","label","score","marg","marg.ideal", "score.freq","marg.freq", "marg.freq.ideal", "resnick.avg", "resnick.avg.p","freq")
 d<-d[order(d$run),]
 resnick.avg.rank<-unlist(tapply(d$resnick.avg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
 d<-cbind(d,resnick.avg.rank)
