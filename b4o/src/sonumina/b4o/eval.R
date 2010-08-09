@@ -72,32 +72,35 @@ v<-matrix(c("marg","Marg. Prob.", T,
 			"resnick.avg.rank", "Resnik (rank)",F,
 			"resnick.avg.p", "Resnik P",F),ncol=3,byrow=T)
 
-d<-read.table("fnd.txt",h=F,stringsAsFactors=F)
-colnames(d)<-c("run","label","score","marg","marg.ideal", "score.freq","marg.freq", "marg.freq.ideal", "resnick.avg", "resnick.avg.p","freq")
-d<-d[order(d$run),]
-resnick.avg.rank<-unlist(tapply(d$resnick.avg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
-d<-cbind(d,resnick.avg.rank)
-
-# all vs all
-res.list<-evaluate(d,v)
-res.list.complete<-res.list
-save(res.list.complete,file="b4o_res.list.complete.RObj")
-
-# only freq vs all. the freq column is 1 if the item in question has frequencies
-d2<-subset(d,d$freq==T)
-res.list.freq.vs.all<-evaluate(d2,v)
-save(res.list.freq.vs.all,file="b4o_res.list.freq.vs.all.RObj")
-
-# only freq vs freq
-d<-read.table("fnd-freq-only.txt",h=F,stringsAsFactors=F)
-colnames(d)<-c("run","label","score","marg","marg.ideal", "score.freq","marg.freq", "marg.freq.ideal", "resnick.avg", "resnick.avg.p","freq")
-d<-d[order(d$run),]
-resnick.avg.rank<-unlist(tapply(d$resnick.avg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
-d<-cbind(d,resnick.avg.rank)
-res.list<-evaluate(d,v)
-res.list.freq.vs.freq<-res.list
-save(res.list.freq.vs.freq,file="b4o_res.list.freq.vs.freq.RObj")
-
+if (file.exists("fnd.txt"))
+{
+	d<-read.table("fnd.txt",h=F,stringsAsFactors=F)
+	colnames(d)<-c("run","label","score","marg","marg.ideal", "score.freq","marg.freq", "marg.freq.ideal", "resnick.avg", "resnick.avg.p","freq")
+	d<-d[order(d$run),]
+	resnick.avg.rank<-unlist(tapply(d$resnick.avg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
+	d<-cbind(d,resnick.avg.rank)
+	
+	# all vs all
+	res.list<-evaluate(d,v)
+	res.list.complete<-res.list
+	save(res.list.complete,file="b4o_res.list.complete.RObj")
+	
+	# only freq vs all. the freq column is 1 if the item in question has frequencies
+	d2<-subset(d,d$freq==T)
+	res.list.freq.vs.all<-evaluate(d2,v)
+	save(res.list.freq.vs.all,file="b4o_res.list.freq.vs.all.RObj")
+} else
+{
+	# only freq vs freq
+	d<-read.table("fnd-freq-only.txt",h=F,stringsAsFactors=F)
+	colnames(d)<-c("run","label","score","marg","marg.ideal", "score.freq","marg.freq", "marg.freq.ideal", "resnick.avg", "resnick.avg.p","freq")
+	d<-d[order(d$run),]
+	resnick.avg.rank<-unlist(tapply(d$resnick.avg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
+	d<-cbind(d,resnick.avg.rank)
+	res.list<-evaluate(d,v)
+	res.list.freq.vs.freq<-res.list
+	save(res.list.freq.vs.freq,file="b4o_res.list.freq.vs.freq.RObj")
+}
 
 
 col<-c("red","blue","cyan","green","gray","orange","black")
