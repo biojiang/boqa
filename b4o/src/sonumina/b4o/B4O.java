@@ -388,14 +388,16 @@ public class B4O
 	private final static double BETA_GRID[] = new double[]{0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45};
 	
 //	private final static int MAX_SAMPLES = 2;
+//	private final static boolean CONSIDER_FREQUENCIES_ONLY = false;
+//	private final static String RESULT_NAME = "fnd.txt";
+//	private final static String [] evidenceCodes = null;
+
 	private final static int MAX_SAMPLES = 100;
 	private final static boolean CONSIDER_FREQUENCIES_ONLY = true;
-//	private final static String RESULT_NAME = "fnd.txt";
 	private final static String RESULT_NAME = "fnd-freq-only.txt";
-	
-	private final static int SIZE_OF_SCORE_DISTRIBUTION = 2500;
-//	private final static String [] evidenceCodes = null;
 	private final static String [] evidenceCodes = new String[]{"PCS","ICE"};
+	
+	private final static int SIZE_OF_SCORE_DISTRIBUTION = 3000;
 	
 	/** False positives can be explained via inheritance */
 	private static int VARIANT_INHERITANCE_POSITIVES = 1<<0;
@@ -1959,7 +1961,7 @@ public class B4O
 		Result modelWithoutFrequencies = assignMarginals(obs, false);
 		
 		/* Second, with taking frequencies into account */
-		Result modelWithFrequencies = modelWithoutFrequencies;//assignMarginals(obs, true);
+		Result modelWithFrequencies = assignMarginals(obs, true);
 
 		/* Third, we apply the resnick sim measure */
 		Result resnick = resnickMaxScore(obs.observations, true, rnd);
