@@ -409,6 +409,9 @@ public class B4O
 	/** Defines the model as a combination of above flags */
 	private static int MODEL_VARIANT = VARIANT_RESPECT_FREQUENCIES | VARIANT_INHERITANCE_NEGATIVES | VARIANT_INHERITANCE_POSITIVES;
 
+	/** If set to true, empty observation are allowed */
+	private static boolean ALLOW_EMPTY_OBSERVATIONS = false;
+	
 	/** Activate debugging */
 	private static final boolean DEBUG = false;
 	
@@ -888,162 +891,176 @@ public class B4O
 	 */
 	public static Observations generateObservations(int itemNr, Random rnd)
 	{
-		int i;
-		int [] falsePositive = new int[slimGraph.getNumberOfVertices()];
-		int numFalsePositive = 0;
-		int [] falseNegative = new int[slimGraph.getNumberOfVertices()];
-		int numFalseNegative = 0;
-		int numMissedInHidden = 0;
+		int retry = 0;
 
-		int numPositive = 0;
-		int numHidden = 0;
-
-		boolean [] observations = new boolean[slimGraph.getNumberOfVertices()];
-		boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
-	
-		boolean CONSIDER_ONLY_DIRECT_ASSOCIATIONS = true;
-
-		if (CONSIDER_ONLY_DIRECT_ASSOCIATIONS)
+		Observations o = null;;
+		
+		do
 		{
-			System.out.println("Item " + itemNr + " has " + items2DirectTerms[itemNr].length + " annotations");
-			for (i=0;i<items2DirectTerms[itemNr].length;i++)
-			{
-				boolean state = true;
 			
-				if (respectFrequencies())
+			int i;
+			int [] falsePositive = new int[slimGraph.getNumberOfVertices()];
+			int numFalsePositive = 0;
+			int [] falseNegative = new int[slimGraph.getNumberOfVertices()];
+			int numFalseNegative = 0;
+			int numMissedInHidden = 0;
+	
+			int numPositive = 0;
+			int numHidden = 0;
+	
+			boolean [] observations = new boolean[slimGraph.getNumberOfVertices()];
+			boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
+		
+			boolean CONSIDER_ONLY_DIRECT_ASSOCIATIONS = true;
+	
+			if (CONSIDER_ONLY_DIRECT_ASSOCIATIONS)
+			{
+				System.out.println("Item " + itemNr + " has " + items2DirectTerms[itemNr].length + " annotations");
+				for (i=0;i<items2DirectTerms[itemNr].length;i++)
 				{
-					state = rnd.nextDouble() < items2TermFrequencies[itemNr][i];
-					System.out.println(items2DirectTerms[itemNr][i] + "(" + items2TermFrequencies[itemNr][i] + ")="+state);
+					boolean state = true;
+				
+					if (respectFrequencies())
+					{
+						state = rnd.nextDouble() < items2TermFrequencies[itemNr][i];
+						System.out.println(items2DirectTerms[itemNr][i] + "(" + items2TermFrequencies[itemNr][i] + ")="+state);
+					}
+					
+					if (state)
+					{
+						hidden[items2DirectTerms[itemNr][i]] = state;
+						observations[items2DirectTerms[itemNr][i]] = state;
+						
+						activateAncestors(items2DirectTerms[itemNr][i], hidden);
+						activateAncestors(items2DirectTerms[itemNr][i], observations);
+						
+						numPositive++;
+					} else
+					{
+						numMissedInHidden++;
+					}
 				}
 				
-				if (state)
+			} else
+			{
+				for (i=0;i<items2Terms[itemNr].length;i++)
 				{
-					hidden[items2DirectTerms[itemNr][i]] = state;
-					observations[items2DirectTerms[itemNr][i]] = state;
-					
-					activateAncestors(items2DirectTerms[itemNr][i], hidden);
-					activateAncestors(items2DirectTerms[itemNr][i], observations);
-					
+					hidden[items2Terms[itemNr][i]] = true;
+					observations[items2Terms[itemNr][i]] = true;
 					numPositive++;
-				} else
+				}
+			}
+	
+			/* Fill in false and true positives */
+			for (i=0;i<observations.length;i++)
+			{
+				double r = rnd.nextDouble();
+				if (observations[i])
 				{
-					numMissedInHidden++;
+					if (r<BETA)
+					{
+						falseNegative[numFalseNegative++] = i;
+						System.out.println("false negative " + i);
+					}
+				}	else
+				{
+					if (r<ALPHA)
+					{
+						falsePositive[numFalsePositive++] = i;
+						System.out.println("false positive " + i);
+					}
+				}
+			}
+	
+			/* apply false negatives */
+			if (areFalseNegativesPropagated())
+			{
+				/* false negative, but also make all descendants negative. They are considered as inherited in this case */
+				for (i=0;i<numFalseNegative;i++)
+				{
+					observations[falseNegative[i]] = false;
+					deactivateDecendants(falseNegative[i], observations);
+				}
+			} else
+			{
+				/* false negative */
+				for (i=0;i<numFalseNegative;i++)
+					observations[falseNegative[i]] = false;
+			
+				/* fix for true path rule */ 
+				for (i=0;i<observations.length;i++)
+				{
+					if (observations[i])
+						activateAncestors(i, observations);
+				}
+			}
+	
+			/* apply false positives */
+			if (areFalsePositivesPropagated())
+			{
+				/* fix for true path rule */
+				for (i=0;i<numFalsePositive;i++)
+				{
+					observations[falsePositive[i]] = true;
+					activateAncestors(falsePositive[i], observations);
+				}
+			} else
+			{
+				/* False positive */
+				for (i=0;i<numFalsePositive;i++)
+					observations[falsePositive[i]] = true;
+	
+				/* fix for the true path rule (reverse case) */
+				for (i=0;i<observations.length;i++)
+				{
+					if (!observations[i])
+						deactivateDecendants(i, observations);
 				}
 			}
 			
-		} else
-		{
-			for (i=0;i<items2Terms[itemNr].length;i++)
-			{
-				hidden[items2Terms[itemNr][i]] = true;
-				observations[items2Terms[itemNr][i]] = true;
-				numPositive++;
-			}
-		}
-
-		/* Fill in false and true positives */
-		for (i=0;i<observations.length;i++)
-		{
-			double r = rnd.nextDouble();
-			if (observations[i])
-			{
-				if (r<BETA)
-				{
-					falseNegative[numFalseNegative++] = i;
-					System.out.println("false negative " + i);
-				}
-			}	else
-			{
-				if (r<ALPHA)
-				{
-					falsePositive[numFalsePositive++] = i;
-					System.out.println("false positive " + i);
-				}
-			}
-		}
-
-		/* apply false negatives */
-		if (areFalseNegativesPropagated())
-		{
-			/* false negative, but also make all descendants negative. They are considered as inherited in this case */
-			for (i=0;i<numFalseNegative;i++)
-			{
-				observations[falseNegative[i]] = false;
-				deactivateDecendants(falseNegative[i], observations);
-			}
-		} else
-		{
-			/* false negative */
-			for (i=0;i<numFalseNegative;i++)
-				observations[falseNegative[i]] = false;
-		
-			/* fix for true path rule */ 
+			for (i=0;i<hidden.length;i++)
+				if (hidden[i]) numHidden++;
+	
+			System.out.println("Number of terms that were missed in hidden: " + numMissedInHidden);
+			System.out.println("Number of hidden positives:" + numPositive);
+			System.out.println("Number of hidden negatives: " + numHidden);
+			
+			numPositive = 0;
+			numFalseNegative = 0;
+			numFalsePositive = 0;
 			for (i=0;i<observations.length;i++)
 			{
 				if (observations[i])
-					activateAncestors(i, observations);
+				{
+					if (!hidden[i]) numFalsePositive++;
+					numPositive++;
+				} else
+				{
+					if (hidden[i]) numFalseNegative++;
+				}
 			}
-		}
-
-		/* apply false positives */
-		if (areFalsePositivesPropagated())
-		{
-			/* fix for true path rule */
-			for (i=0;i<numFalsePositive;i++)
+	
+			System.out.println("Number of observed positives:" + numPositive);
+			System.out.println("Raw number of false positives: " + numFalsePositive);
+			System.out.println("Raw number of false negatives " + numFalseNegative);
+	
+			if (numPositive == 0 && !ALLOW_EMPTY_OBSERVATIONS)
 			{
-				observations[falsePositive[i]] = true;
-				activateAncestors(falsePositive[i], observations);
+				/* Queries with no query make no sense */
+				retry++;
+				continue;
 			}
-		} else
-		{
-			/* False positive */
-			for (i=0;i<numFalsePositive;i++)
-				observations[falsePositive[i]] = true;
-
-			/* fix for the true path rule (reverse case) */
-			for (i=0;i<observations.length;i++)
-			{
-				if (!observations[i])
-					deactivateDecendants(i, observations);
-			}
-		}
+			
+			Stats stats = new Stats();
+			determineCases(observations, hidden, stats);
+			System.out.println("Number of modelled false postives " + stats.getCases(Stats.NodeCase.FALSE_POSITIVE) + " (alpha=" +  stats.falsePositiveRate() + "%)");
+			System.out.println("Number of modelled false negatives " + stats.getCases(Stats.NodeCase.FALSE_NEGATIVE) + " (beta=" +  stats.falseNegativeRate() + "%)");
 		
-		for (i=0;i<hidden.length;i++)
-			if (hidden[i]) numHidden++;
-
-		System.out.println("Number of terms that were missed in hidden: " + numMissedInHidden);
-		System.out.println("Number of hidden positives:" + numPositive);
-		System.out.println("Number of hidden negatives: " + numHidden);
-		
-		numPositive = 0;
-		numFalseNegative = 0;
-		numFalsePositive = 0;
-		for (i=0;i<observations.length;i++)
-		{
-			if (observations[i])
-			{
-				if (!hidden[i]) numFalsePositive++;
-				numPositive++;
-			} else
-			{
-				if (hidden[i]) numFalseNegative++;
-			}
-		}
-
-		System.out.println("Number of observed positives:" + numPositive);
-		System.out.println("Raw number of false positives: " + numFalsePositive);
-		System.out.println("Raw number of false negatives " + numFalseNegative);
-
-		
-		Stats stats = new Stats();
-		determineCases(observations, hidden, stats);
-		System.out.println("Number of modelled false postives " + stats.getCases(Stats.NodeCase.FALSE_POSITIVE) + " (alpha=" +  stats.falsePositiveRate() + "%)");
-		System.out.println("Number of modelled false negatives " + stats.getCases(Stats.NodeCase.FALSE_NEGATIVE) + " (beta=" +  stats.falseNegativeRate() + "%)");
-		
-		Observations o = new Observations();
-		o.item = itemNr;
-		o.observations = observations;
-		o.observationStats = stats;
+			o = new Observations();
+			o.item = itemNr;
+			o.observations = observations;
+			o.observationStats = stats;
+		} while (!ALLOW_EMPTY_OBSERVATIONS && retry++ < 50);
 		return o;
 	}
 
