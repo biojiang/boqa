@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -383,14 +384,18 @@ public class B4O
 	/* Settings */
 	private final static double ALPHA = 0.0005;
 	private final static double BETA = 0.1;
-	private final static double ALPHA_GRID[] = new double[]{ALPHA/10,ALPHA/5,ALPHA,ALPHA*5,ALPHA*10};
-	private final static double BETA_GRID[] = new double[]{BETA/4,BETA/2,BETA,BETA*2,BETA*4};
+	private final static double ALPHA_GRID[] = new double[]{0.00005,0.0001,0.0005,0.001,0.005,0.01};
+	private final static double BETA_GRID[] = new double[]{0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45};
 	
-	private final static int MAX_SAMPLES = 2;
-	private final static boolean CONSIDER_FREQUENCIES_ONLY = false;
-	private final static String RESULT_NAME = "fnd.txt";
-	private final static int SIZE_OF_SCORE_DISTRIBUTION = 10000;
-	private final static String [] evidenceCodes = null;//new String[]{"PCS","ICE"};
+//	private final static int MAX_SAMPLES = 2;
+	private final static int MAX_SAMPLES = 100;
+	private final static boolean CONSIDER_FREQUENCIES_ONLY = true;
+//	private final static String RESULT_NAME = "fnd.txt";
+	private final static String RESULT_NAME = "fnd-freq-only.txt";
+	
+	private final static int SIZE_OF_SCORE_DISTRIBUTION = 2500;
+//	private final static String [] evidenceCodes = null;
+	private final static String [] evidenceCodes = new String[]{"PCS","ICE"};
 	
 	/** False positives can be explained via inheritance */
 	private static int VARIANT_INHERITANCE_POSITIVES = 1<<0;
@@ -891,6 +896,7 @@ public class B4O
 		int numMissedInHidden = 0;
 
 		int numPositive = 0;
+		int numHidden = 0;
 
 		boolean [] observations = new boolean[slimGraph.getNumberOfVertices()];
 		boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
@@ -1001,9 +1007,13 @@ public class B4O
 					deactivateDecendants(i, observations);
 			}
 		}
+		
+		for (i=0;i<hidden.length;i++)
+			if (hidden[i]) numHidden++;
 
 		System.out.println("Number of terms that were missed in hidden: " + numMissedInHidden);
-		System.out.println("Number of hiddden positives:" + numPositive);
+		System.out.println("Number of hidden positives:" + numPositive);
+		System.out.println("Number of hidden negatives: " + numHidden);
 		
 		numPositive = 0;
 		numFalseNegative = 0;
@@ -1130,6 +1140,7 @@ public class B4O
 			provideGlobals(itemsToBeConsidered);
 			
 			System.out.println("There were " + oldSize + " items but we consider only " + allItemList.size() + " of them with frequencies.");
+			System.out.println("Considering " + slimGraph.getNumberOfVertices() + " terms");
 		}
 		
 		if (PRECALCULATE_MAXICS)
@@ -1205,9 +1216,15 @@ public class B4O
 		
 		/**************************************************************************************************************************/
 
+		final BufferedWriter param = new BufferedWriter(new FileWriter(RESULT_NAME.split("\\.")[0]+ "_param.txt"));
+		param.write("alpha\tbeta\tconsider.freqs.only\n");
+		param.write(String.format("%g\t%g\t%b\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY));
+		param.flush();
+		
 		final BufferedWriter out = new BufferedWriter(new FileWriter(RESULT_NAME));
 
-		ExecutorService es = Executors.newFixedThreadPool(numProcessors - 1);
+		ExecutorService es = Executors.newFixedThreadPool(numProcessors);
+//		ExecutorService es = Executors.newFixedThreadPool(1);
 
 		Random rnd = new Random(9);
 
@@ -1219,8 +1236,9 @@ public class B4O
 			{
 //				if (i != firstItemWithFrequencies) continue;
 //				if (!itemHasFrequencies[i]) continue;
+//				if (i != 24) continue;
 
-				final long seed = rnd.nextLong();
+				final long seed = /*2905060951719767123l;//*/rnd.nextLong();
 				final int item = i;
 				final int fixedRun = run++;
 
@@ -1230,7 +1248,7 @@ public class B4O
 					{
 						StringBuilder builder = new StringBuilder();
 					
-						System.out.println("Seed = " + seed);
+						System.out.println("Seed = " + seed + " run = " + fixedRun);
 						
 						Result[] res = processItem(item,false,new Random(seed));
 	
@@ -1515,6 +1533,11 @@ public class B4O
 		{
 			return marginals[i];
 		}
+		
+		public double getMarginalIdeal(int i)
+		{
+			return marginalsIdeal[i];
+		}
 	}
 
 	/**
@@ -1544,6 +1567,8 @@ public class B4O
 
 		double [] idealScores = new double[allItemList.size()];
 		double idealNormalization = Math.log(0);
+
+		boolean exitNow = false;
 		
 		for (i=0;i<allItemList.size();i++)
 		{
@@ -1559,18 +1584,37 @@ public class B4O
 			}
 			normalization = Util.logAdd(normalization, res.scores[i]);
 			
-			
 			/* Calculate ideal */
 			double fpr = observations.observationStats.falsePositiveRate();
+			if (fpr == 0) fpr = 0.0000001;
+			else if (fpr == 1.0) fpr = 0.999999;
+			else if (Double.isNaN(fpr))
+			{
+//				System.out.println("fpr is NaN");
+				exitNow = true;
+				fpr = 0.5;
+			}
+
 			double fnr = observations.observationStats.falseNegativeRate();
-			
-			if (fpr == 0)
-				fpr = 0.0000001;
-			if (fnr == 0)
-				fnr = 0.0000001;
+			if (fnr == 0) fnr = 0.0000001;
+			else if (fnr == 1) fnr =0.999999;
+			else if (Double.isNaN(fnr))
+			{
+//				System.out.println("fnr is NaN");
+				exitNow = true;
+				fnr = 0.5;
+			}
 			
 			idealScores[i] = stats.score(fpr,fnr);
 			idealNormalization = Util.logAdd(idealNormalization, idealScores[i]);
+
+//			if (Double.isNaN(idealScores[i]))
+//			{
+//				fnr = 0.01;
+//				
+//				System.out.println(observations.item + " NaN" + " " + fnr + "  " + fpr + "   "  + stats.score(fpr,fnr) + "  " + res.scores[i]);
+//			}
+			
 			
 //			for (int)
 			
@@ -1582,8 +1626,28 @@ public class B4O
 		{
 			res.marginals[i] = Math.exp(res.scores[i] - normalization);
 			res.marginalsIdeal[i] = Math.exp(idealScores[i]- idealNormalization);
+
+//			System.out.println(i + ": " + idealScores[i] + " (" + res.getMarginalIdeal(i) + ") " + res.scores[i] + " (" + res.getMarginal(i) + ")");
+//			System.out.println(res.marginals[i] + "  " + res.marginalsIdeal[i]);
 		}
 
+		/* There is a possibility that ideal marginal is not as good as the marginal
+		 * for the unknown parameter situation,  i.e., if the initial signal got such
+		 * disrupted that another item is more likely. This may produce strange plots.
+		 * Therefore, we take the parameter estimated marginals as the ideal one if
+		 * they match the reality better.
+		 */
+		if (res.marginalsIdeal[observations.item] < res.marginals[observations.item])
+		{
+			for (i=0;i<allItemList.size();i++)
+				res.marginalsIdeal[i] = res.marginals[i];
+		}
+		                       
+		                       
+		System.out.println(idealNormalization + "  " + normalization);
+
+//		if (exitNow)
+//			System.exit(10);
 		return res;
 	}
 
@@ -1878,7 +1942,7 @@ public class B4O
 		Result modelWithoutFrequencies = assignMarginals(obs, false);
 		
 		/* Second, with taking frequencies into account */
-		Result modelWithFrequencies = assignMarginals(obs, true);
+		Result modelWithFrequencies = modelWithoutFrequencies;//assignMarginals(obs, true);
 
 		/* Third, we apply the resnick sim measure */
 		Result resnick = resnickMaxScore(obs.observations, true, rnd);
@@ -1904,9 +1968,22 @@ public class B4O
 		};
 
 		ArrayList<Pair> scoreList = new ArrayList<Pair>(allItemList.size());
+		ArrayList<Pair> idealList = new ArrayList<Pair>(allItemList.size());
 		for (i=0;i<allItemList.size();i++)
+		{
 			scoreList.add(new Pair(i,modelWithoutFrequencies.getScore(i)));
+			idealList.add(new Pair(i,modelWithoutFrequencies.getMarginalIdeal(i)));
+		}
 		Collections.sort(scoreList);
+		Collections.sort(idealList, new Comparator<Pair>() {
+			public int compare(Pair o1, Pair o2)
+			{
+				if (o1.score > o2.score) return 1;
+				if (o1.score < o2.score) return -1;
+				return 0;
+			};
+		});
+
 
 		/* Display top 10 */
 		for (i=0;i<Math.min(10,scoreList.size());i++)
@@ -1915,17 +1992,35 @@ public class B4O
 			boolean itIs = p.idx == item;
 			System.out.println((i+1) + (itIs?"(*)":"") + ": " + allItemList.get(p.idx) + ": " +  p.score + " " + modelWithoutFrequencies.getMarginal(p.idx));
 		}
+
+		int scoreRank  = 0;
+		int marginalIdealRank = 0;
+		
 		/* And where the searched item is */
-		for (i=10;i<scoreList.size();i++)
+		for (i=0;i<scoreList.size();i++)
 		{
 			Pair p = scoreList.get(i);
-			boolean itIs = p.idx == item;
+//			boolean itIs = p.idx == item;
 			if (p.idx == item)
 			{
-				System.out.println((i+1) + (itIs?"(*)":"") + ": " + allItemList.get(p.idx) + ": " +  p.score + " " + modelWithoutFrequencies.getMarginal(p.idx));
+				scoreRank = i + 1;
+				break;
+			}
+		}
+		
+		for (i=0;i<idealList.size();i++)
+		{
+			Pair p = scoreList.get(i);
+			if (p.idx == item)
+			{
+				marginalIdealRank = i + 1;
+				break;
 			}
 		}
 
+//		System.out.println((i+1) + (itIs?"(*)":"") + ": " + allItemList.get(p.idx) + ": " +  p.score + " " + modelWithoutFrequencies.getMarginal(p.idx));
+		System.out.println("Rank of searched item. Score: " + scoreRank + "  Ideal: " + marginalIdealRank + " ( " + modelWithoutFrequencies.getMarginalIdeal(item) + ")");
+		
 		System.out.println("Statistics of the searched item");
 		System.out.println(modelWithoutFrequencies.stats[item].toString());
 		System.out.println("Statistics for the top item");
