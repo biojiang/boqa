@@ -382,8 +382,8 @@ public class B4O
 	public static Pattern frequencyFractionPattern = Pattern.compile("(\\d+)/(\\d+)");
 	
 	/* Settings */
-	private final static double ALPHA = 0.0005;
-	private final static double BETA = 0.1;
+	private final static double ALPHA = 0.0001;
+	private final static double BETA = 0.05;
 	private final static double ALPHA_GRID[] = new double[]{0.00005,0.0001,0.0005,0.001,0.005,0.01};
 	private final static double BETA_GRID[] = new double[]{0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45};
 	
@@ -397,7 +397,7 @@ public class B4O
 	private final static String RESULT_NAME = "fnd-freq-only.txt";
 	private final static String [] evidenceCodes = new String[]{"PCS","ICE"};
 	
-	private final static int SIZE_OF_SCORE_DISTRIBUTION = 3000;
+	private final static int SIZE_OF_SCORE_DISTRIBUTION = 20000;
 	
 	/** False positives can be explained via inheritance */
 	private static int VARIANT_INHERITANCE_POSITIVES = 1<<0;
@@ -1236,8 +1236,8 @@ public class B4O
 		/**************************************************************************************************************************/
 
 		final BufferedWriter param = new BufferedWriter(new FileWriter(RESULT_NAME.split("\\.")[0]+ "_param.txt"));
-		param.write("alpha\tbeta\tconsider.freqs.only\n");
-		param.write(String.format("%g\t%g\t%b\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY));
+		param.write("alpha\tbeta\tconsider.freqs.only\tterms\n");
+		param.write(String.format("%g\t%g\t%b\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY,slimGraph.getNumberOfVertices()));
 		param.flush();
 		
 		final BufferedWriter out = new BufferedWriter(new FileWriter(RESULT_NAME));
