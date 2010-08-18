@@ -387,17 +387,17 @@ public class B4O
 	private final static double ALPHA_GRID[] = new double[]{0.00005,0.0001,0.0005,0.001,0.005,0.01};
 	private final static double BETA_GRID[] = new double[]{0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45};
 	
-//	private final static int MAX_SAMPLES = 2;
-//	private final static boolean CONSIDER_FREQUENCIES_ONLY = false;
-//	private final static String RESULT_NAME = "fnd.txt";
-//	private final static String [] evidenceCodes = null;
+	private final static int MAX_SAMPLES = 1;
+	private final static boolean CONSIDER_FREQUENCIES_ONLY = false;
+	private final static String RESULT_NAME = "fnd.txt";
+	private final static String [] evidenceCodes = null;
 
-	private final static int MAX_SAMPLES = 100;
-	private final static boolean CONSIDER_FREQUENCIES_ONLY = true;
-	private final static String RESULT_NAME = "fnd-freq-only.txt";
-	private final static String [] evidenceCodes = new String[]{"PCS","ICE"};
+//	private final static int MAX_SAMPLES = 100;
+//	private final static boolean CONSIDER_FREQUENCIES_ONLY = true;
+//	private final static String RESULT_NAME = "fnd-freq-only.txt";
+//	private final static String [] evidenceCodes = new String[]{"PCS","ICE"};
 	
-	private final static int SIZE_OF_SCORE_DISTRIBUTION = 20000;
+	private final static int SIZE_OF_SCORE_DISTRIBUTION = 30;
 	
 	/** False positives can be explained via inheritance */
 	private static int VARIANT_INHERITANCE_POSITIVES = 1<<0;
@@ -1643,8 +1643,8 @@ public class B4O
 
 		for (i=0;i<allItemList.size();i++)
 		{
-			res.marginals[i] = Math.exp(res.scores[i] - normalization);
-			res.marginalsIdeal[i] = Math.exp(idealScores[i]- idealNormalization);
+			res.marginals[i] = Math.max(Math.exp(res.scores[i] - normalization),1);
+			res.marginalsIdeal[i] = Math.max(Math.exp(idealScores[i]- idealNormalization),1);
 
 //			System.out.println(i + ": " + idealScores[i] + " (" + res.getMarginalIdeal(i) + ") " + res.scores[i] + " (" + res.getMarginal(i) + ")");
 //			System.out.println(res.marginals[i] + "  " + res.marginalsIdeal[i]);
