@@ -374,8 +374,11 @@ public class B4O
 	/** Contains the IC of the terms */
 	public static double [] terms2IC;
 
-	/** Contains the term with maximum common ancestor */
+	/** Contains the term with maximum common ancestor of two terms */
 	private static int micaMatrix[][];
+
+	/** Contains for each item the max mica for the given term */ 
+	private static int [][] micaForItem;
 	
 	/** Used to parse frequency information */
 	public static Pattern frequencyPattern = Pattern.compile("(\\d+).(\\d{4})\\s*%");
@@ -397,7 +400,7 @@ public class B4O
 //	private final static String RESULT_NAME = "fnd-freq-only.txt";
 //	private final static String [] evidenceCodes = new String[]{"PCS","ICE"};
 	
-	private final static int SIZE_OF_SCORE_DISTRIBUTION = 30;
+	private final static int SIZE_OF_SCORE_DISTRIBUTION = 10000;
 	
 	/** False positives can be explained via inheritance */
 	private static int VARIANT_INHERITANCE_POSITIVES = 1<<0;
@@ -422,6 +425,9 @@ public class B4O
 	
 	/** Use cached MaxIC terms */
 	private static final boolean PRECALCULATE_MAXICS = true;
+	
+	/** Use precalculated max items */
+	private static final boolean PRECALCULATE_ITEM_MAXS = true;
 	
 	/**
 	 * Returns whether false negatives are propagated in a
@@ -899,7 +905,6 @@ public class B4O
 		
 		do
 		{
-			
 			int i;
 			int [] falsePositive = new int[slimGraph.getNumberOfVertices()];
 			int numFalsePositive = 0;
@@ -1162,6 +1167,7 @@ public class B4O
 			System.out.println("Considering " + slimGraph.getNumberOfVertices() + " terms");
 		}
 		
+		/** Here we precaculate the maxICs of two given terms in a dense matrix */
 		if (PRECALCULATE_MAXICS)
 		{
 			int [][] newMaxICMatrix = new int[slimGraph.getNumberOfVertices()][];
@@ -1173,6 +1179,55 @@ public class B4O
 			}
 			micaMatrix = newMaxICMatrix;
 		}
+		
+		/** Here we precalculate for each item the term which contributes as maximum ic term to the resnick calculation */
+		if (PRECALCULATE_ITEM_MAXS)
+		{
+			micaForItem = new int[allItemList.size()][slimGraph.getNumberOfVertices()];
+
+			for (int item = 0; item < allItemList.size(); item++)
+			{
+				/* The fixed set */
+				int [] t2 = items2DirectTerms[item];
+
+				for (int to = 0; to < slimGraph.getNumberOfVertices(); to++)
+				{
+					double maxIC = Double.NEGATIVE_INFINITY;
+					int maxCommon = -1;
+
+					for (int ti : t2)
+					{
+						int common = commonAncestorWithMaxIC(to, ti);
+						if (terms2IC[common] > maxIC)
+						{
+							maxIC = terms2IC[common];
+							maxCommon = common;
+						}
+					}
+					micaForItem[item][to] = maxCommon;
+				}
+			}
+		}
+			
+//		
+//			private static double simScoreMaxAvg(int[] t1, int[] t2)
+//		{
+//			double score = 0;
+//			for (int to : t1)
+//			{
+//				double maxIC = Double.NEGATIVE_INFINITY;
+//
+//				for (int ti : t2)
+//				{
+//					int common = commonAncestorWithMaxIC(to, ti);
+//					if (terms2IC[common] > maxIC) maxIC = terms2IC[common];
+//				}
+//				score += maxIC;
+//			}
+//			score /= t1.length;
+//			return score;
+//		}
+
 
 		/**************************************************************************************************************************/
 
@@ -1643,8 +1698,8 @@ public class B4O
 
 		for (i=0;i<allItemList.size();i++)
 		{
-			res.marginals[i] = Math.max(Math.exp(res.scores[i] - normalization),1);
-			res.marginalsIdeal[i] = Math.max(Math.exp(idealScores[i]- idealNormalization),1);
+			res.marginals[i] = Math.min(Math.exp(res.scores[i] - normalization),1);
+			res.marginalsIdeal[i] = Math.min(Math.exp(idealScores[i]- idealNormalization),1);
 
 //			System.out.println(i + ": " + idealScores[i] + " (" + res.getMarginalIdeal(i) + ") " + res.scores[i] + " (" + res.getMarginal(i) + ")");
 //			System.out.println(res.marginals[i] + "  " + res.marginalsIdeal[i]);
@@ -1811,29 +1866,51 @@ public class B4O
 	 * Score two list of terms according to resnick-max-avg-of-best
 	 * method.
 	 * 
-	 * @param t1
-	 * @param t2
+	 * @param tl1
+	 * @param tl2
 	 * @return
 	 */
-	private static double simScoreMaxAvg(int[] t1, int[] t2)
+	private static double simScoreMaxAvg(int[] tl1, int[] tl2)
 	{
 		double score = 0;
-		for (int to : t1)
+		for (int t1 : tl1)
 		{
 			double maxIC = Double.NEGATIVE_INFINITY;
 
-			for (int ti : t2)
+			for (int t2 : tl2)
 			{
-				int common = commonAncestorWithMaxIC(to, ti);
+				int common = commonAncestorWithMaxIC(t1, t2);
 				if (terms2IC[common] > maxIC) maxIC = terms2IC[common];
 			}
+			
 			score += maxIC;
 		}
-		score /= t1.length;
+		score /= tl1.length;
 		return score;
 	}
 
 	/**
+	 * Sim score avg using two lists of terms.
+	 * 
+	 * @param tl1
+	 * @param item
+	 * @return
+	 */
+	private static double simScoreMaxAvgVsItem(int [] tl1, int item)
+	{
+		if (PRECALCULATE_ITEM_MAXS)
+		{
+			double score = 0;
+			for (int t1 : tl1)
+				score += terms2IC[micaForItem[item][t1]];
+			score /= tl1.length;
+			return score;
+		}
+		return simScoreMaxAvg(tl1,items2DirectTerms[item]);
+	}
+	
+	/**
+	 * Sim score avg using two lists of terms.
 	 * 
 	 * @param t1
 	 * @param t2
@@ -1866,6 +1943,18 @@ public class B4O
 		return simScoreMaxAvg(t1,t2);
 	}
 	
+	/**
+	 * Score one list of terms vs an item.
+	 * 
+	 * @param t1
+	 * @param item
+	 * @return
+	 */
+	private static double simScoreVsItem(int [] t1, int item)
+	{
+		return simScoreMaxAvgVsItem(t1,item);
+	}
+	
 
 	/**
 	 * Makes the calculation according to Resnick max. We handle the observations as an item
@@ -1887,6 +1976,7 @@ public class B4O
 		res.scores = new double[allItemList.size()];
 		res.marginals = new double[allItemList.size()];
 	
+		/* Initialize shuffling */
 		for (int i=0;i<shuffledTerms.length;i++)
 			shuffledTerms[i] = i;
 
@@ -1895,7 +1985,7 @@ public class B4O
 		
 		for (int i = 0;i<allItemList.size();i++)
 		{
-			int [] t2 = items2DirectTerms[i];
+//			int [] t2 = items2DirectTerms[i];
 			
 			long time = System.currentTimeMillis();
 
@@ -1905,7 +1995,7 @@ public class B4O
 				lastTime = time;
 			}
 
-			double score = simScore(observedTerms, t2);
+			double score = simScoreVsItem(observedTerms,i);
 
 			res.scores[i] = score;
 			int count = 0;
@@ -1919,15 +2009,15 @@ public class B4O
 					int chosenIndex = rnd.nextInt(shuffledTerms.length - k);
 					int chosenTerm = shuffledTerms[chosenIndex];
 
-					/* Place last term at the original position */
+					/* Place last term at the position of the chosen term */
 					shuffledTerms[chosenIndex] = shuffledTerms[observedTerms.length - k -1];
 					
 					/* Place chosen term at the last position */
-					shuffledTerms[observedTerms.length - k -1] = chosenTerm;
+					shuffledTerms[observedTerms.length - k - 1] = chosenTerm;
 
 					randomizedTerms[k] = chosenTerm;
 				}
-				double randomScore = simScore(randomizedTerms, t2);
+				double randomScore = simScoreVsItem(randomizedTerms, i);
 				if (randomScore >= score) count++;
 			}
 			
