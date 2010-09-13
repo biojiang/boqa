@@ -1985,8 +1985,6 @@ public class B4O
 		
 		for (int i = 0;i<allItemList.size();i++)
 		{
-//			int [] t2 = items2DirectTerms[i];
-			
 			long time = System.currentTimeMillis();
 
 			if (time - lastTime > 5000)
