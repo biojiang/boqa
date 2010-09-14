@@ -17,7 +17,13 @@ evaluate<-function(d,v)
 	
 	for (i in (1:nrow(v)))
 	{
-		ord<-order(d[,v[i,1]],decreasing=as.logical(v[i,3]))
+		if (v[i,1] == "resnick.avg.p")
+		{
+			ord<-order(d[,v[i,1]],1-d$label,decreasing=as.logical(v[i,3]))
+		} else
+		{
+			ord<-order(d[,v[i,1]],decreasing=as.logical(v[i,3]))
+		}
 		
 		# data is orderd. Threshold is such that the values
 		# above an element are flagged as positive (inclusive)
@@ -74,7 +80,7 @@ v<-matrix(c("marg","Marg. Prob.", T,
 
 if (file.exists("fnd.txt"))
 {
-	d<-read.table("fnd.txt",h=F,stringsAsFactors=F)
+	d<-read.table("fnd.txt",h=F,stringsAsFactors=F,colClasses=c("integer","integer","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric"))
 	colnames(d)<-c("run","label","score","marg","marg.ideal", "score.freq","marg.freq", "marg.freq.ideal", "resnick.avg", "resnick.avg.p","freq")
 	d<-d[order(d$run),]
 	resnick.avg.rank<-unlist(tapply(d$resnick.avg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
