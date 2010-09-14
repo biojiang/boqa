@@ -345,6 +345,62 @@ class QuerySets
 	}
 }
 
+/**
+ * Basic distribution
+ *
+ * @author sba
+ */
+class Distribution
+{
+	private int [] cum;
+	private double max;
+	
+	public Distribution(int [] counts, double max)
+	{
+		cum = new int[counts.length+1];
+		for (int i=1;i<counts.length+1;i++)
+			cum[i] = cum[i-1] + counts[i-1];
+		this.max = max;
+	}
+	
+	/**
+	 * Returns the p value of the given score
+	 * 
+	 * @param score
+	 * @return
+	 */
+	double getP(double score)
+	{
+		int bin = (int)(score / max * 1000);
+		return 1 - (cum[bin] / (double)cum[cum.length - 1]);
+	}
+}
+
+/**
+ * Basic container for distributions.
+ * 
+ * @author Sebastian Bauer
+ */
+class Distributions
+{
+	private Distribution[] distr;
+	
+	Distributions(int numberOfDistributions)
+	{
+		distr = new Distribution[numberOfDistributions];
+	}
+	
+	public Distribution getDistribution(int i)
+	{
+		return distr[i];
+	}
+	
+	public void setDistribution(int i, Distribution dist)
+	{
+		distr[i] = dist;
+	}
+}
+
 public class B4O
 {
 	public static GOGraph graph;
@@ -411,6 +467,9 @@ public class B4O
 	/** Contains the directory where the score distribution is stored */
 	private static File scoreDistributionDirectory;
 	
+	/** Stores the score distribution */
+	private static Distributions scoreDistributions;
+	
 	/** Used to parse frequency information */
 	public static Pattern frequencyPattern = Pattern.compile("(\\d+).(\\d{4})\\s*%");
 	public static Pattern frequencyFractionPattern = Pattern.compile("(\\d+)/(\\d+)");
@@ -462,6 +521,12 @@ public class B4O
 	
 	/** Cache the queries */
 	private static final boolean CACHE_RANDOM_QUERIES = true; 
+
+	/** Cache the score distribution */
+	private static final boolean CACHE_SCORE_DISTRIBUTION = true; 
+
+	/** Defines the maximal query size for the cached distribution */
+	private static final int MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION = 20;
 
 	/**
 	 * Returns whether false negatives are propagated in a
@@ -1173,7 +1238,7 @@ public class B4O
 	{
 		int i;
 
-		int numProcessors = Runtime.getRuntime().availableProcessors();
+		int numProcessors = 1;//Runtime.getRuntime().availableProcessors();
 		
 		createHPOOntology();
 		
@@ -1250,31 +1315,14 @@ public class B4O
 		/** Instantiates the query cache */
 		if (CACHE_RANDOM_QUERIES)
 		{
-			int maxSizes = 0;
-			for (i=0;i<allItemList.size();i++)
-				maxSizes = java.lang.Math.max(maxSizes,items2DirectTerms[i].length);
-			queryCache = new QuerySets(maxSizes);
-		}
-			
-//		
-//			private static double simScoreMaxAvg(int[] t1, int[] t2)
-//		{
-//			double score = 0;
-//			for (int to : t1)
-//			{
-//				double maxIC = Double.NEGATIVE_INFINITY;
-//
-//				for (int ti : t2)
-//				{
-//					int common = commonAncestorWithMaxIC(to, ti);
-//					if (terms2IC[common] > maxIC) maxIC = terms2IC[common];
-//				}
-//				score += maxIC;
-//			}
-//			score /= t1.length;
-//			return score;
-//		}
+//			int maxSizes = 0;
+//			for (i=0;i<allItemList.size();i++)
+//				maxSizes = java.lang.Math.max(maxSizes,items2DirectTerms[i].length);
+			queryCache = new QuerySets(MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1);
 
+			if (CACHE_SCORE_DISTRIBUTION)
+				scoreDistributions = new Distributions(allItemList.size() * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1));
+		}
 
 		/**************************************************************************************************************************/
 
@@ -2019,6 +2067,8 @@ public class B4O
 		int [] randomizedTerms = new int[observedTerms.length];
 		int [] shuffledTerms = new int[slimGraph.getNumberOfVertices()];
 		
+		int querySize = observedTerms.length;
+		
 		Result res = new Result();
 		res.scores = new double[allItemList.size()];
 		res.marginals = new double[allItemList.size()];
@@ -2043,40 +2093,84 @@ public class B4O
 			double score = simScoreVsItem(observedTerms,i);
 
 			res.scores[i] = score;
-			int count = 0;
 
 			if (CACHE_RANDOM_QUERIES)
 			{
+				if (querySize > MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION)
+					querySize = MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION;
+				
 				int [][] queries;
 				synchronized (queryCache)
 				{
-					queries = queryCache.getQueries(observedTerms.length);
+					queries = queryCache.getQueries(querySize);
 					if (queries == null)
 					{
-						queries = new int[SIZE_OF_SCORE_DISTRIBUTION][observedTerms.length];
+						queries = new int[SIZE_OF_SCORE_DISTRIBUTION][querySize];
 						for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
-							choose(rnd, observedTerms.length, queries[j], shuffledTerms);
+							choose(rnd, querySize, queries[j], shuffledTerms);
 						
-						queryCache.setQueries(observedTerms.length, queries);
+						queryCache.setQueries(querySize, queries);
 					}
 				}
 				
-				for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
+				if (CACHE_SCORE_DISTRIBUTION)
 				{
-					double randomScore = simScoreVsItem(queries[j], i);
-					if (randomScore >= score) count++;
+					Distribution d;
+					
+					synchronized (scoreDistributions)
+					{
+						d = scoreDistributions.getDistribution(i * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize);
+
+						if (d == null)
+						{
+							/* Determine score distribution */
+							double [] scores = new double[SIZE_OF_SCORE_DISTRIBUTION];
+							double maxScore = Double.NEGATIVE_INFINITY;
+
+							for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
+							{
+								scores[j] = simScoreVsItem(queries[j], i);
+								if (scores[j] > maxScore) maxScore = scores[j];
+							}
+
+							/* throw into equidistant binnings */
+							int [] hist = new int[1000];
+							for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
+							{
+								int bin = (int)java.lang.Math.floor((scores[j] / maxScore * 999));
+								hist[bin]++;
+							}
+
+							d = new Distribution(hist,maxScore);
+							scoreDistributions.setDistribution(i, d);
+							res.marginals[i] = d.getP(score);
+//							System.out.println(d.getP(score) + "  " + (count / (double)SIZE_OF_SCORE_DISTRIBUTION));
+//							System.exit(1);
+						}
+						
+					}
+				} else
+				{
+					int count = 0;
+					for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
+					{
+						double randomScore = simScoreVsItem(queries[j], i);
+						if (randomScore >= score) count++;
+					}
+					res.marginals[i] = count / (double)SIZE_OF_SCORE_DISTRIBUTION;
 				}
 			} else
 			{
+				int count = 0;
 				for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
 				{
 					choose(rnd, observedTerms.length, randomizedTerms, shuffledTerms);
 					double randomScore = simScoreVsItem(randomizedTerms, i);
 					if (randomScore >= score) count++;
 				}
+				res.marginals[i] = count / (double)SIZE_OF_SCORE_DISTRIBUTION;
 			}
 			
-			res.marginals[i] = count / (double)SIZE_OF_SCORE_DISTRIBUTION;
 		}
 		
 		return res;
@@ -2084,7 +2178,7 @@ public class B4O
 
 	/**
 	 * Chooses size randomly selected values from storage. Storage is
-	 * maniupualted by this call. Selected values are stored in chosen.
+	 * manipulated by this call. Selected values are stored in chosen.
 	 * 
 	 * @param rnd
 	 * @param size number of elements that are chosen
