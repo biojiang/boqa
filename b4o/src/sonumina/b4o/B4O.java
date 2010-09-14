@@ -407,6 +407,9 @@ public class B4O
 	
 	/** Contains the query cache, needs to be synched when accessed */
 	private static QuerySets queryCache;
+
+	/** Contains the directory where the score distribution is stored */
+	private static File scoreDistributionDirectory;
 	
 	/** Used to parse frequency information */
 	public static Pattern frequencyPattern = Pattern.compile("(\\d+).(\\d{4})\\s*%");
@@ -1178,6 +1181,10 @@ public class B4O
 
 		HashSet<ByteString> itemsToBeConsidered = new HashSet<ByteString>(assoc.getAllAnnotatedGenes());
 		provideGlobals(itemsToBeConsidered);
+		
+		/* Define the directory in which the distributions are stored */
+		scoreDistributionDirectory = new File("distribution",allItemList.size() + "-" + CONSIDER_FREQUENCIES_ONLY);
+		scoreDistributionDirectory.mkdirs();
 		
 		/* If we want to consider items with frequencies only, we like to shrink
 		 * the item list to contain only the relevant items.
