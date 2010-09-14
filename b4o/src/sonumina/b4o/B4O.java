@@ -458,7 +458,7 @@ public class B4O
 	private static final boolean PRECALCULATE_ITEM_MAXS = true;
 	
 	/** Cache the queries */
-	private static final boolean CACHE_QUERIES = true; 
+	private static final boolean CACHE_RANDOM_QUERIES = true; 
 
 	/**
 	 * Returns whether false negatives are propagated in a
@@ -1241,7 +1241,7 @@ public class B4O
 		}
 		
 		/** Instantiates the query cache */
-		if (CACHE_QUERIES)
+		if (CACHE_RANDOM_QUERIES)
 		{
 			int maxSizes = 0;
 			for (i=0;i<allItemList.size();i++)
@@ -2037,32 +2037,71 @@ public class B4O
 
 			res.scores[i] = score;
 			int count = 0;
-			
-			for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
+
+			if (CACHE_RANDOM_QUERIES)
 			{
-				/* Choose terms randomly as the size of observed terms. We avoid drawing the same term but
-				 * alter shuffledTerms such that it can be used again in the next iteration */
-				for (int k=0;k<observedTerms.length;k++)
+				int [][] queries;
+				synchronized (queryCache)
 				{
-					int chosenIndex = rnd.nextInt(shuffledTerms.length - k);
-					int chosenTerm = shuffledTerms[chosenIndex];
-
-					/* Place last term at the position of the chosen term */
-					shuffledTerms[chosenIndex] = shuffledTerms[observedTerms.length - k -1];
-					
-					/* Place chosen term at the last position */
-					shuffledTerms[observedTerms.length - k - 1] = chosenTerm;
-
-					randomizedTerms[k] = chosenTerm;
+					queries = queryCache.getQueries(observedTerms.length);
+					if (queries == null)
+					{
+						queries = new int[SIZE_OF_SCORE_DISTRIBUTION][observedTerms.length];
+						for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
+							choose(rnd, observedTerms.length, queries[j], shuffledTerms);
+						
+						queryCache.setQueries(observedTerms.length, queries);
+					}
 				}
-				double randomScore = simScoreVsItem(randomizedTerms, i);
-				if (randomScore >= score) count++;
+				
+				for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
+				{
+					double randomScore = simScoreVsItem(queries[j], i);
+					if (randomScore >= score) count++;
+				}
+			} else
+			{
+				for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
+				{
+					choose(rnd, observedTerms.length, randomizedTerms, shuffledTerms);
+					double randomScore = simScoreVsItem(randomizedTerms, i);
+					if (randomScore >= score) count++;
+				}
 			}
 			
 			res.marginals[i] = count / (double)SIZE_OF_SCORE_DISTRIBUTION;
 		}
 		
 		return res;
+	}
+
+	/**
+	 * Chooses size randomly selected values from storage. Storage is
+	 * maniupualted by this call. Selected values are stored in chosen.
+	 * 
+	 * @param rnd
+	 * @param size number of elements that are chosen
+	 * @param chosen where the chosen values are deposited.
+	 * @param storage defines the elements from which to choose
+	 */
+	private static void choose(Random rnd, int size, int[] chosen, int[] storage)
+	{
+		/* Choose terms randomly as the size of observed terms. We avoid drawing the same term but
+		 * alter shuffledTerms such that it can be used again in the next iteration.
+		 * Note that this duplicates code from the above. */
+		for (int k=0;k<size;k++)
+		{
+			int chosenIndex = rnd.nextInt(storage.length - k);
+			int chosenTerm = storage[chosenIndex];
+
+			/* Place last term at the position of the chosen term */
+			storage[chosenIndex] = storage[size - k -1];
+			
+			/* Place chosen term at the last position */
+			storage[size - k - 1] = chosenTerm;
+
+			chosen[k] = chosenTerm;
+		}
 	}
 
 	/**
