@@ -320,6 +320,31 @@ class Observations
 	Stats observationStats;
 }
 
+/**
+ * Class representing different sets of queries.
+ * 
+ * @author Sebastian Bauer
+ */
+class QuerySets
+{
+	private int [][][] queries;
+	
+	public QuerySets(int maxSizes)
+	{
+		queries = new int[maxSizes][][];
+	}
+	
+	public int [][] getQueries(int querySize)
+	{
+		return queries[querySize];
+	}
+	
+	public void setQueries(int querySize, int [][] querySets)
+	{
+		queries[querySize] = querySets;
+	}
+}
+
 public class B4O
 {
 	public static GOGraph graph;
@@ -380,6 +405,9 @@ public class B4O
 	/** Contains for each item the max mica for the given term */ 
 	private static int [][] micaForItem;
 	
+	/** Contains the query cache, needs to be synched when accessed */
+	private static QuerySets queryCache;
+	
 	/** Used to parse frequency information */
 	public static Pattern frequencyPattern = Pattern.compile("(\\d+).(\\d{4})\\s*%");
 	public static Pattern frequencyFractionPattern = Pattern.compile("(\\d+)/(\\d+)");
@@ -423,12 +451,15 @@ public class B4O
 	/** Use threading */
 	private static final boolean THREADING = true;
 	
-	/** Use cached MaxIC terms */
+	/** Use cached MaxIC terms. Speeds up Resnik */
 	private static final boolean PRECALCULATE_MAXICS = true;
 	
-	/** Use precalculated max items */
+	/** Use precalculated max items. Speeds up Resnik */
 	private static final boolean PRECALCULATE_ITEM_MAXS = true;
 	
+	/** Cache the queries */
+	private static final boolean CACHE_QUERIES = true; 
+
 	/**
 	 * Returns whether false negatives are propagated in a
 	 * top-down fashion.
@@ -1207,6 +1238,15 @@ public class B4O
 					micaForItem[item][to] = maxCommon;
 				}
 			}
+		}
+		
+		/** Instantiates the query cache */
+		if (CACHE_QUERIES)
+		{
+			int maxSizes = 0;
+			for (i=0;i<allItemList.size();i++)
+				maxSizes = java.lang.Math.max(maxSizes,items2DirectTerms[i].length);
+			queryCache = new QuerySets(maxSizes);
 		}
 			
 //		
