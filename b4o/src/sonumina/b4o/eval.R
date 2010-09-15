@@ -83,12 +83,12 @@ if (file.exists("fnd.txt"))
 	if (!file.exists("d.RObj"))
 	{
 		d<-read.table("fnd.txt",h=F,stringsAsFactors=F,colClasses=c("integer","integer","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric"))
+		colnames(d)<-c("run","label","score","marg","marg.ideal", "score.freq","marg.freq", "marg.freq.ideal", "resnick.avg", "resnick.avg.p","freq")
 		save(d,file="d.RObj");
 	} else
 	{
 		load("d.RObj")
 	}
-	colnames(d)<-c("run","label","score","marg","marg.ideal", "score.freq","marg.freq", "marg.freq.ideal", "resnick.avg", "resnick.avg.p","freq")
 	d<-d[order(d$run),]
 	resnick.avg.rank<-unlist(tapply(d$resnick.avg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
 	d<-cbind(d,resnick.avg.rank)
