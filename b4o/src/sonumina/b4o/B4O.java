@@ -371,7 +371,8 @@ class Distribution
 	 */
 	double getP(double score)
 	{
-		int bin = (int)(score / max * 1000);
+		if (score > max) return 1.0 / cum.length;
+		int bin = (int)java.lang.Math.floor(score / max * 999.0);
 		return 1 - (cum[bin] / (double)cum[cum.length - 1]);
 	}
 }
@@ -398,6 +399,46 @@ class Distributions
 	public void setDistribution(int i, Distribution dist)
 	{
 		distr[i] = dist;
+	}
+}
+
+/**
+ * Class representing a Boolean matrix.
+ * 
+ * @author Sebastian Bauer
+ *
+ */
+class BooleanMatrix
+{
+	private int [][] matrix;
+
+	BooleanMatrix(int rows, int cols)
+	{
+		matrix = new int[rows][(cols + 31)/32];
+	}
+	
+	/**
+	 * Sets the matrix at (i,j) to 1.
+	 * 
+	 * @param i
+	 * @param j
+	 * @param state
+	 */
+	public void set(int i, int j, boolean state)
+	{
+		matrix[i][j / 32] |= 1 << (j % 32);
+	}
+	
+	/**
+	 * Returns the matrix' state at (i,j).
+	 * 
+	 * @param i
+	 * @param j
+	 * @return
+	 */
+	public boolean get(int i, int j)
+	{
+		return (matrix[i][j / 32] & (1 << (j % 32))) != 0;
 	}
 }
 
@@ -475,22 +516,23 @@ public class B4O
 	public static Pattern frequencyFractionPattern = Pattern.compile("(\\d+)/(\\d+)");
 	
 	/* Settings */
-	private final static double ALPHA = 0.0001;
-	private final static double BETA = 0.05;
+	private final static double ALPHA = 0.0005;
+	private final static double BETA = 0.1;
 	private final static double ALPHA_GRID[] = new double[]{0.00005,0.0001,0.0005,0.001,0.005,0.01};
 	private final static double BETA_GRID[] = new double[]{0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45};
 	
-	private final static int MAX_SAMPLES = 1;
-	private final static boolean CONSIDER_FREQUENCIES_ONLY = false;
-	private final static String RESULT_NAME = "fnd.txt";
-	private final static String [] evidenceCodes = null;
+//	private final static int MAX_SAMPLES = 1;
+//	private final static boolean CONSIDER_FREQUENCIES_ONLY = false;
+//	private final static String RESULT_NAME = "fnd.txt";
+//	private final static String [] evidenceCodes = null;
+//	private final static int SIZE_OF_SCORE_DISTRIBUTION = 100000;
 
-//	private final static int MAX_SAMPLES = 100;
-//	private final static boolean CONSIDER_FREQUENCIES_ONLY = true;
-//	private final static String RESULT_NAME = "fnd-freq-only.txt";
-//	private final static String [] evidenceCodes = new String[]{"PCS","ICE"};
+	private final static int MAX_SAMPLES = 100;
+	private final static boolean CONSIDER_FREQUENCIES_ONLY = true;
+	private final static String RESULT_NAME = "fnd-freq-only.txt";
+	private final static String [] evidenceCodes = new String[]{"PCS","ICE"};
+	private final static int SIZE_OF_SCORE_DISTRIBUTION = 100000;
 	
-	private final static int SIZE_OF_SCORE_DISTRIBUTION = 10000;
 	
 	/** False positives can be explained via inheritance */
 	private static int VARIANT_INHERITANCE_POSITIVES = 1<<0;
@@ -520,10 +562,13 @@ public class B4O
 	private static final boolean PRECALCULATE_ITEM_MAXS = true;
 	
 	/** Cache the queries */
-	private static final boolean CACHE_RANDOM_QUERIES = true; 
+	private static final boolean CACHE_RANDOM_QUERIES = false; 
+
+	/** Forbid illegal queries */
+	private static final boolean FORBID_ILLEGAL_QUERIES = true;
 
 	/** Cache the score distribution */
-	private static final boolean CACHE_SCORE_DISTRIBUTION = true; 
+	private static final boolean CACHE_SCORE_DISTRIBUTION = false; 
 
 	/** Defines the maximal query size for the cached distribution */
 	private static final int MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION = 20;
@@ -1238,7 +1283,7 @@ public class B4O
 	{
 		int i;
 
-		int numProcessors = 1;//Runtime.getRuntime().availableProcessors();
+		int numProcessors = Runtime.getRuntime().availableProcessors();
 		
 		createHPOOntology();
 		
@@ -1248,7 +1293,7 @@ public class B4O
 		provideGlobals(itemsToBeConsidered);
 		
 		/* Define the directory in which the distributions are stored */
-		scoreDistributionDirectory = new File("distribution",allItemList.size() + "-" + CONSIDER_FREQUENCIES_ONLY);
+		scoreDistributionDirectory = new File("distribution",allItemList.size() + "-" + CONSIDER_FREQUENCIES_ONLY + "-" + SIZE_OF_SCORE_DISTRIBUTION);
 		scoreDistributionDirectory.mkdirs();
 		
 		/* If we want to consider items with frequencies only, we like to shrink
@@ -1317,7 +1362,7 @@ public class B4O
 		{
 //			int maxSizes = 0;
 //			for (i=0;i<allItemList.size();i++)
-//				maxSizes = java.lang.Math.max(maxSizes,items2DirectTerms[i].length);
+//				maxSizes = java.lang.Math.max(maxSizes,items2Direct[i].length);
 			queryCache = new QuerySets(MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1);
 
 			if (CACHE_SCORE_DISTRIBUTION)
@@ -1528,7 +1573,7 @@ public class B4O
 		term2Ancestors = slimGraph.vertexAncestors;
 		term2Descendants = slimGraph.vertexDescendants;
 		termsInTopologicalOrder = slimGraph.getVertexIndices(inducedGraph.getTermsInTopologicalOrder());
-		
+
 		if (termsInTopologicalOrder.length != slimGraph.getNumberOfVertices())
 			throw new RuntimeException("The ontology graph contains cycles.");
 		termsToplogicalRank = new int[termsInTopologicalOrder.length];
@@ -1813,8 +1858,7 @@ public class B4O
 		}
 		                       
 		                       
-		System.out.println(idealNormalization + "  " + normalization);
-
+//		System.out.println(idealNormalization + "  " + normalization);
 //		if (exitNow)
 //			System.exit(10);
 		return res;
@@ -2090,10 +2134,11 @@ public class B4O
 				lastTime = time;
 			}
 
+			/* Determine and remember the plain score */
 			double score = simScoreVsItem(observedTerms,i);
-
 			res.scores[i] = score;
 
+			/* Turn it into a p value by considering the distribution */
 			if (CACHE_RANDOM_QUERIES)
 			{
 				if (querySize > MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION)
@@ -2107,7 +2152,7 @@ public class B4O
 					{
 						queries = new int[SIZE_OF_SCORE_DISTRIBUTION][querySize];
 						for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
-							choose(rnd, querySize, queries[j], shuffledTerms);
+							chooseTerms(rnd, querySize, queries[j], shuffledTerms);
 						
 						queryCache.setQueries(querySize, queries);
 					}
@@ -2137,18 +2182,23 @@ public class B4O
 							int [] hist = new int[1000];
 							for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
 							{
-								int bin = (int)java.lang.Math.floor((scores[j] / maxScore * 999));
+								int bin = (int)java.lang.Math.floor(scores[j] / maxScore * 999.0);
 								hist[bin]++;
 							}
 
 							d = new Distribution(hist,maxScore);
 							scoreDistributions.setDistribution(i, d);
-							res.marginals[i] = d.getP(score);
-//							System.out.println(d.getP(score) + "  " + (count / (double)SIZE_OF_SCORE_DISTRIBUTION));
-//							System.exit(1);
 						}
-						
 					}
+					res.marginals[i] = d.getP(score);
+//					{
+//						int count = 0;
+//						for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
+//						{
+//							double randomScore = simScoreVsItem(queries[j], i);
+//							if (randomScore >= score) count++;
+//						}
+//					}
 				} else
 				{
 					int count = 0;
@@ -2164,7 +2214,7 @@ public class B4O
 				int count = 0;
 				for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
 				{
-					choose(rnd, observedTerms.length, randomizedTerms, shuffledTerms);
+					chooseTerms(rnd, observedTerms.length, randomizedTerms, shuffledTerms);
 					double randomScore = simScoreVsItem(randomizedTerms, i);
 					if (randomScore >= score) count++;
 				}
@@ -2174,6 +2224,47 @@ public class B4O
 		}
 		
 		return res;
+	}
+
+	/**
+	 * Select size number of terms that are stored in chosen.
+	 * 
+	 * @param rnd
+	 * @param size
+	 * @param chosen
+	 * @param storage
+	 */
+	private static void chooseTerms(Random rnd, int size, int[] chosen, int[] storage)
+	{
+		if (FORBID_ILLEGAL_QUERIES)
+		{
+			boolean valid;
+			int tries = 0;
+			
+			do
+			{
+				choose(rnd, size, chosen, storage);
+				valid = true;
+				
+				outer:
+				for (int i=0;i<size;i++)
+				{
+					for (int j=0;j<size;j++)
+					{
+						if (i==j) continue;
+						if (slimGraph.isDescendant(chosen[i], chosen[j]))
+						{
+							valid = false;
+							break outer;
+						}
+					}
+				}
+				tries++;
+			} while (!valid);
+		} else
+		{
+			choose(rnd, size, chosen, storage);
+		}
 	}
 
 	/**
