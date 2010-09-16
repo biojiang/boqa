@@ -402,46 +402,6 @@ class Distributions
 	}
 }
 
-/**
- * Class representing a Boolean matrix.
- * 
- * @author Sebastian Bauer
- *
- */
-class BooleanMatrix
-{
-	private int [][] matrix;
-
-	BooleanMatrix(int rows, int cols)
-	{
-		matrix = new int[rows][(cols + 31)/32];
-	}
-	
-	/**
-	 * Sets the matrix at (i,j) to 1.
-	 * 
-	 * @param i
-	 * @param j
-	 * @param state
-	 */
-	public void set(int i, int j, boolean state)
-	{
-		matrix[i][j / 32] |= 1 << (j % 32);
-	}
-	
-	/**
-	 * Returns the matrix' state at (i,j).
-	 * 
-	 * @param i
-	 * @param j
-	 * @return
-	 */
-	public boolean get(int i, int j)
-	{
-		return (matrix[i][j / 32] & (1 << (j % 32))) != 0;
-	}
-}
-
 public class B4O
 {
 	public static GOGraph graph;
@@ -562,7 +522,7 @@ public class B4O
 	private static final boolean PRECALCULATE_ITEM_MAXS = true;
 	
 	/** Cache the queries */
-	private static final boolean CACHE_RANDOM_QUERIES = false; 
+	private static final boolean CACHE_RANDOM_QUERIES = true; 
 
 	/** Forbid illegal queries */
 	private static final boolean FORBID_ILLEGAL_QUERIES = true;
