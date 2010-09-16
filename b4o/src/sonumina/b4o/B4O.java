@@ -1071,14 +1071,14 @@ public class B4O
 					if (r<BETA)
 					{
 						falseNegative[numFalseNegative++] = i;
-						System.out.println("false negative " + i);
+//						System.out.println("false negative " + i);
 					}
 				}	else
 				{
 					if (r<ALPHA)
 					{
 						falsePositive[numFalsePositive++] = i;
-						System.out.println("false positive " + i);
+//						System.out.println("false positive " + i);
 					}
 				}
 			}
