@@ -476,9 +476,9 @@ public class B4O
 	public static Pattern frequencyFractionPattern = Pattern.compile("(\\d+)/(\\d+)");
 	
 	/* Settings */
-	private final static double ALPHA = 0.0005;
+	private final static double ALPHA = 0.1;
 	private final static double BETA = 0.1;
-	private final static double ALPHA_GRID[] = new double[]{0.00005,0.0001,0.0005,0.001,0.005,0.01};
+	private final static double ALPHA_GRID[] = new double[]{0.001,0.01,0.1,0.2,0.1,0.3,0.4};
 	private final static double BETA_GRID[] = new double[]{0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45};
 	
 //	private final static int MAX_SAMPLES = 1;
@@ -504,7 +504,7 @@ public class B4O
 	private static int VARIANT_RESPECT_FREQUENCIES = 1<<2;
 
 	/** Defines the model as a combination of above flags */
-	private static int MODEL_VARIANT = VARIANT_RESPECT_FREQUENCIES | VARIANT_INHERITANCE_NEGATIVES | VARIANT_INHERITANCE_POSITIVES;
+	private static int MODEL_VARIANT = VARIANT_RESPECT_FREQUENCIES | VARIANT_INHERITANCE_NEGATIVES;// | VARIANT_INHERITANCE_POSITIVES;
 
 	/** If set to true, empty observation are allowed */
 	private static boolean ALLOW_EMPTY_OBSERVATIONS = false;
@@ -544,7 +544,7 @@ public class B4O
 	 */
 	public static boolean areFalseNegativesPropagated()
 	{
-		return (MODEL_VARIANT & VARIANT_INHERITANCE_NEGATIVES) != 0;
+		return (MODEL_VARIANT & VARIANT_INHERITANCE_POSITIVES) != 0;
 	}
 	
 	/**
@@ -1427,7 +1427,7 @@ public class B4O
 					
 						System.out.println("Seed = " + seed + " run = " + fixedRun);
 						
-						Result[] res = processItem(item,false,new Random(seed));
+						ExperimentStore store = processItem(item,false,new Random(seed));
 	
 						for (int j=0;j<allItemList.size();j++)
 						{
@@ -1435,21 +1435,21 @@ public class B4O
 							builder.append("\t");
 							builder.append(item==j?1:0);
 							builder.append("\t");
-							builder.append(res[0].scores[j]);
+							builder.append(store.modelWithoutFrequencies.scores[j]);
 							builder.append("\t");
-							builder.append(res[0].marginals[j]);
+							builder.append(store.modelWithoutFrequencies.marginals[j]);
 							builder.append("\t");
-							builder.append(res[0].marginalsIdeal[j]);
+							builder.append(store.modelWithoutFrequencies.marginalsIdeal[j]);
 							builder.append("\t");
-							builder.append(res[1].scores[j]);
+							builder.append(store.modelWithFrequencies.scores[j]);
 							builder.append("\t");
-							builder.append(res[1].marginals[j]);
+							builder.append(store.modelWithFrequencies.marginals[j]);
 							builder.append("\t");
-							builder.append(res[1].marginalsIdeal[j]);
+							builder.append(store.modelWithFrequencies.marginalsIdeal[j]);
 							builder.append("\t");
-							builder.append(res[2].scores[j]);
+							builder.append(store.resnick.scores[j]);
 							builder.append("\t");
-							builder.append(res[2].marginals[j]);
+							builder.append(store.resnick.marginals[j]);
 							builder.append("\t");
 							builder.append(itemHasFrequencies[item]?1:0);
 							builder.append("\n");
@@ -2257,6 +2257,14 @@ public class B4O
 			chosen[k] = chosenTerm;
 		}
 	}
+	
+	static class ExperimentStore
+	{
+		Observations obs;
+		Result modelWithoutFrequencies;
+		Result modelWithFrequencies;
+		Result resnick;
+	}
 
 	/**
 	 * Processes the simulation and evaluation for the given item.
@@ -2268,10 +2276,10 @@ public class B4O
 	 *  2. model with frequencies
 	 *  3. resnick (score and p value)
 	 */
-	private static Result[] processItem(int item, boolean provideGraph, Random rnd)
+	private static ExperimentStore processItem(int item, boolean provideGraph, Random rnd)
 	{
 		int i;
-		
+	
 		Observations obs = generateObservations(item, rnd);
 		
 		boolean [] observations = obs.observations;
@@ -2286,6 +2294,12 @@ public class B4O
 
 		/* Third, we apply the resnick sim measure */
 		Result resnick = resnickMaxScore(obs.observations, true, rnd);
+		
+		ExperimentStore id = new ExperimentStore();
+		id.obs = obs;
+		id.modelWithoutFrequencies = modelWithoutFrequencies;
+		id.modelWithFrequencies = modelWithFrequencies;
+		id.resnick = resnick;
 		
 		/******** The rest is for debugging purposes ********/
 		if (VERBOSE || provideGraph)
@@ -2417,6 +2431,7 @@ public class B4O
 			}
 		}
 
-		return new Result[]{modelWithoutFrequencies,modelWithFrequencies,resnick};
+		return id;
+//		return new Result[]{modelWithoutFrequencies,modelWithFrequencies,resnick};
 	}
 }
