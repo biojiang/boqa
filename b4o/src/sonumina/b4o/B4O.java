@@ -372,8 +372,14 @@ class Distribution
 	double getP(double score)
 	{
 		if (score > max) return 1.0 / cum.length;
-		int bin = (int)java.lang.Math.floor(score / max * 999.0);
+		int bin = getBin(score,max);
 		return 1 - (cum[bin] / (double)cum[cum.length - 1]);
+	}
+	
+	static int getBin(double score, double maxScore)
+	{
+		int bin = (int)java.lang.Math.floor(score / maxScore * 999.0);
+		return bin;
 	}
 }
 
@@ -476,18 +482,18 @@ public class B4O
 	public static Pattern frequencyFractionPattern = Pattern.compile("(\\d+)/(\\d+)");
 	
 	/* Settings */
-	private final static double ALPHA = 0.1;
-	private final static double BETA = 0.1;
-	private final static double ALPHA_GRID[] = new double[]{0.001,0.01,0.1,0.2,0.1,0.3,0.4};
-	private final static double BETA_GRID[] = new double[]{0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45};
+	private final static double ALPHA = 0.01;
+	private final static double BETA = 0.05;
+	private final static double ALPHA_GRID[] = new double[]{0.01,0.05,0.1,0.2,0.1,0.3,0.4};
+	private final static double BETA_GRID[] = new double[] {0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45};
 	
 //	private final static int MAX_SAMPLES = 1;
 //	private final static boolean CONSIDER_FREQUENCIES_ONLY = false;
 //	private final static String RESULT_NAME = "fnd.txt";
 //	private final static String [] evidenceCodes = null;
-//	private final static int SIZE_OF_SCORE_DISTRIBUTION = 100000;
+//	private final static int SIZE_OF_SCORE_DISTRIBUTION = 250000;
 
-	private final static int MAX_SAMPLES = 100;
+	private final static int MAX_SAMPLES = 10;
 	private final static boolean CONSIDER_FREQUENCIES_ONLY = true;
 	private final static String RESULT_NAME = "fnd-freq-only.txt";
 	private final static String [] evidenceCodes = new String[]{"PCS","ICE"};
@@ -528,7 +534,7 @@ public class B4O
 	private static final boolean FORBID_ILLEGAL_QUERIES = true;
 
 	/** Cache the score distribution */
-	private static final boolean CACHE_SCORE_DISTRIBUTION = false; 
+	private static final boolean CACHE_SCORE_DISTRIBUTION = true; 
 
 	/** Defines the maximal query size for the cached distribution */
 	private static final int MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION = 20;
@@ -1037,7 +1043,9 @@ public class B4O
 					if (respectFrequencies())
 					{
 						state = rnd.nextDouble() < items2TermFrequencies[itemNr][i];
-						System.out.println(items2DirectTerms[itemNr][i] + "(" + items2TermFrequencies[itemNr][i] + ")="+state);
+						
+						if (VERBOSE)
+							System.out.println(items2DirectTerms[itemNr][i] + "(" + items2TermFrequencies[itemNr][i] + ")="+state);
 					}
 					
 					if (state)
@@ -1399,6 +1407,7 @@ public class B4O
 		param.flush();
 		
 		final BufferedWriter out = new BufferedWriter(new FileWriter(RESULT_NAME));
+		final BufferedWriter summary = new BufferedWriter(new FileWriter(RESULT_NAME.split("\\.")[0]+ "_summary.txt"));
 
 		ExecutorService es = Executors.newFixedThreadPool(numProcessors);
 //		ExecutorService es = Executors.newFixedThreadPool(1);
@@ -1423,7 +1432,7 @@ public class B4O
 				{
 					public void run()
 					{
-						StringBuilder builder = new StringBuilder();
+						StringBuilder resultBuilder = new StringBuilder();
 					
 						System.out.println("Seed = " + seed + " run = " + fixedRun);
 						
@@ -1431,33 +1440,44 @@ public class B4O
 	
 						for (int j=0;j<allItemList.size();j++)
 						{
-							builder.append(fixedRun);
-							builder.append("\t");
-							builder.append(item==j?1:0);
-							builder.append("\t");
-							builder.append(store.modelWithoutFrequencies.scores[j]);
-							builder.append("\t");
-							builder.append(store.modelWithoutFrequencies.marginals[j]);
-							builder.append("\t");
-							builder.append(store.modelWithoutFrequencies.marginalsIdeal[j]);
-							builder.append("\t");
-							builder.append(store.modelWithFrequencies.scores[j]);
-							builder.append("\t");
-							builder.append(store.modelWithFrequencies.marginals[j]);
-							builder.append("\t");
-							builder.append(store.modelWithFrequencies.marginalsIdeal[j]);
-							builder.append("\t");
-							builder.append(store.resnick.scores[j]);
-							builder.append("\t");
-							builder.append(store.resnick.marginals[j]);
-							builder.append("\t");
-							builder.append(itemHasFrequencies[item]?1:0);
-							builder.append("\n");
+							resultBuilder.append(fixedRun);
+							resultBuilder.append("\t");
+							resultBuilder.append(item==j?1:0);
+							resultBuilder.append("\t");
+							resultBuilder.append(store.modelWithoutFrequencies.scores[j]);
+							resultBuilder.append("\t");
+							resultBuilder.append(store.modelWithoutFrequencies.marginals[j]);
+							resultBuilder.append("\t");
+							resultBuilder.append(store.modelWithoutFrequencies.marginalsIdeal[j]);
+							resultBuilder.append("\t");
+							resultBuilder.append(store.modelWithFrequencies.scores[j]);
+							resultBuilder.append("\t");
+							resultBuilder.append(store.modelWithFrequencies.marginals[j]);
+							resultBuilder.append("\t");
+							resultBuilder.append(store.modelWithFrequencies.marginalsIdeal[j]);
+							resultBuilder.append("\t");
+							resultBuilder.append(store.resnick.scores[j]);
+							resultBuilder.append("\t");
+							resultBuilder.append(store.resnick.marginals[j]);
+							resultBuilder.append("\t");
+							resultBuilder.append(itemHasFrequencies[item]?1:0);
+							resultBuilder.append("\n");
 						}
 	
 						synchronized (out) {
 							try {
-								out.append(builder.toString());
+								out.append(resultBuilder.toString());
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+
+						String sum = fixedRun + "\t" + store.obs.observationStats.falsePositiveRate() + "\t" + store.obs.observationStats.falseNegativeRate() + "\n";
+
+						synchronized (summary) {
+							try {
+								summary.write(sum);
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -1476,6 +1496,10 @@ public class B4O
 
 		synchronized (out) {
 			out.close();
+		}
+		
+		synchronized (summary) {
+			summary.close();
 		}
 
 		OntologizerThreadGroups.workerThreadGroup.interrupt();
@@ -2144,12 +2168,12 @@ public class B4O
 							int [] hist = new int[1000];
 							for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
 							{
-								int bin = (int)java.lang.Math.floor(scores[j] / maxScore * 999.0);
+								int bin = Distribution.getBin(scores[j], maxScore);
 								hist[bin]++;
 							}
 
 							d = new Distribution(hist,maxScore);
-							scoreDistributions.setDistribution(i, d);
+							scoreDistributions.setDistribution(i * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize, d);
 						}
 					}
 					res.marginals[i] = d.getP(score);
