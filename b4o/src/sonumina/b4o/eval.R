@@ -1,7 +1,7 @@
 #' Evaluates a given data frame for classification performance
 #' 
 #' @param d represents a frame, from which date is gathered
-#' @param v represents a three column matrix, in which the name of the slots 
+#' @param v represents a column matrix, in which the name of the slots 
 #'        that are used for the plots of the data frame can be specified. The last
 #'        column represents whether high values are good or not.
 evaluate<-function(d,v)
@@ -14,21 +14,43 @@ evaluate<-function(d,v)
 	res<-list();
 	
 	colnames(v)<-c("short","full","high.is.good")
-	
+
 	for (i in (1:nrow(v)))
 	{
-		if (v[i,1] == "resnick.avg.p")
+		# get the type
+		type<-v[i,1]
+
+		# get primary and optional secondary values
+		if (type == "resnick.avg.p.opt")
 		{
-			ord<-order(d[,v[i,1]],1-d$label,decreasing=as.logical(v[i,3]))
+			primary.values<-d$resnick.avg.p
+			secondary.values<-1-d$label
 		} else
 		{
-			ord<-order(d[,v[i,1]],decreasing=as.logical(v[i,3]))
+		    primary.values<-d[,type]
+		    
+		    if (type == "resnick.avg.p")
+		    {
+		    	secondary.values<- -d$resnick.avg
+		    } else
+		    {
+		    	secondary.values<-NA
+		    }
 		}
-		
-		# data is orderd. Threshold is such that the values
+
+		# get the order
+		if (is.na(secondary.values[1]))
+		{
+			ord<-order(primary.values,decreasing=as.logical(v[i,3]))
+		} else
+		{
+			ord<-order(primary.values,secondary.values,decreasing=as.logical(v[i,3]))
+		}
+
+		# data is ordered. Threshold is such that the values
 		# above an element are flagged as positive (inclusive)
 		# and values below an element as negative.
-		values<-d[ord,v[i,1]]
+		values<-primary.values[ord]
 		labels<-d[ord,]$label
 		
 		tps<-cumsum(labels)					# true positives
@@ -76,11 +98,12 @@ v<-matrix(c("marg","Marg. Prob.", T,
 		    "marg.freq.ideal", "Marg. Prob. (Freq,Ideal)", T,
             "resnick.avg", "Resnik",T,
 			"resnick.avg.rank", "Resnik (rank)",F,
-			"resnick.avg.p", "Resnik P",F),ncol=3,byrow=T)
+			"resnick.avg.p", "Resnik P",F,
+			"resnick.avg.p.opt", "Resnik P*",F),ncol=3,byrow=T)
 
 if (file.exists("fnd.txt"))
 {
-	if (!file.exists("d.RObj"))
+	if ((!file.exists("d.RObj")) || (file.info("d.RObj")$mtime < file.info("fnd.txt")$mtime))
 	{
 		d<-read.table("fnd.txt",h=F,stringsAsFactors=F,colClasses=c("integer","integer","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric"))
 		colnames(d)<-c("run","label","score","marg","marg.ideal", "score.freq","marg.freq", "marg.freq.ideal", "resnick.avg", "resnick.avg.p","freq")
@@ -89,14 +112,17 @@ if (file.exists("fnd.txt"))
 	{
 		load("d.RObj")
 	}
+	message("Data read")
 	d<-d[order(d$run),]
 	resnick.avg.rank<-unlist(tapply(d$resnick.avg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
 	d<-cbind(d,resnick.avg.rank)
+	message("Data prepared")
 	
 	# all vs all
 	res.list<-evaluate(d,v)
 	res.list.complete<-res.list
 	save(res.list.complete,file="b4o_res.list.complete.RObj")
+	message("all vs. all done");
 	
 	# only freq vs all. the freq column is 1 if the item in question has frequencies
 	d2<-subset(d,d$freq==T)
@@ -116,17 +142,18 @@ if (file.exists("fnd.txt"))
 }
 
 
-col<-c("red","blue","cyan","green","gray","orange","black")
+col<-c("red","blue","cyan","green","gray","orange","magenta", "black")
 
 #pdf("b4o-precall.pdf")
 
-plot(res.list[[1]]$recall.lines,res.list[[1]]$prec.lines,type="l",col=col[1],xlab="Recall",ylab="Precision")
+plot(ylim=c(0,1),res.list[[1]]$recall.lines,res.list[[1]]$prec.lines,type="l",col=col[1],xlab="Recall",ylab="Precision")
 lines(res.list[[2]]$recall.lines,res.list[[2]]$prec.lines,type="l",col=col[2])
 lines(res.list[[3]]$recall.lines,res.list[[3]]$prec.lines,type="l",col=col[3])
 lines(res.list[[4]]$recall.lines,res.list[[4]]$prec.lines,type="l",col=col[4])
 lines(res.list[[5]]$recall.lines,res.list[[5]]$prec.lines,type="l",col=col[5])
 lines(res.list[[6]]$recall.lines,res.list[[6]]$prec.lines,type="l",col=col[6])
 lines(res.list[[7]]$recall.lines,res.list[[7]]$prec.lines,type="l",col=col[7])
+lines(res.list[[8]]$recall.lines,res.list[[8]]$prec.lines,type="l",col=col[8])
 
 legend(x="topright",as.character(lapply(res.list,function(x) x$name)),col=col,lty=1)
 

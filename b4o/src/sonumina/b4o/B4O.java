@@ -29,7 +29,7 @@ import ontologizer.association.Association;
 import ontologizer.association.AssociationContainer;
 import ontologizer.association.Gene2Associations;
 import ontologizer.benchmark.Datafiles;
-import ontologizer.go.GOGraph;
+import ontologizer.go.Ontology;
 import ontologizer.go.ParentTermID;
 import ontologizer.go.Term;
 import ontologizer.go.TermContainer;
@@ -410,7 +410,7 @@ class Distributions
 
 public class B4O
 {
-	public static GOGraph graph;
+	public static Ontology graph;
 	public static AssociationContainer assoc;
 	
 	/** Term enumerator */
@@ -482,10 +482,10 @@ public class B4O
 	public static Pattern frequencyFractionPattern = Pattern.compile("(\\d+)/(\\d+)");
 	
 	/* Settings */
-	private final static double ALPHA = 0.01;
-	private final static double BETA = 0.05;
-	private final static double ALPHA_GRID[] = new double[]{0.01,0.05,0.1,0.2,0.1,0.3,0.4};
-	private final static double BETA_GRID[] = new double[] {0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45};
+	private final static double ALPHA = 0.001; // 0.01
+	private final static double BETA = 0.05;   // 0.1
+	private final static double ALPHA_GRID[] = new double[]{1e-10,0.0005,0.001,0.005,0.01,0.05,0.1};
+	private final static double BETA_GRID[] = new double[] {1e-10,0.005,0.01,0.05,0.1,0.2};
 	
 //	private final static int MAX_SAMPLES = 1;
 //	private final static boolean CONSIDER_FREQUENCIES_ONLY = false;
@@ -493,11 +493,11 @@ public class B4O
 //	private final static String [] evidenceCodes = null;
 //	private final static int SIZE_OF_SCORE_DISTRIBUTION = 250000;
 
-	private final static int MAX_SAMPLES = 10;
+	private final static int MAX_SAMPLES = 100;
 	private final static boolean CONSIDER_FREQUENCIES_ONLY = true;
 	private final static String RESULT_NAME = "fnd-freq-only.txt";
 	private final static String [] evidenceCodes = new String[]{"PCS","ICE"};
-	private final static int SIZE_OF_SCORE_DISTRIBUTION = 100000;
+	private final static int SIZE_OF_SCORE_DISTRIBUTION = 250000;
 	
 	
 	/** False positives can be explained via inheritance */
@@ -534,7 +534,7 @@ public class B4O
 	private static final boolean FORBID_ILLEGAL_QUERIES = true;
 
 	/** Cache the score distribution */
-	private static final boolean CACHE_SCORE_DISTRIBUTION = true; 
+	private static final boolean CACHE_SCORE_DISTRIBUTION = false; 
 
 	/** Defines the maximal query size for the cached distribution */
 	private static final int MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION = 20;
@@ -628,7 +628,7 @@ public class B4O
 		terms.add(c12);
 		TermContainer termContainer = new TermContainer(terms,"","");
 
-		graph = new GOGraph(termContainer);
+		graph = new Ontology(termContainer);
 
 		HashSet<TermID> tids = new HashSet<TermID>();
 		for (Term term : terms)
@@ -1552,7 +1552,7 @@ public class B4O
 		ItemEnumerator itemEnumerator = ItemEnumerator.createFromTermEnumerator(termEnumerator);
 
 		/* Term stuff */
-		GOGraph inducedGraph = graph.getInducedGraph(termEnumerator.getAllAnnotatedTermsAsList()); 
+		Ontology inducedGraph = graph.getInducedGraph(termEnumerator.getAllAnnotatedTermsAsList()); 
 		slimGraph = inducedGraph.getSlimGraphView();
 
 		term2Parents = slimGraph.vertexParents;
@@ -1930,7 +1930,7 @@ public class B4O
 		for (int i = 0;i<terms.length;i++)
 			termList.add(slimGraph.getVertex(terms[i]).getID());
 		
-		GOGraph termGraph = graph.getInducedGraph(termList);
+		Ontology termGraph = graph.getInducedGraph(termList);
 		
 		ArrayList<Term> leafTermList = termGraph.getLeafTerms();
 		
