@@ -658,7 +658,7 @@ public class B4O
 		GODOTWriter.writeDOT(graph, new File("example.dot"), null, tids, new AbstractDotAttributesProvider() {
 			public String getDotNodeAttributes(TermID id) {
 
-				return "label=\""+graph.getGOTerm(id).getName()+"\"";
+				return "label=\""+graph.getTerm(id).getName()+"\"";
 			}
 		});
 	}
@@ -1365,11 +1365,11 @@ public class B4O
 			GODOTWriter.writeDOT(graph.getInducedGraph(termEnumerator.getAllAnnotatedTermsAsList()), new File("hpo-example.dot"), null, hpoTerms, new AbstractDotAttributesProvider() {
 				public String getDotNodeAttributes(TermID id) {
 					String termName;
-					Term term = graph.getGOTerm(id);
+					Term term = graph.getTerm(id);
 					if (graph.isRootTerm(id)) termName = "Human Phenotype";
 					else  termName = term.getName();
 					String name = "\\emph{" + termName + "}";
-					int termIdx = slimGraph.getVertexIndex(graph.getGOTerm(id));
+					int termIdx = slimGraph.getVertexIndex(graph.getTerm(id));
 					int numberOfItems = termEnumerator.getAnnotatedGenes(id).totalAnnotatedCount();
 					
 					String label = "\\small" + name + "\\\\\\ " + numberOfItems + " \\\\\\ IC=" + String.format("%.4f", terms2IC[termIdx]);
@@ -1589,7 +1589,7 @@ public class B4O
 			items2Terms[i] = new int[tids.size()];
 			
 			for (TermID tid : tids)
-				items2Terms[i][j++] = slimGraph.getVertexIndex(graph.getGOTerm(tid));
+				items2Terms[i][j++] = slimGraph.getVertexIndex(graph.getTerm(tid));
 			
 			i++;
 		}
@@ -1622,7 +1622,7 @@ public class B4O
 			items2DirectTerms[i] = new int[tids.size()];
 
 			for (TermID tid : tids)
-				items2DirectTerms[i][j++] = slimGraph.getVertexIndex(graph.getGOTerm(tid));
+				items2DirectTerms[i][j++] = slimGraph.getVertexIndex(graph.getTerm(tid));
 			i++;
 		}
 
@@ -2436,7 +2436,7 @@ public class B4O
 				GODOTWriter.writeDOT(graph, new File("setting.dot"), null, allSet, new AbstractDotAttributesProvider() {
 					public String getDotNodeAttributes(TermID id) {
 						String fillcolor = "";
-						String label = graph.getGOTerm(id).getName();
+						String label = graph.getTerm(id).getName();
 						String flags = "";
 						if (hiddenSet.contains(id))
 							fillcolor = ",style=filled,fillcolor=gray";
