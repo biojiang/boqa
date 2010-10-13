@@ -2238,6 +2238,8 @@ public class B4O
 					for (int j=0;j<size;j++)
 					{
 						if (i==j) continue;
+
+						/* If a chosen term is descendant of another one, we reject the query. */
 						if (slimGraph.isDescendant(chosen[i], chosen[j]))
 						{
 							valid = false;
