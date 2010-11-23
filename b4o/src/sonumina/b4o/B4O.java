@@ -1341,6 +1341,37 @@ public class B4O
 		}
 
 		/**************************************************************************************************************************/
+		/* Write score distribution */
+		
+		{
+			int [] shuffledTerms = new int[slimGraph.getNumberOfVertices()];
+
+			/* Initialize shuffling */
+			for (i=0;i<shuffledTerms.length;i++)
+				shuffledTerms[i] = i;
+
+			i = 0;
+
+			FileWriter out = new FileWriter("score.txt");
+			
+			Random rnd = new Random();
+
+			for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
+			{
+				int q = 10;
+				int [] randomizedTerms = new int[q];
+
+				chooseTerms(rnd, q, randomizedTerms, shuffledTerms);
+				double randomScore = simScoreVsItem(randomizedTerms, i);
+				out.write(randomScore + " \n");
+			}
+			out.flush();
+			out.close();
+
+			System.out.println("Score distribution for item " + allItemList.get(i));
+		}
+		
+		/**************************************************************************************************************************/
 
 		/* Write example */
 
@@ -2188,11 +2219,13 @@ public class B4O
 				} else
 				{
 					int count = 0;
+
 					for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
 					{
 						double randomScore = simScoreVsItem(queries[j], i);
 						if (randomScore >= score) count++;
 					}
+					
 					res.marginals[i] = count / (double)SIZE_OF_SCORE_DISTRIBUTION;
 				}
 			} else
