@@ -18,6 +18,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
 import ontologizer.GODOTWriter;
 import ontologizer.GOTermEnumerator;
 import ontologizer.GlobalPreferences;
@@ -482,22 +488,25 @@ public class B4O
 	public static Pattern frequencyFractionPattern = Pattern.compile("(\\d+)/(\\d+)");
 	
 	/* Settings */
+	private static String ontologyPath = "http://www.human-phenotype-ontology.org/human-phenotype-ontology.obo.gz";
+	private static String annotationPath = "http://www.human-phenotype-ontology.org/phenotype_annotation.omim.gz";
+	
 	private final static double ALPHA = 0.001; // 0.01
-	private final static double BETA = 0.05;   // 0.1
+	private final static double BETA = 0.10;   // 0.1
 	private final static double ALPHA_GRID[] = new double[]{1e-10,0.0005,0.001,0.005,0.01,0.05,0.1};
 	private final static double BETA_GRID[] = new double[] {1e-10,0.005,0.01,0.05,0.1,0.2};
 	
-//	private final static int MAX_SAMPLES = 1;
-//	private final static boolean CONSIDER_FREQUENCIES_ONLY = false;
-//	private final static String RESULT_NAME = "fnd.txt";
-//	private final static String [] evidenceCodes = null;
-//	private final static int SIZE_OF_SCORE_DISTRIBUTION = 250000;
-
-	private final static int MAX_SAMPLES = 100;
-	private final static boolean CONSIDER_FREQUENCIES_ONLY = true;
-	private final static String RESULT_NAME = "fnd-freq-only.txt";
-	private final static String [] evidenceCodes = new String[]{"PCS","ICE"};
+	private final static int MAX_SAMPLES = 1;
+	private final static boolean CONSIDER_FREQUENCIES_ONLY = false;
+	private final static String RESULT_NAME = "fnd.txt";
+	private final static String [] evidenceCodes = null;
 	private final static int SIZE_OF_SCORE_DISTRIBUTION = 250000;
+
+//	private final static int MAX_SAMPLES = 100;
+//	private final static boolean CONSIDER_FREQUENCIES_ONLY = true;
+//	private final static String RESULT_NAME = "fnd-freq-only.txt";
+//	private final static String [] evidenceCodes = new String[]{"PCS","ICE"};
+//	private final static int SIZE_OF_SCORE_DISTRIBUTION = 250000;
 	
 	
 	/** False positives can be explained via inheritance */
@@ -589,8 +598,8 @@ public class B4O
 		GlobalPreferences.setProxyPort(888);
 		GlobalPreferences.setProxyHost("realproxy.charite.de");
 
-		String oboPath = "http://www.human-phenotype-ontology.org/human-phenotype-ontology.obo.gz";
-		String assocPath = "http://www.human-phenotype-ontology.org/phenotype_annotation.omim.gz";
+		String oboPath = ontologyPath;
+		String assocPath = annotationPath;
 
 		Datafiles df = new Datafiles(oboPath,assocPath);
 		graph = df.graph;
@@ -1244,17 +1253,53 @@ public class B4O
 	}
 
 	/**
+	 * Parses the command line.
+	 * 
+	 * @param args
+	 */
+	public static void parseCommandLine(String [] args)
+	{
+	   Options opt = new Options();
+	   opt.addOption("o", "ontology", true, "Path or URL to the ontology file. Default is \"" + ontologyPath + "\"");
+	   opt.addOption("a", "annotations", true, "Path or URL to files containing annotations. Default is \"" + annotationPath + "\"");
+	   opt.addOption("h", "help", false, "Shows this help");
+
+	   try
+	   {
+		   GnuParser parser = new GnuParser();
+		   CommandLine cl;
+		   cl = parser.parse(opt, args);
+
+		   if (cl.hasOption('h'))
+		   {
+			   HelpFormatter f = new HelpFormatter();
+			   f.printHelp(B4O.class.getName(), opt);
+			   System.exit(0);
+		   }
+		   
+		   ontologyPath = cl.getOptionValue('o',ontologyPath);
+	   } catch (ParseException e)
+	   {
+		   System.err.println("Faield to parse commandline: " + e.getLocalizedMessage());
+		   System.exit(1);
+	   }
+	   
+	}
+	
+	/**
 	 * Main Entry.
 	 * 
 	 * @param args
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
+	@SuppressWarnings("unused")
 	public static void main(String[] args) throws InterruptedException, IOException
 	{
 		int i;
-
 		int numProcessors = Runtime.getRuntime().availableProcessors();
+
+		parseCommandLine(args);
 		
 		createHPOOntology();
 		
@@ -1343,6 +1388,7 @@ public class B4O
 		/**************************************************************************************************************************/
 		/* Write score distribution */
 		
+		if (false)
 		{
 			int [] shuffledTerms = new int[slimGraph.getNumberOfVertices()];
 
@@ -1368,7 +1414,8 @@ public class B4O
 			out.flush();
 			out.close();
 
-			System.out.println("Score distribution for item " + allItemList.get(i));
+			System.out.println("Score distribution for item " + allItemList.get(i) + "  " + items2DirectTerms[i].length);
+			System.exit(-1);
 		}
 		
 		/**************************************************************************************************************************/
