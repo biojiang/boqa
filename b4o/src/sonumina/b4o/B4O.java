@@ -389,7 +389,7 @@ public class B4O
 	private final static int MAX_SAMPLES = 100;
 	private final static boolean CONSIDER_FREQUENCIES_ONLY = true;
 	private final static String RESULT_NAME = "fnd-freq-only.txt";
-	private final static String [] evidenceCodes = new String[]{"PCS","ICE"};
+	private final static String [] evidenceCodes = null;//new String[]{"PCS","ICE"};
 	private final static int SIZE_OF_SCORE_DISTRIBUTION = 250000;
 	
 	
@@ -1520,7 +1520,7 @@ public class B4O
 		
 		PopulationSet allItems = new PopulationSet("all");
 		allItems.addGenes(allItemsToBeConsidered);
-		termEnumerator = allItems.enumerateGOTerms(graph, assoc, evidences.keySet());
+		termEnumerator = allItems.enumerateGOTerms(graph, assoc, evidences!=null?evidences.keySet():null);
 		ItemEnumerator itemEnumerator = ItemEnumerator.createFromTermEnumerator(termEnumerator);
 		
 		/* Term stuff */
