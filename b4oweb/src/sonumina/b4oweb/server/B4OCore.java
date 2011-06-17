@@ -20,7 +20,10 @@ public class B4OCore
 	 * The static ontology object. Defines terms that the user can select.
 	 */
 	static private Ontology ontology;
-	
+
+	/**
+	 * The static association container. Defines the items.
+	 */
 	static private AssociationContainer associations;
 
 	static
@@ -42,8 +45,23 @@ public class B4OCore
 		}
 	}
 	
+	/**
+	 * Returns the global ontology.
+	 * 
+	 * @return
+	 */
 	public static Ontology getOntology()
 	{
 		return ontology;
+	}
+	
+	/**
+	 * Returns the global association container.
+	 * 
+	 * @return
+	 */
+	public static AssociationContainer getAssociations()
+	{
+		return associations;
 	}
 }
