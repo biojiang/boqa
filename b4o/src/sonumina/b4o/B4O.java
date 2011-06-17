@@ -1188,7 +1188,7 @@ public class B4O
 		
 		createHPOOntology();
 		
-		graph.findRedundantISARelations();
+//		graph.findRedundantISARelations();
 
 		HashSet<ByteString> itemsToBeConsidered = new HashSet<ByteString>(assoc.getAllAnnotatedGenes());
 		provideGlobals(itemsToBeConsidered);
@@ -1495,6 +1495,9 @@ public class B4O
 				
 			}
 		}
+		
+		System.out.println(allItemsToBeConsidered.size() + " items so far");
+		
 		System.out.println("Available evidences:");
 		for (Entry<ByteString,Integer> ev : evidences.entrySet())
 			System.out.println(ev.getKey().toString() + "->" + ev.getValue());
@@ -1504,18 +1507,21 @@ public class B4O
 			System.out.println("Requested evidences: ");
 			evidences.clear();
 			for (String ev : evidenceCodes)
+			{
+				System.out.println(ev);
 				evidences.put(new ByteString(ev),1);
+			}
 		} else
 		{
 			/* Means take everything */
 			evidences = null;
 		}
-
+		
 		PopulationSet allItems = new PopulationSet("all");
 		allItems.addGenes(allItemsToBeConsidered);
 		termEnumerator = allItems.enumerateGOTerms(graph, assoc, evidences.keySet());
 		ItemEnumerator itemEnumerator = ItemEnumerator.createFromTermEnumerator(termEnumerator);
-
+		
 		/* Term stuff */
 		Ontology inducedGraph = graph.getInducedGraph(termEnumerator.getAllAnnotatedTermsAsList()); 
 		slimGraph = inducedGraph.getSlimGraphView();
@@ -1542,6 +1548,8 @@ public class B4O
 			item2Index.put(item, i);
 			i++;
 		}
+		
+		System.out.println(i + " items passed criterias");
 
 		/* Fill item matrix */
 		items2Terms = new int[allItemList.size()][];
