@@ -1474,6 +1474,7 @@ public class B4O
 	 * 
 	 * @param allItemsToBeConsidered
 	 */
+	@SuppressWarnings("unused")
 	private static void provideGlobals(Set<ByteString> allItemsToBeConsidered)
 	{
 		int i;
@@ -2436,6 +2437,5 @@ public class B4O
 		}
 
 		return id;
-//		return new Result[]{modelWithoutFrequencies,modelWithFrequencies,resnick};
 	}
 }
