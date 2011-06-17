@@ -1,6 +1,11 @@
 package sonumina.b4oweb.client;
 
+import java.util.Arrays;
+import java.util.List;
+
 import sonumina.b4oweb.shared.FieldVerifier;
+
+import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -8,12 +13,14 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.user.cellview.client.CellList;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -35,6 +42,9 @@ public class B4oweb implements EntryPoint {
 	private final GreetingServiceAsync greetingService = GWT
 			.create(GreetingService.class);
 
+	  private static final List<String> DAYS = Arrays.asList("Sunday", "Monday",
+		      "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
+	
 	/**
 	 * This is the entry point method.
 	 */
@@ -52,6 +62,22 @@ public class B4oweb implements EntryPoint {
 		RootPanel.get("nameFieldContainer").add(nameField);
 		RootPanel.get("sendButtonContainer").add(sendButton);
 		RootPanel.get("errorLabelContainer").add(errorLabel);
+
+		{
+			TextCell textCell = new TextCell();
+			CellList<String> cellList = new CellList<String>(textCell);
+			cellList.setRowCount(DAYS.size(),true);
+			cellList.setRowData(DAYS);
+			cellList.setPageSize(5);
+	
+			ScrollPanel scrollPanel = new ScrollPanel();
+//		RangeLabelPager rangeLabelPager = new RangeLabelPager();
+			
+			//RootPanel.get().add(cellList);
+			//scrollPanel.add(cellList);
+			scrollPanel.setWidget(cellList);
+			RootPanel.get().add(scrollPanel);
+		}
 
 		// Focus the cursor on the name field when the app loads
 		nameField.setFocus(true);
