@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -367,29 +368,29 @@ public class B4O
 	private static Distributions scoreDistributions;
 	
 	/** Used to parse frequency information */
-	public static Pattern frequencyPattern = Pattern.compile("(\\d+).(\\d{4})\\s*%");
+	public static Pattern frequencyPattern = Pattern.compile("(\\d+)\\.?(\\d*)\\s*%");
 	public static Pattern frequencyFractionPattern = Pattern.compile("(\\d+)/(\\d+)");
 	
 	/* Settings */
 	private static String ontologyPath = "http://www.human-phenotype-ontology.org/human-phenotype-ontology.obo.gz";
 	private static String annotationPath = "http://www.human-phenotype-ontology.org/phenotype_annotation.omim.gz";
-	
+
 	private final static double ALPHA = 0.001; // 0.01
 	private final static double BETA = 0.10;   // 0.1
 	private final static double ALPHA_GRID[] = new double[]{1e-10,0.0005,0.001,0.005,0.01,0.05,0.1};
 	private final static double BETA_GRID[] = new double[] {1e-10,0.005,0.01,0.05,0.1,0.2};
 	
-	private final static int MAX_SAMPLES = 1;
-	private final static boolean CONSIDER_FREQUENCIES_ONLY = false;
-	private final static String RESULT_NAME = "fnd.txt";
-	private final static String [] evidenceCodes = null;
-	private final static int SIZE_OF_SCORE_DISTRIBUTION = 250000;
-
-//	private final static int MAX_SAMPLES = 100;
-//	private final static boolean CONSIDER_FREQUENCIES_ONLY = true;
-//	private final static String RESULT_NAME = "fnd-freq-only.txt";
-//	private final static String [] evidenceCodes = new String[]{"PCS","ICE"};
+//	private final static int MAX_SAMPLES = 1;
+//	private final static boolean CONSIDER_FREQUENCIES_ONLY = false;
+//	private final static String RESULT_NAME = "fnd.txt";
+//	private final static String [] evidenceCodes = null;
 //	private final static int SIZE_OF_SCORE_DISTRIBUTION = 250000;
+
+	private final static int MAX_SAMPLES = 100;
+	private final static boolean CONSIDER_FREQUENCIES_ONLY = true;
+	private final static String RESULT_NAME = "fnd-freq-only.txt";
+	private final static String [] evidenceCodes = new String[]{"PCS","ICE"};
+	private final static int SIZE_OF_SCORE_DISTRIBUTION = 250000;
 	
 	
 	/** False positives can be explained via inheritance */
@@ -1161,6 +1162,7 @@ public class B4O
 		   }
 		   
 		   ontologyPath = cl.getOptionValue('o',ontologyPath);
+		   annotationPath = cl.getOptionValue('a', annotationPath);
 	   } catch (ParseException e)
 	   {
 		   System.err.println("Faield to parse commandline: " + e.getLocalizedMessage());
@@ -1477,30 +1479,32 @@ public class B4O
 		int i;
 
 		/* list all evidence codes */
-		HashSet<ByteString> evidences = new HashSet<ByteString>();
+		HashMap<ByteString,Integer> evidences = new HashMap<ByteString,Integer>();
 		for (Gene2Associations g2a : assoc)
 		{
 			for (Association a : g2a)
 			{
-				if (!evidences.contains(a.getEvidence()))
-					evidences.add(a.getEvidence());
+				/* Worst implementation ever! */
+				Integer evidence = evidences.get(a.getEvidence());
+				if (evidence == null)
+					evidence = 1;
+				else
+					evidence++;
+				
+				evidences.put(a.getEvidence(), evidence);
 				
 			}
 		}
 		System.out.println("Available evidences:");
-		for (ByteString ev : evidences)
-		{
-			System.out.println(ev.toString());
-		}
+		for (Entry<ByteString,Integer> ev : evidences.entrySet())
+			System.out.println(ev.getKey().toString() + "->" + ev.getValue());
 
 		if (evidenceCodes != null)
 		{
 			System.out.println("Requested evidences: ");
 			evidences.clear();
 			for (String ev : evidenceCodes)
-			{
-				evidences.add(new ByteString(ev));
-			}
+				evidences.put(new ByteString(ev),1);
 		} else
 		{
 			/* Means take everything */
@@ -1509,7 +1513,7 @@ public class B4O
 
 		PopulationSet allItems = new PopulationSet("all");
 		allItems.addGenes(allItemsToBeConsidered);
-		termEnumerator = allItems.enumerateGOTerms(graph, assoc, evidences);
+		termEnumerator = allItems.enumerateGOTerms(graph, assoc, evidences.keySet());
 		ItemEnumerator itemEnumerator = ItemEnumerator.createFromTermEnumerator(termEnumerator);
 
 		/* Term stuff */
@@ -1655,7 +1659,10 @@ public class B4O
 		Matcher matcher = frequencyPattern.matcher(freq);
 		if (matcher.matches())
 		{
-			f = Double.parseDouble(matcher.group(1)) + Double.parseDouble(matcher.group(2)) / 10000;
+			String fractionalPart = matcher.group(2);
+			if (fractionalPart == null || fractionalPart.length() == 0) fractionalPart = "0";
+			
+			f = Double.parseDouble(matcher.group(1)) + Double.parseDouble(fractionalPart) / Math.pow(10,fractionalPart.length());
 			f /= 100.0;
 		} else
 		{
