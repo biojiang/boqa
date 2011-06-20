@@ -42,8 +42,8 @@ public class B4oweb implements EntryPoint {
 	private final GreetingServiceAsync greetingService = GWT
 			.create(GreetingService.class);
 
-	  private static final List<String> DAYS = Arrays.asList("Sunday", "Monday",
-		      "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
+	  private static final List<String> DAYS = Arrays.asList(null, "Sunday", "Monday",
+		      "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "1", "2", "3", "4", "5");
 	
 	/**
 	 * This is the entry point method.
@@ -64,19 +64,17 @@ public class B4oweb implements EntryPoint {
 		RootPanel.get("errorLabelContainer").add(errorLabel);
 
 		{
-			TextCell textCell = new TextCell();
-			CellList<String> cellList = new CellList<String>(textCell);
-			cellList.setRowCount(DAYS.size(),true);
+			VerticalPanel verticalPanel = new VerticalPanel();
+			CellList<String> cellList = new CellList<String>(new TextCell());
+			cellList.setRowCount(DAYS.size() * 2,true);
 			cellList.setRowData(DAYS);
-			cellList.setPageSize(5);
-	
-			ScrollPanel scrollPanel = new ScrollPanel();
-//		RangeLabelPager rangeLabelPager = new RangeLabelPager();
+			cellList.setHeight("200px");
+			cellList.setWidth("100px");
 			
-			//RootPanel.get().add(cellList);
-			//scrollPanel.add(cellList);
-			scrollPanel.setWidget(cellList);
-			RootPanel.get().add(scrollPanel);
+			ScrollPanel scrollPanel = new ScrollPanel(cellList);
+
+			verticalPanel.add(scrollPanel);
+			RootPanel.get().add(verticalPanel);
 		}
 
 		// Focus the cursor on the name field when the app loads
