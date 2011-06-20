@@ -1,10 +1,12 @@
+library(compiler)
+
 #' Evaluates a given data frame for classification performance
 #' 
 #' @param d represents a frame, from which date is gathered
 #' @param v represents a column matrix, in which the name of the slots 
 #'        that are used for the plots of the data frame can be specified. The last
 #'        column represents whether high values are good or not.
-evaluate<-function(d,v)
+evaluate.def<-function(d,v)
 {
 	if (nrow(d)==0)
 	{
@@ -90,6 +92,8 @@ evaluate<-function(d,v)
 	}
 	return(res)
 }
+
+evaluate<-cmpfun(evaluate.def)
 
 
 v<-matrix(c("marg","Marg. Prob.", T,
