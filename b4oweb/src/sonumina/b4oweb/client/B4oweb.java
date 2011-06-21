@@ -35,13 +35,12 @@ public class B4oweb implements EntryPoint {
 	private static final String SERVER_ERROR = "An error occurred while "
 			+ "attempting to contact the server. Please check your network "
 			+ "connection and try again.";
-
+	
 	/**
 	 * Create a remote service proxy to talk to the server-side Greeting service.
 	 */
-	private final GreetingServiceAsync greetingService = GWT
-			.create(GreetingService.class);
-
+	private final B4OServiceAsync b4oService = GWT.create(B4OService.class);
+	
 	  private static final List<String> DAYS = Arrays.asList(null, "Sunday", "Monday",
 		      "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "1", "2", "3", "4", "5");
 	
@@ -69,8 +68,8 @@ public class B4oweb implements EntryPoint {
 			cellList.setRowCount(DAYS.size() * 2,true);
 			cellList.setRowData(DAYS);
 			cellList.setHeight("200px");
-			cellList.setWidth("100px");
-			
+			cellList.setWidth("500px");
+
 			ScrollPanel scrollPanel = new ScrollPanel(cellList);
 
 			verticalPanel.add(scrollPanel);
@@ -81,6 +80,19 @@ public class B4oweb implements EntryPoint {
 		nameField.setFocus(true);
 		nameField.selectAll();
 
+		b4oService.getNumberOfTerms(new AsyncCallback<Integer>() {
+			@Override
+			public void onSuccess(Integer result)
+			{
+				GWT.log(result + "");
+			}
+
+			@Override
+			public void onFailure(Throwable caught)
+			{
+			}
+		});
+		
 		// Create the popup dialog box
 		final DialogBox dialogBox = new DialogBox();
 		dialogBox.setText("Remote Procedure Call");
@@ -99,6 +111,18 @@ public class B4oweb implements EntryPoint {
 		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
 		dialogVPanel.add(closeButton);
 		dialogBox.setWidget(dialogVPanel);
+
+		b4oService.getTest(new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result)
+			{
+			}
+			@Override
+			public void onFailure(Throwable caught)
+			{
+			}
+		});
+		
 
 		// Add a handler to close the DialogBox
 		closeButton.addClickHandler(new ClickHandler() {
@@ -143,28 +167,6 @@ public class B4oweb implements EntryPoint {
 				sendButton.setEnabled(false);
 				textToServerLabel.setText(textToServer);
 				serverResponseLabel.setText("");
-				greetingService.greetServer(textToServer,
-						new AsyncCallback<String>() {
-							public void onFailure(Throwable caught) {
-								// Show the RPC error message to the user
-								dialogBox
-										.setText("Remote Procedure Call - Failure");
-								serverResponseLabel
-										.addStyleName("serverResponseLabelError");
-								serverResponseLabel.setHTML(SERVER_ERROR);
-								dialogBox.center();
-								closeButton.setFocus(true);
-							}
-
-							public void onSuccess(String result) {
-								dialogBox.setText("Remote Procedure Call");
-								serverResponseLabel
-										.removeStyleName("serverResponseLabelError");
-								serverResponseLabel.setHTML(result);
-								dialogBox.center();
-								closeButton.setFocus(true);
-							}
-						});
 			}
 		}
 
