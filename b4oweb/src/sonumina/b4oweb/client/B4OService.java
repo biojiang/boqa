@@ -1,5 +1,7 @@
 package sonumina.b4oweb.client;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -13,4 +15,6 @@ public interface B4OService extends RemoteService
 	 * @return
 	 */
 	int getNumberOfTerms();
+	
+	String [] getNamesOfTerms(List<Integer> ids);
 }

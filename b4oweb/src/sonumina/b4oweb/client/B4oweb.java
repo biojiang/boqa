@@ -1,13 +1,11 @@
 package sonumina.b4oweb.client;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import sonumina.b4oweb.shared.FieldVerifier;
 
 import com.google.gwt.cell.client.AbstractCell;
-import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -17,7 +15,6 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.dom.client.ScrollEvent;
 import com.google.gwt.event.dom.client.ScrollHandler;
-import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.CellList;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -32,9 +29,61 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 class LazyTerm
 {
-	public boolean loaded;
-	public int id;
+	public enum LoadingState
+	{
+		STATE_NOT_LOADED,
+		STATE_LOADING,
+		STATE_LOADED,
+		STATE_MAX
+	};
+
+	private final static int STATE_MASK = upperPowerOfTwo(LoadingState.STATE_MAX.ordinal()) - 1;
+
+	public int flags;
+
+	public int serverId;
 	public String text;
+	
+	/**
+	 * From bit twiddling hacks.
+	 * 
+	 * @param v
+	 * @return
+	 */
+	public static int upperPowerOfTwo(int v)
+	{
+		v--;
+		v |= v >> 1;
+		v |= v >> 2;
+		v |= v >> 4;
+		v |= v >> 8;
+		v |= v >> 16;
+		v |= v >> 32;
+		v++;
+		return v;
+	}
+	
+	public void setLoadingFlag(LoadingState state)
+	{
+		flags &= ~STATE_MASK;
+		flags |= state.ordinal();
+	}
+	
+	public boolean isNotLoaded()
+	{
+		return (flags & STATE_MASK) == LoadingState.STATE_NOT_LOADED.ordinal();
+	}
+	
+	public boolean isLoading()
+	{
+		return (flags & STATE_MASK) == LoadingState.STATE_LOADING.ordinal();
+	}
+
+	public boolean isLoaded()
+	{
+		return (flags & STATE_MASK) == LoadingState.STATE_LOADED.ordinal();
+	}
+
 }
 
 class LazyTermCell extends AbstractCell<LazyTerm>
@@ -66,9 +115,12 @@ public class B4oweb implements EntryPoint
 	private final B4OServiceAsync b4oService = GWT.create(B4OService.class);
 
 	/**
-	 * Our term storage.
+	 * Our local term storage.
 	 */
 	private List<LazyTerm> termsList = new ArrayList<LazyTerm>();
+	
+//	private int [] loadingIndices;
+//	private int numLoadingIndices;
 	
 	/**
 	 * The strings of terms that are currently displayed.
@@ -94,15 +146,37 @@ public class B4oweb implements EntryPoint
 		
 		int first = ypos / rowHeight;
 		int visible = visibleHeight / rowHeight + 1;
+		
+		ArrayList<Integer> toBeLoaded = new ArrayList<Integer>();
 
 		for (int i=first;i < first + visible && i < termsList.size();i++)
 		{
-			GWT.log(termsList.size() + " ");
-			termsList.get(i).loaded = true;
-			termsList.get(i).text = i + "w";
+			LazyTerm t = termsList.get(i);
+			if (t.isNotLoaded())
+			{
+				t.setLoadingFlag(LazyTerm.LoadingState.STATE_LOADING);
+				toBeLoaded.add(i);
+			}
 		}
+		
+		if (toBeLoaded.size() > 0)
+		{
+			b4oService.getNamesOfTerms(toBeLoaded, new AsyncCallback<String[]>()
+			{
 
-		cellList.setRowData(first,termsList.subList(first, Math.min(first + visible,termsList.size())));
+				@Override
+				public void onFailure(Throwable caught) { GWT.log("Error", caught);};
+
+				@Override
+				public void onSuccess(String[] result)
+				{
+					for (String s : result)
+						GWT.log(s);
+				}
+				
+			});
+//			cellList.setRowData(first,termsList.subList(first, Math.min(first + visible,termsList.size())));
+		}
 	}
 	
 	/**
@@ -127,7 +201,6 @@ public class B4oweb implements EntryPoint
 		{
 			VerticalPanel verticalPanel = new VerticalPanel();
 
-
 			cellList = new CellList<LazyTerm>(new LazyTermCell());
 			cellList.setHeight("200px");
 			cellList.setWidth("500px");
@@ -137,8 +210,6 @@ public class B4oweb implements EntryPoint
 			verticalPanel.add(scrollPanel);
 			RootPanel.get().add(verticalPanel);
 			
-			
-
 			b4oService.getNumberOfTerms(new AsyncCallback<Integer>() {
 				@Override
 				public void onSuccess(Integer result)
