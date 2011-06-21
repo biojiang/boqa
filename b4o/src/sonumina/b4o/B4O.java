@@ -386,7 +386,7 @@ public class B4O
 //	private final static String [] evidenceCodes = null;
 //	private final static int SIZE_OF_SCORE_DISTRIBUTION = 250000;
 
-	private final static int MAX_SAMPLES = 100;
+	private final static int MAX_SAMPLES = 5;
 	private final static boolean CONSIDER_FREQUENCIES_ONLY = true;
 	private final static String RESULT_NAME = "fnd-freq-only.txt";
 	private final static String [] evidenceCodes = null;//new String[]{"PCS","ICE"};
@@ -674,6 +674,10 @@ public class B4O
 		}
 	}
 	
+	static final boolean MEASURE_TIME = true;
+
+	static long timeDuration;
+	
 	/**
 	 * 
 	 * 
@@ -686,6 +690,11 @@ public class B4O
 	{
 		int numTerms = items2TermFrequencies[item].length;
 		int numTermsWithExplicitFrequencies = 0;
+
+		long now;
+		
+		if (MEASURE_TIME)
+			now = System.nanoTime();
 
 		/* Sort according to the frequencies */
 		class Freq implements Comparable<Freq>
@@ -769,6 +778,13 @@ public class B4O
 			determineCases(observedTerms, hidden, stats);
 			statsList.add(stats,factor);
 		}
+		
+		if (MEASURE_TIME)
+		{
+			timeDuration += System.nanoTime() - now;
+			System.out.println(timeDuration / (1000 * 1000));
+		}
+
 		return statsList;
 	}
 	
@@ -1182,7 +1198,7 @@ public class B4O
 	public static void main(String[] args) throws InterruptedException, IOException
 	{
 		int i;
-		int numProcessors = Runtime.getRuntime().availableProcessors();
+		int numProcessors = MEASURE_TIME?1:Runtime.getRuntime().availableProcessors();
 
 		parseCommandLine(args);
 		
