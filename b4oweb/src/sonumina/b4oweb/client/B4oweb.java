@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sonumina.b4oweb.shared.FieldVerifier;
+import sonumina.b4oweb.shared.SharedTerm;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.EntryPoint;
@@ -41,8 +42,7 @@ class LazyTerm
 
 	public int flags;
 
-	public int serverId;
-	public String text;
+	public SharedTerm term;
 	
 	/**
 	 * From bit twiddling hacks.
@@ -92,7 +92,7 @@ class LazyTermCell extends AbstractCell<LazyTerm>
 	@Override
 	public void render(Context context, LazyTerm value, SafeHtmlBuilder sb)
 	{
-		sb.appendHtmlConstant(value.text);
+		sb.appendHtmlConstant(value.term!=null?value.term.term:"Loading name...");
 	}	
 }
 
@@ -118,9 +118,6 @@ public class B4oweb implements EntryPoint
 	 * Our local term storage.
 	 */
 	private List<LazyTerm> termsList = new ArrayList<LazyTerm>();
-	
-//	private int [] loadingIndices;
-//	private int numLoadingIndices;
 	
 	/**
 	 * The strings of terms that are currently displayed.
@@ -161,21 +158,23 @@ public class B4oweb implements EntryPoint
 		
 		if (toBeLoaded.size() > 0)
 		{
-			b4oService.getNamesOfTerms(toBeLoaded, new AsyncCallback<String[]>()
+			b4oService.getNamesOfTerms(toBeLoaded, new AsyncCallback<SharedTerm[]>()
 			{
-
 				@Override
 				public void onFailure(Throwable caught) { GWT.log("Error", caught);};
 
 				@Override
-				public void onSuccess(String[] result)
+				public void onSuccess(SharedTerm [] result)
 				{
-					for (String s : result)
-						GWT.log(s);
+					for (SharedTerm t : result)
+					{
+						GWT.log(t.serverId + " " + t.term);
+						termsList.get(t.serverId).term = t;
+
+						cellList.setRowData(t.serverId,termsList.subList(t.serverId, t.serverId+1));						
+					}
 				}
-				
 			});
-//			cellList.setRowData(first,termsList.subList(first, Math.min(first + visible,termsList.size())));
 		}
 	}
 	
@@ -219,7 +218,6 @@ public class B4oweb implements EntryPoint
 					for (int i=0;i<result;i++)
 					{
 						LazyTerm t = new LazyTerm();
-						t.text = "Unknown term " + i;
 						termsList.add(t);
 					}
 

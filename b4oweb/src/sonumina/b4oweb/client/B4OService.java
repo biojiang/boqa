@@ -2,6 +2,8 @@ package sonumina.b4oweb.client;
 
 import java.util.List;
 
+import sonumina.b4oweb.shared.SharedTerm;
+
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -12,9 +14,16 @@ public interface B4OService extends RemoteService
 	
 	/**
 	 * Returns the number of terms.
+	 * 
 	 * @return
 	 */
 	int getNumberOfTerms();
 	
-	String [] getNamesOfTerms(List<Integer> ids);
+	/**
+	 * Returns the terms with the given server ids.
+	 * 
+	 * @param ids
+	 * @return
+	 */
+	SharedTerm [] getNamesOfTerms(List<Integer> ids);
 }

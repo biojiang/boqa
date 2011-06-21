@@ -3,6 +3,7 @@ package sonumina.b4oweb.server;
 import java.util.List;
 
 import sonumina.b4oweb.client.B4OService;
+import sonumina.b4oweb.shared.SharedTerm;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -23,15 +24,20 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 	}
 
 	@Override
-	public String[] getNamesOfTerms(List<Integer> ids)
+	public SharedTerm[] getNamesOfTerms(List<Integer> ids)
 	{
-		if (ids == null) return new String[0];
+		if (ids == null) return new SharedTerm[0];
 
-		String [] names = new String[ids.size()];
+		SharedTerm [] names = new SharedTerm[ids.size()];
 		
 		int i=0;
 		for (int id : ids)
-			names[i++] = B4OCore.getSlimGraph().getVertex(id).getName();
+		{
+			names[i] = new SharedTerm();
+			names[i].serverId = id;
+			names[i].term = B4OCore.getSlimGraph().getVertex(id).getName();
+			i++;
+		}
 		return names;
 	}
 
