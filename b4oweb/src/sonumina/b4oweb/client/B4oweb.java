@@ -1,10 +1,12 @@
 package sonumina.b4oweb.client;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import sonumina.b4oweb.shared.FieldVerifier;
 
+import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -13,6 +15,10 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.dom.client.ScrollEvent;
+import com.google.gwt.event.dom.client.ScrollHandler;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.CellList;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -24,10 +30,28 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
+class LazyTerm
+{
+	public boolean loaded;
+	public int id;
+	public String text;
+}
+
+class LazyTermCell extends AbstractCell<LazyTerm>
+{
+
+	@Override
+	public void render(Context context, LazyTerm value, SafeHtmlBuilder sb)
+	{
+		sb.appendHtmlConstant(value.text);
+	}	
+}
+
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class B4oweb implements EntryPoint {
+public class B4oweb implements EntryPoint
+{
 	/**
 	 * The message displayed to the user when the server cannot be reached or
 	 * returns an error.
@@ -35,19 +59,57 @@ public class B4oweb implements EntryPoint {
 	private static final String SERVER_ERROR = "An error occurred while "
 			+ "attempting to contact the server. Please check your network "
 			+ "connection and try again.";
-	
+
 	/**
 	 * Create a remote service proxy to talk to the server-side Greeting service.
 	 */
 	private final B4OServiceAsync b4oService = GWT.create(B4OService.class);
+
+	/**
+	 * Our term storage.
+	 */
+	private List<LazyTerm> termsList = new ArrayList<LazyTerm>();
 	
-	  private static final List<String> DAYS = Arrays.asList(null, "Sunday", "Monday",
-		      "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "1", "2", "3", "4", "5");
+	/**
+	 * The strings of terms that are currently displayed.
+	 */
+	private List<LazyTerm> termsCellList;
+	
+	private CellList<LazyTerm> cellList;
+	private ScrollPanel scrollPanel;
+	
+	/**
+	 * Updates the given term list.
+	 */
+	private void updateTermsList()
+	{
+		int ypos = scrollPanel.getVerticalScrollPosition();
+		int totalHeight = scrollPanel.getElement().getScrollHeight();
+		int visibleHeight = cellList.getElement().getClientHeight();
+		int numberOfElements = cellList.getPageSize();
+
+		int rowHeight = totalHeight / numberOfElements;
+		if (totalHeight % numberOfElements != 0)
+			GWT.log("The row height couldn't be determined properly");
+		
+		int first = ypos / rowHeight;
+		int visible = visibleHeight / rowHeight + 1;
+
+		for (int i=first;i < first + visible && i < termsList.size();i++)
+		{
+			GWT.log(termsList.size() + " ");
+			termsList.get(i).loaded = true;
+			termsList.get(i).text = i + "w";
+		}
+
+		cellList.setRowData(first,termsList.subList(first, Math.min(first + visible,termsList.size())));
+	}
 	
 	/**
 	 * This is the entry point method.
 	 */
-	public void onModuleLoad() {
+	public void onModuleLoad()
+	{
 		final Button sendButton = new Button("Send");
 		final TextBox nameField = new TextBox();
 		nameField.setText("GWT User");
@@ -64,35 +126,60 @@ public class B4oweb implements EntryPoint {
 
 		{
 			VerticalPanel verticalPanel = new VerticalPanel();
-			CellList<String> cellList = new CellList<String>(new TextCell());
-			cellList.setRowCount(DAYS.size() * 2,true);
-			cellList.setRowData(DAYS);
+
+
+			cellList = new CellList<LazyTerm>(new LazyTermCell());
 			cellList.setHeight("200px");
 			cellList.setWidth("500px");
 
-			ScrollPanel scrollPanel = new ScrollPanel(cellList);
+			scrollPanel = new ScrollPanel(cellList);
 
 			verticalPanel.add(scrollPanel);
 			RootPanel.get().add(verticalPanel);
+			
+			
+
+			b4oService.getNumberOfTerms(new AsyncCallback<Integer>() {
+				@Override
+				public void onSuccess(Integer result)
+				{
+					/* Fill the client store first */
+					termsList = new ArrayList<LazyTerm>(result);
+					for (int i=0;i<result;i++)
+					{
+						LazyTerm t = new LazyTerm();
+						t.text = "Unknown term " + i;
+						termsList.add(t);
+					}
+
+				    termsCellList = new ArrayList<LazyTerm>(termsList);
+
+					cellList.setRowData(termsCellList);
+					cellList.setRowCount(result,true);
+				}
+	
+				@Override
+				public void onFailure(Throwable caught)
+				{
+				}
+			});
+			
+			scrollPanel.addScrollHandler(new ScrollHandler() {
+				@Override
+				public void onScroll(ScrollEvent event)
+				{
+					updateTermsList();
+				}
+			});
+			
+			updateTermsList();
 		}
+		
 
 		// Focus the cursor on the name field when the app loads
 		nameField.setFocus(true);
 		nameField.selectAll();
 
-		b4oService.getNumberOfTerms(new AsyncCallback<Integer>() {
-			@Override
-			public void onSuccess(Integer result)
-			{
-				GWT.log(result + "");
-			}
-
-			@Override
-			public void onFailure(Throwable caught)
-			{
-			}
-		});
-		
 		// Create the popup dialog box
 		final DialogBox dialogBox = new DialogBox();
 		dialogBox.setText("Remote Procedure Call");
