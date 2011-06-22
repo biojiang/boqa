@@ -20,7 +20,7 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 	@Override
 	public int getNumberOfTerms()
 	{
-		return B4OCore.getSlimGraph().getNumberOfVertices(); 
+		return B4OCore.getNumberTerms(); 
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 		{
 			names[i] = new SharedTerm();
 			names[i].serverId = id;
-			names[i].term = B4OCore.getSlimGraph().getVertex(id).getName();
+			names[i].term = B4OCore.getTerm(id).getName();
 			i++;
 		}
 		return names;

@@ -1,6 +1,8 @@
 package sonumina.b4oweb.server;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.logging.Logger;
 
 import ontologizer.association.AssociationContainer;
@@ -28,6 +30,16 @@ public class B4OCore
 	 * The corresponding slim view.
 	 */
 	static private SlimDirectedGraphView<Term> slimGraph;
+
+	/**
+	 * Contains the indices of the term in sorted order
+	 */
+	static private int [] sorted2Idx;
+	
+	/**
+	 * Contains the rank of the term within the sorted order. 
+	 */
+	static private int [] idx2Sorted;
 	
 	/**
 	 * The static association container. Defines the items.
@@ -55,6 +67,35 @@ public class B4OCore
 		slimGraph = ontology.getSlimGraphView();
 		logger.info("Slim graph greated");
 
+		/* Sort the term according to the alphabet */
+		class TermName
+		{
+			int index;
+			String name;
+		}
+		TermName [] terms = new TermName[slimGraph.getNumberOfVertices()];
+		for (int i=0;i<slimGraph.getNumberOfVertices();i++)
+		{
+			terms[i] = new TermName();
+			terms[i].name = slimGraph.getVertex(i).getName();
+			terms[i].index = i;
+		}
+		Arrays.sort(terms, new Comparator<TermName>() {
+			@Override
+			public int compare(TermName o1, TermName o2)
+			{
+				return o1.name.compareTo(o2.name);
+			}
+		});
+		sorted2Idx = new int[terms.length];
+		idx2Sorted = new int[terms.length];
+		for (int i=0;i<terms.length;i++)
+		{
+			sorted2Idx[i] = terms[i].index;
+			idx2Sorted[terms[i].index] = i;
+		}
+		
+		/* Load associations */
 		try {
 			AssociationParser ap = new AssociationParser(ASSOCIATIONS_PATH,ontology.getTermContainer(),null,null);
 			associations = new AssociationContainer(ap.getAssociations(), ap.getSynonym2gene(), ap.getDbObject2gene());
@@ -82,14 +123,25 @@ public class B4OCore
 	{
 		return associations;
 	}
-	
+
 	/**
-	 * Returns the slim graph representation of the ontology. 
+	 * Returns the number of terms.
 	 * 
 	 * @return
 	 */
-	public static SlimDirectedGraphView<Term> getSlimGraph()
+	public static int getNumberTerms()
 	{
-		return slimGraph;
+		return slimGraph.getNumberOfVertices();
+	}
+
+	/**
+	 * Returns the term at the given sorted index.
+	 * 
+	 * @param sortedIdx
+	 * @return
+	 */
+	public static Term getTerm(int sortedIdx)
+	{
+		return slimGraph.getVertex(sorted2Idx[sortedIdx]);
 	}
 }
