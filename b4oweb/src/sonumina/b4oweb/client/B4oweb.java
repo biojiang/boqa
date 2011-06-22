@@ -1,6 +1,7 @@
 package sonumina.b4oweb.client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import sonumina.b4oweb.shared.FieldVerifier;
@@ -9,6 +10,7 @@ import sonumina.b4oweb.shared.SharedTerm;
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -127,6 +129,7 @@ public class B4oweb implements EntryPoint
 	private CellList<LazyTerm> cellList;
 	private ScrollPanel scrollPanel;
 	
+	
 	/**
 	 * Updates the given term list.
 	 */
@@ -140,6 +143,12 @@ public class B4oweb implements EntryPoint
 		int rowHeight = totalHeight / numberOfElements;
 		if (totalHeight % numberOfElements != 0)
 			GWT.log("The row height couldn't be determined properly");
+		
+		if (rowHeight == 0)
+		{
+			GWT.log("Row height is 0");
+			return;
+		}
 		
 		int first = ypos / rowHeight;
 		int visible = visibleHeight / rowHeight + 1;
@@ -157,25 +166,31 @@ public class B4oweb implements EntryPoint
 		}
 		
 		if (toBeLoaded.size() > 0)
-		{
-			b4oService.getNamesOfTerms(toBeLoaded, new AsyncCallback<SharedTerm[]>()
-			{
-				@Override
-				public void onFailure(Throwable caught) { GWT.log("Error", caught);};
-
-				@Override
-				public void onSuccess(SharedTerm [] result)
+			updateTerms(toBeLoaded);
+	}
+	
+	private void updateTerms(List<Integer> toBeLoaded)
+	{
+		b4oService.getNamesOfTerms(toBeLoaded, new AsyncCallback<SharedTerm[]>()
 				{
-					for (SharedTerm t : result)
-					{
-						GWT.log(t.serverId + " " + t.term);
-						termsList.get(t.serverId).term = t;
+					@Override
+					public void onFailure(Throwable caught) { GWT.log("Error", caught);};
 
-						cellList.setRowData(t.serverId,termsList.subList(t.serverId, t.serverId+1));						
+					@Override
+					public void onSuccess(SharedTerm [] result)
+					{
+						for (SharedTerm t : result)
+						{
+							GWT.log(t.serverId + " " + t.term);
+							LazyTerm lz = termsList.get(t.serverId);
+							if (lz != null)
+							{
+								lz.term = t;
+								cellList.setRowData(t.serverId,termsList.subList(t.serverId, t.serverId+1));
+							}
+						}
 					}
-				}
-			});
-		}
+				});
 	}
 	
 	/**
@@ -225,12 +240,13 @@ public class B4oweb implements EntryPoint
 
 					cellList.setRowData(termsCellList);
 					cellList.setRowCount(result,true);
+
+					/* Update the first */
+					updateTerms(Arrays.asList(0,1,2,3,4,5,6,7,8,9,10,11,12));
 				}
 	
 				@Override
-				public void onFailure(Throwable caught)
-				{
-				}
+				public void onFailure(Throwable caught) { }
 			});
 			
 			scrollPanel.addScrollHandler(new ScrollHandler() {
@@ -240,8 +256,6 @@ public class B4oweb implements EntryPoint
 					updateTermsList();
 				}
 			});
-			
-			updateTermsList();
 		}
 		
 
@@ -268,17 +282,6 @@ public class B4oweb implements EntryPoint
 		dialogVPanel.add(closeButton);
 		dialogBox.setWidget(dialogVPanel);
 
-		b4oService.getTest(new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result)
-			{
-			}
-			@Override
-			public void onFailure(Throwable caught)
-			{
-			}
-		});
-		
 
 		// Add a handler to close the DialogBox
 		closeButton.addClickHandler(new ClickHandler() {
