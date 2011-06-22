@@ -10,14 +10,20 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("b4o")
 public interface B4OService extends RemoteService
 {
-	String getTest();
-	
 	/**
 	 * Returns the number of terms.
 	 * 
 	 * @return
 	 */
 	int getNumberOfTerms();
+	
+	/**
+	 * Returns the number of terms matching the given pattern.
+	 * 
+	 * @param pattern
+	 * @return
+	 */
+	int getNumberOfTerms(String pattern);
 	
 	/**
 	 * Returns the terms with the given server ids.

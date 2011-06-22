@@ -125,13 +125,24 @@ public class B4OCore
 	}
 
 	/**
-	 * Returns the number of terms.
+	 * Returns the number of terms that match the given pattern.
 	 * 
+	 * @param pattern may be null
 	 * @return
 	 */
-	public static int getNumberTerms()
+	public static int getNumberTerms(String pattern)
 	{
-		return slimGraph.getNumberOfVertices();
+		if (pattern == null || pattern.length() == 0)
+			return slimGraph.getNumberOfVertices();
+
+		int numberOfTerms = 0;
+		for (int i=0;i<slimGraph.getNumberOfVertices();i++)
+		{
+			
+			if (slimGraph.getVertex(i).getName().contains(pattern))
+				numberOfTerms++;
+		}
+		return numberOfTerms;
 	}
 
 	/**
@@ -144,4 +155,5 @@ public class B4OCore
 	{
 		return slimGraph.getVertex(sorted2Idx[sortedIdx]);
 	}
+
 }

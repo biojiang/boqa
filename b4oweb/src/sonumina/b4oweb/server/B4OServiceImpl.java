@@ -12,16 +12,17 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 {
 
 	@Override
-	public String getTest()
+	public int getNumberOfTerms()
 	{
-		return "MyString";
+		return B4OCore.getNumberTerms(null); 
 	}
 
 	@Override
-	public int getNumberOfTerms()
+	public int getNumberOfTerms(String pattern)
 	{
-		return B4OCore.getNumberTerms(); 
+		return B4OCore.getNumberTerms(pattern);
 	}
+
 
 	@Override
 	public SharedTerm[] getNamesOfTerms(List<Integer> ids)
@@ -40,5 +41,4 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 		}
 		return names;
 	}
-
 }
