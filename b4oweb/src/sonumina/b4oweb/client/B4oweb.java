@@ -115,7 +115,7 @@ public class B4oweb implements EntryPoint
 			+ "connection and try again.";
 
 	/**
-	 * Create a remote service proxy to talk to the server-side Greeting service.
+	 * Create a remote service proxy to talk to the server-side b4o service.
 	 */
 	private final B4OServiceAsync b4oService = GWT.create(B4OService.class);
 
@@ -125,7 +125,13 @@ public class B4oweb implements EntryPoint
 	private List<LazyTerm> termsList = new ArrayList<LazyTerm>();
 	
 	/**
-	 * The strings of terms that are currently displayed.
+	 * The filter string that is used in the term filter.
+	 */
+	private String termFilterString;
+	
+	/**
+	 * The strings of terms that are currently displayed. This may be less than above
+	 * if a filter string is active.
 	 */
 	private List<LazyTerm> termsCellList;
 	
@@ -134,9 +140,9 @@ public class B4oweb implements EntryPoint
 	
 	
 	/**
-	 * Updates the given term list.
+	 * Updates the terms currently visible within the scroll panel.
 	 */
-	private void updateTermsList()
+	private void updateVisibleTerms()
 	{
 		int ypos = scrollPanel.getVerticalScrollPosition();
 		int totalHeight = scrollPanel.getElement().getScrollHeight();
@@ -171,7 +177,12 @@ public class B4oweb implements EntryPoint
 		if (toBeLoaded.size() > 0)
 			updateTerms(toBeLoaded);
 	}
-	
+
+	/**
+	 * Updates local information of the given terms.
+	 * 
+	 * @param toBeLoaded
+	 */
 	private void updateTerms(List<Integer> toBeLoaded)
 	{
 		b4oService.getNamesOfTerms(toBeLoaded, new AsyncCallback<SharedTerm[]>()
@@ -194,6 +205,14 @@ public class B4oweb implements EntryPoint
 						}
 					}
 				});
+	}
+	
+	/**
+	 * Populates the term cell list with terms.
+	 */
+	private void populateTerms()
+	{
+		
 	}
 	
 	/**
@@ -228,7 +247,8 @@ public class B4oweb implements EntryPoint
 				
 				@Override
 				public void onKeyUp(KeyUpEvent event) {
-							GWT.log(termTextBox.getText());
+					termFilterString = termTextBox.getText();
+					populateTerms();
 				}
 			});
 			verticalPanel.add(termTextBox);
@@ -268,7 +288,7 @@ public class B4oweb implements EntryPoint
 				@Override
 				public void onScroll(ScrollEvent event)
 				{
-					updateTermsList();
+					updateVisibleTerms();
 				}
 			});
 		}
