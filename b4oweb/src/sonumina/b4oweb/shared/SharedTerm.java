@@ -18,7 +18,7 @@ public class SharedTerm implements IsSerializable
 	 * This is the global server id of term.
 	 */
 	public int serverId;
-	
+
 	/**
 	 * The name of the term.
 	 */

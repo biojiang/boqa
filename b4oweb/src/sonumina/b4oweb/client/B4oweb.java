@@ -194,12 +194,12 @@ public class B4oweb implements EntryPoint
 					{
 						for (SharedTerm t : result)
 						{
-							GWT.log(t.serverId + " " + t.term);
-							LazyTerm lz = termsList.get(t.serverId);
+							GWT.log(t.requestId + " " + t.term);
+							LazyTerm lz = termsList.get(t.requestId);
 							if (lz != null)
 							{
 								lz.term = t;
-								cellList.setRowData(t.serverId,termsList.subList(t.serverId, t.serverId+1));
+								cellList.setRowData(t.requestId,termsList.subList(t.requestId, t.requestId+1));
 							}
 						}
 					}

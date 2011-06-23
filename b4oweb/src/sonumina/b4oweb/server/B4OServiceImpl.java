@@ -41,7 +41,7 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 		for (int id : ids)
 		{
 			names[i] = new SharedTerm();
-			names[i].serverId = id;
+			names[i].requestId = id;
 			names[i].term = B4OCore.getTerm(id).getName();
 			i++;
 		}
