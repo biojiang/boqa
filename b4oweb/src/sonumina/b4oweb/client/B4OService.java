@@ -37,7 +37,7 @@ public interface B4OService extends RemoteService
 	 * Returns the terms with the given ids.
 	 * 
 	 * @param pattern
-	 * @param ids
+	 * @param ids defines the position within the context of the given pattern.
 	 * @return
 	 */
 	SharedTerm [] getNamesOfTerms(String pattern, List<Integer> ids);
