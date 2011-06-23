@@ -2,6 +2,8 @@ package sonumina.b4oweb.server;
 
 import java.util.List;
 
+import ontologizer.go.Term;
+
 import sonumina.b4oweb.client.B4OService;
 import sonumina.b4oweb.shared.SharedTerm;
 
@@ -35,14 +37,24 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 	{
 		if (ids == null) return new SharedTerm[0];
 
+		int i=0, j=0;
 		SharedTerm [] names = new SharedTerm[ids.size()];
 
-		int i=0;
-		for (int id : ids)
+		/* Go through all terms of the given pattern and then fill
+		 * our returning array as requested by the caller */
+		for (Term t : B4OCore.getTerms(pattern))
 		{
-			names[i] = new SharedTerm();
-			names[i].requestId = id;
-			names[i].term = B4OCore.getTerm(id).getName();
+			if (ids.get(j) == i)
+			{
+				names[j] = new SharedTerm();
+				names[j].requestId = i;
+				names[j].serverId = B4OCore.getIdOfTerm(t);
+				names[j].term = B4OCore.getTerm(names[j].serverId).getName();
+				j++;
+
+				if (j >= ids.size())
+					break;
+			}
 			i++;
 		}
 		return names;

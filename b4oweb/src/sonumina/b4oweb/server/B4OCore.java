@@ -191,4 +191,15 @@ public class B4OCore
 		return numberOfTerms;
 	
 	}
+
+	/**
+	 * Returns the id of the given term.
+	 * 
+	 * @param t
+	 * @return
+	 */
+	public static int getIdOfTerm(Term t)
+	{
+		return idx2Sorted[slimGraph.getVertexIndex(t)];
+	}
 }
