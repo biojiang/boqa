@@ -9,6 +9,18 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SharedTerm implements IsSerializable
 {
-	public int serverId; 
+	/**
+	 * This is the request id which the server stores.
+	 */
+	public int requestId;
+
+	/**
+	 * This is the global server id of term.
+	 */
+	public int serverId;
+	
+	/**
+	 * The name of the term.
+	 */
 	public String term;
 }

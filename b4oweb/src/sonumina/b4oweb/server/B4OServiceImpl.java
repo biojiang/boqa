@@ -27,10 +27,16 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 	@Override
 	public SharedTerm[] getNamesOfTerms(List<Integer> ids)
 	{
+		return getNamesOfTerms(null,ids);
+	}
+
+	@Override
+	public SharedTerm[] getNamesOfTerms(String pattern, List<Integer> ids)
+	{
 		if (ids == null) return new SharedTerm[0];
 
 		SharedTerm [] names = new SharedTerm[ids.size()];
-		
+
 		int i=0;
 		for (int id : ids)
 		{

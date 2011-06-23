@@ -3,6 +3,7 @@ package sonumina.b4oweb.server;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.logging.Logger;
 
 import ontologizer.association.AssociationContainer;
@@ -125,6 +126,54 @@ public class B4OCore
 	}
 
 	/**
+	 * Returns the term at the given sorted index.
+	 * 
+	 * @param sortedIdx
+	 * @return
+	 */
+	public static Term getTerm(int sortedIdx)
+	{
+		return slimGraph.getVertex(sorted2Idx[sortedIdx]);
+	}
+
+	/**
+	 * Returns the terms matching the pattern. 
+	 * 
+	 * @param pattern
+	 * @return
+	 */
+	public static Iterable<Term> getTerms(final String pattern)
+	{
+		return new Iterable<Term>() {
+			
+			@Override
+			public Iterator<Term> iterator() {
+				return new Iterator<Term>()
+				{
+					int i = 0;
+					
+					@Override
+					public boolean hasNext()
+					{
+						for (;i<slimGraph.getNumberOfVertices();i++)
+							if (pattern == null || pattern.length() == 0 || getTerm(i).getName().contains(pattern))
+								return true;
+						return false;
+					}
+					
+					@Override
+					public Term next() {
+						return slimGraph.getVertex(i++);
+					}
+					
+					@Override
+					public void remove() { }
+				};
+			}
+		};
+	}
+	
+	/**
 	 * Returns the number of terms that match the given pattern.
 	 * 
 	 * @param pattern may be null
@@ -136,24 +185,10 @@ public class B4OCore
 			return slimGraph.getNumberOfVertices();
 
 		int numberOfTerms = 0;
-		for (int i=0;i<slimGraph.getNumberOfVertices();i++)
-		{
-			
-			if (slimGraph.getVertex(i).getName().contains(pattern))
-				numberOfTerms++;
-		}
+		for (@SuppressWarnings("unused") Term t : getTerms(pattern))
+			numberOfTerms++;
+
 		return numberOfTerms;
+	
 	}
-
-	/**
-	 * Returns the term at the given sorted index.
-	 * 
-	 * @param sortedIdx
-	 * @return
-	 */
-	public static Term getTerm(int sortedIdx)
-	{
-		return slimGraph.getVertex(sorted2Idx[sortedIdx]);
-	}
-
 }

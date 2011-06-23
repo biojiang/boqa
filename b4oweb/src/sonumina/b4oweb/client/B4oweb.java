@@ -138,7 +138,6 @@ public class B4oweb implements EntryPoint
 	private CellList<LazyTerm> cellList;
 	private ScrollPanel scrollPanel;
 	
-	
 	/**
 	 * Updates the terms currently visible within the scroll panel.
 	 */
@@ -212,7 +211,18 @@ public class B4oweb implements EntryPoint
 	 */
 	private void populateTerms()
 	{
-		
+		b4oService.getNumberOfTerms(termFilterString, new AsyncCallback<Integer>() {
+
+			@Override
+			public void onFailure(Throwable caught) { }
+
+			@Override
+			public void onSuccess(Integer result)
+			{
+				GWT.log(result + " ");
+			}
+		});
+
 	}
 	
 	/**
