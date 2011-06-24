@@ -156,8 +156,10 @@ public class B4OCore
 					public boolean hasNext()
 					{
 						for (;i<slimGraph.getNumberOfVertices();i++)
+						{
 							if (pattern == null || pattern.length() == 0 || getTerm(i).getName().contains(pattern))
 								return true;
+						}
 						return false;
 					}
 					

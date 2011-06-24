@@ -163,9 +163,9 @@ public class B4oweb implements EntryPoint
 		
 		ArrayList<Integer> toBeLoaded = new ArrayList<Integer>();
 
-		for (int i=first;i < first + visible && i < termsList.size();i++)
+		for (int i=first;i < first + visible && i < termsCellList.size();i++)
 		{
-			LazyTerm t = termsList.get(i);
+			LazyTerm t = termsCellList.get(i);
 			if (t.isNotLoaded())
 			{
 				t.setLoadingFlag(LazyTerm.LoadingState.STATE_LOADING);
@@ -184,7 +184,7 @@ public class B4oweb implements EntryPoint
 	 */
 	private void updateTerms(List<Integer> toBeLoaded)
 	{
-		b4oService.getNamesOfTerms(toBeLoaded, new AsyncCallback<SharedTerm[]>()
+		b4oService.getNamesOfTerms(termFilterString, toBeLoaded, new AsyncCallback<SharedTerm[]>()
 				{
 					@Override
 					public void onFailure(Throwable caught) { GWT.log("Error", caught);};
@@ -194,7 +194,7 @@ public class B4oweb implements EntryPoint
 					{
 						for (SharedTerm t : result)
 						{
-							GWT.log(t.requestId + " " + t.term);
+							GWT.log(t.serverId + " " + t.requestId + " " + t.term);
 							LazyTerm lz = termsCellList.get(t.requestId);
 							if (lz != null)
 							{
@@ -219,7 +219,14 @@ public class B4oweb implements EntryPoint
 			@Override
 			public void onSuccess(Integer result)
 			{
-				GWT.log(result + " ");
+			    termsCellList = new ArrayList<LazyTerm>(result);
+				for (int i=0;i<result;i++)
+				{
+					LazyTerm t = new LazyTerm();
+					termsCellList.add(t);
+				}
+				cellList.setRowData(termsCellList);
+				cellList.setRowCount(result,true);
 			}
 		});
 
