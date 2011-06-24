@@ -225,8 +225,13 @@ public class B4oweb implements EntryPoint
 					LazyTerm t = new LazyTerm();
 					termsCellList.add(t);
 				}
+				
+				long start = System.currentTimeMillis();
+
 				cellList.setRowData(termsCellList);
 				cellList.setRowCount(result,true);
+				
+				GWT.log((System.currentTimeMillis() - start) + " " + termsCellList.size());
 			}
 		});
 
@@ -290,8 +295,12 @@ public class B4oweb implements EntryPoint
 
 				    termsCellList = new ArrayList<LazyTerm>(termsList);
 
+					long start = System.currentTimeMillis();
+
 					cellList.setRowData(termsCellList);
 					cellList.setRowCount(result,true);
+
+					GWT.log((System.currentTimeMillis() - start) + " " + termsCellList.size());
 
 					/* Update the first */
 					updateTerms(Arrays.asList(0,1,2,3,4,5,6,7,8,9,10,11,12));

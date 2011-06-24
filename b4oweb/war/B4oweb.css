@@ -25,7 +25,13 @@ h1 {
 }
 
 .serverResponseLabelError {
-  color: red;
+  color: green;
+  border: 2px;
+}
+
+.scrollable {
+      border: 1px solid #ccc;
+      text-align: left;
 }
 
 /** Set ids using widget.getElement().setId("idOfElement") */
