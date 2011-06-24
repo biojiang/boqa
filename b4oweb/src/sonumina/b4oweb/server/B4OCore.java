@@ -163,7 +163,7 @@ public class B4OCore
 					
 					@Override
 					public Term next() {
-						return slimGraph.getVertex(i++);
+						return getTerm(i++);
 					}
 					
 					@Override
