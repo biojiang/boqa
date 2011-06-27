@@ -14,22 +14,31 @@ import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.dom.client.ScrollEvent;
 import com.google.gwt.event.dom.client.ScrollHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.CellList;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.SelectionModel;
@@ -129,7 +138,7 @@ public class B4oweb implements EntryPoint
 	/**
 	 * The filter string that is used in the term filter.
 	 */
-	private String availableTermsFilterString;
+	private String availableTermsFilterString = "";
 	
 	/**
 	 * The strings of terms that are currently displayed. This may be less than above
@@ -145,7 +154,7 @@ public class B4oweb implements EntryPoint
 	/**
 	 * The available term cell list.
 	 */
-	private CellList<LazyTerm> availableTermsList;
+	private CellList<LazyTerm> availableTermsCellList;
 	
 	/**
 	 * And to which it is embedded.
@@ -153,14 +162,29 @@ public class B4oweb implements EntryPoint
 	private ScrollPanel availableTermsScrollPanel;
 	
 	/**
+	 * The table holding the selected terms.
+	 */
+	private CellTable<LazyTerm> selectedTermsCellTable;
+
+	/**
+	 * And the panel to which it is embedded.
+	 */
+	private ScrollPanel selectedTermsScrollPanel;
+
+	/**
+	 * The terms that are currently selected.
+	 */
+	private List<LazyTerm> selectedTermsList = new ArrayList<LazyTerm>();
+
+	/**
 	 * Updates the terms currently visible within the scroll panel.
 	 */
 	private void updateVisibleTerms()
 	{
 		int ypos = availableTermsScrollPanel.getVerticalScrollPosition();
 		int totalHeight = availableTermsScrollPanel.getElement().getScrollHeight();
-		int visibleHeight = availableTermsList.getElement().getClientHeight();
-		int numberOfElements = availableTermsList.getPageSize();
+		int visibleHeight = availableTermsCellList.getElement().getClientHeight();
+		int numberOfElements = availableTermsCellList.getPageSize();
 
 		int rowHeight = totalHeight / numberOfElements;
 		if (totalHeight % numberOfElements != 0)
@@ -213,7 +237,7 @@ public class B4oweb implements EntryPoint
 							if (lz != null)
 							{
 								lz.term = t;
-								availableTermsList.setRowData(t.requestId,availableTermsBackendList.subList(t.requestId, t.requestId+1));
+								availableTermsCellList.setRowData(t.requestId,availableTermsBackendList.subList(t.requestId, t.requestId+1));
 							}
 						}
 					}
@@ -223,7 +247,7 @@ public class B4oweb implements EntryPoint
 	/**
 	 * Populates the term cell list with terms.
 	 */
-	private void populateTerms()
+	private void populateAvailableTerms()
 	{
 		b4oService.getNumberOfTerms(availableTermsFilterString, new AsyncCallback<Integer>() {
 
@@ -242,24 +266,21 @@ public class B4oweb implements EntryPoint
 				
 				long start = System.currentTimeMillis();
 
-				availableTermsList.setRowData(availableTermsBackendList);
-				availableTermsList.setRowCount(result,true);
+				availableTermsCellList.setRowData(availableTermsBackendList);
+				availableTermsCellList.setRowCount(result,true);
 				
 				GWT.log((System.currentTimeMillis() - start) + " " + availableTermsBackendList.size());
-
-//				start = System.currentTimeMillis();
-//				ArrayList<Integer> test = new ArrayList<Integer>();
-//				for (int i=0;i<10000;i++)
-//					test.add(i);
-//				GWT.log((System.currentTimeMillis() - start) + " building list");
-//
-//				start = System.currentTimeMillis();
-//				for (int i=0;i<9000;i++)
-//					test.remove(test.size() - 1);
-//				GWT.log((System.currentTimeMillis() - start) + " shrinking list");
 			}
 		});
-
+	}
+	
+	/**
+	 * 
+	 */
+	private void populateSelectedTerms()
+	{
+		selectedTermsCellTable.setRowData(selectedTermsList);
+		GWT.log("" + selectedTermsCellTable.getRowCount());
 	}
 	
 	/**
@@ -267,29 +288,18 @@ public class B4oweb implements EntryPoint
 	 */
 	public void onModuleLoad()
 	{
-//		final Button sendButton = new Button("Send");
-//		final TextBox nameField = new TextBox();
-//		nameField.setText("GWT User");
-//		final Label errorLabel = new Label();
-//
-//		// We can add style names to widgets
-//		sendButton.addStyleName("sendButton");
-
-		// Add the nameField and sendButton to the RootPanel
-		// Use RootPanel.get() to get the entire body element
-//		RootPanel.get("nameFieldContainer").add(nameField);
-//		RootPanel.get("sendButtonContainer").add(sendButton);
-//		RootPanel.get("errorLabelContainer").add(errorLabel);
-
+		HorizontalPanel horizontalPanel = new HorizontalPanel();
+		RootLayoutPanel.get().add(horizontalPanel);
+		
 		{
-			VerticalPanel verticalPanel = new VerticalPanel();
+			VerticalPanel availableTermsPanel = new VerticalPanel();
 
-			availableTermsList = new CellList<LazyTerm>(new LazyTermCell());
-			availableTermsList.setHeight("200px");
-			availableTermsList.setWidth("520px");
+			availableTermsCellList = new CellList<LazyTerm>(new LazyTermCell());
+			availableTermsCellList.setHeight("200px");
+			availableTermsCellList.setWidth("520px");
 			
 			final SelectionModel<LazyTerm> selectionModel = new SingleSelectionModel<LazyTerm>();
-			availableTermsList.setSelectionModel(selectionModel);
+			availableTermsCellList.setSelectionModel(selectionModel);
 			
 			final TextBox termTextBox = new TextBox();
 			termTextBox.setWidth("520px");
@@ -297,30 +307,51 @@ public class B4oweb implements EntryPoint
 				@Override
 				public void onKeyUp(KeyUpEvent event)
 				{
-					if (event.isDownArrow())
+					String newAvailableTermsFilterString = termTextBox.getText();
+					if (!newAvailableTermsFilterString.equals(availableTermsFilterString))
 					{
-						availableTermsSelectedIndex++;
-						selectionModel.setSelected(availableTermsList.getVisibleItem(availableTermsSelectedIndex), true);
-					} else if (event.isUpArrow())
-					{
-						if (availableTermsSelectedIndex == -1)
-							availableTermsSelectedIndex = availableTermsList.getRowCount();
-						availableTermsSelectedIndex--;
-						selectionModel.setSelected(availableTermsList.getVisibleItem(availableTermsSelectedIndex), true);
-					} else
-					{
-						availableTermsFilterString = termTextBox.getText();
-						populateTerms();
+						availableTermsFilterString = newAvailableTermsFilterString;
+						populateAvailableTerms();
 					}
 				}
 			});
-			verticalPanel.add(termTextBox);
+
+			termTextBox.addKeyDownHandler(new KeyDownHandler() {
+				
+				@Override
+				public void onKeyDown(KeyDownEvent event) {
+					switch (event.getNativeKeyCode())
+					{
+						case	KeyCodes.KEY_DOWN:
+								availableTermsSelectedIndex++;
+								selectionModel.setSelected(availableTermsCellList.getVisibleItem(availableTermsSelectedIndex), true);
+								break;
+
+						case	KeyCodes.KEY_UP:
+								if (availableTermsSelectedIndex == -1)
+									availableTermsSelectedIndex = availableTermsCellList.getRowCount();
+								availableTermsSelectedIndex--;
+								selectionModel.setSelected(availableTermsCellList.getVisibleItem(availableTermsSelectedIndex), true);
+								break;
+						
+						case	KeyCodes.KEY_ENTER:
+								if (availableTermsSelectedIndex != -1)
+								{
+									selectedTermsList.add(availableTermsBackendList.get(availableTermsSelectedIndex));
+									populateSelectedTerms();
+								}
+								break;
+					}
+				}
+			});
 			
-			availableTermsScrollPanel = new ScrollPanel(availableTermsList);
+			availableTermsPanel.add(termTextBox);
+			
+			availableTermsScrollPanel = new ScrollPanel(availableTermsCellList);
 			availableTermsScrollPanel.addStyleName("scrollable");
-			verticalPanel.add(availableTermsScrollPanel);
-			
-			RootPanel.get().add(verticalPanel);
+			availableTermsPanel.add(availableTermsScrollPanel);
+
+			horizontalPanel.add(availableTermsPanel);
 			
 			b4oService.getNumberOfTerms(new AsyncCallback<Integer>() {
 				@Override
@@ -338,8 +369,8 @@ public class B4oweb implements EntryPoint
 
 					long start = System.currentTimeMillis();
 
-					availableTermsList.setRowData(availableTermsBackendList);
-					availableTermsList.setRowCount(result,true);
+					availableTermsCellList.setRowData(availableTermsBackendList);
+					availableTermsCellList.setRowCount(result,true);
 
 					GWT.log((System.currentTimeMillis() - start) + " " + availableTermsBackendList.size());
 
@@ -359,80 +390,31 @@ public class B4oweb implements EntryPoint
 				}
 			});
 		}
+		
+		{
+			VerticalPanel selectedTermsPanel = new VerticalPanel();
+			
+			selectedTermsCellTable = new CellTable<LazyTerm>();
+			selectedTermsCellTable.setHeight("220px");
+			selectedTermsCellTable.setWidth("520px");
+			selectedTermsCellTable.addColumn(new TextColumn<LazyTerm>()
+					{
+						@Override
+						public String getValue(LazyTerm term)
+						{
+							if (term.term != null)
+								return term.term.term;
+							return "Unknown";
+						}
+					});
 
-//		// Focus the cursor on the name field when the app loads
-//		nameField.setFocus(true);
-//		nameField.selectAll();
-//
-//		// Create the popup dialog box
-//		final DialogBox dialogBox = new DialogBox();
-//		dialogBox.setText("Remote Procedure Call");
-//		dialogBox.setAnimationEnabled(true);
-//		final Button closeButton = new Button("Close");
-//		// We can set the id of a widget by accessing its Element
-//		closeButton.getElement().setId("closeButton");
-//		final Label textToServerLabel = new Label();
-//		final HTML serverResponseLabel = new HTML();
-//		VerticalPanel dialogVPanel = new VerticalPanel();
-//		dialogVPanel.addStyleName("dialogVPanel");
-//		dialogVPanel.add(new HTML("<b>Sending name to the server:</b>"));
-//		dialogVPanel.add(textToServerLabel);
-//		dialogVPanel.add(new HTML("<br><b>Server replies:</b>"));
-//		dialogVPanel.add(serverResponseLabel);
-//		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
-//		dialogVPanel.add(closeButton);
-//		dialogBox.setWidget(dialogVPanel);
-//
-//
-//		// Add a handler to close the DialogBox
-//		closeButton.addClickHandler(new ClickHandler() {
-//			public void onClick(ClickEvent event) {
-//				dialogBox.hide();
-//				sendButton.setEnabled(true);
-//				sendButton.setFocus(true);
-//			}
-//		});
-//
-//		// Create a handler for the sendButton and nameField
-//		class MyHandler implements ClickHandler, KeyUpHandler {
-//			/**
-//			 * Fired when the user clicks on the sendButton.
-//			 */
-//			public void onClick(ClickEvent event) {
-//				sendNameToServer();
-//			}
-//
-//			/**
-//			 * Fired when the user types in the nameField.
-//			 */
-//			public void onKeyUp(KeyUpEvent event) {
-//				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-//					sendNameToServer();
-//				}
-//			}
-//
-//			/**
-//			 * Send the name from the nameField to the server and wait for a response.
-//			 */
-//			private void sendNameToServer() {
-//				// First, we validate the input.
-//				errorLabel.setText("");
-//				String textToServer = nameField.getText();
-//				if (!FieldVerifier.isValidName(textToServer)) {
-//					errorLabel.setText("Please enter at least four characters");
-//					return;
-//				}
-//
-//				// Then, we send the input to the server.
-//				sendButton.setEnabled(false);
-//				textToServerLabel.setText(textToServer);
-//				serverResponseLabel.setText("");
-//			}
-//		}
-//
-//		// Add a handler to send the name to the server
-//		MyHandler handler = new MyHandler();
-//		sendButton.addClickHandler(handler);
-//		nameField.addKeyUpHandler(handler);
+			selectedTermsScrollPanel = new ScrollPanel(selectedTermsPanel);
+			selectedTermsScrollPanel.addStyleName("scrollable");
+			selectedTermsScrollPanel.setWidget(selectedTermsCellTable);
+
+			selectedTermsPanel.add(selectedTermsScrollPanel);
+			
+			horizontalPanel.add(selectedTermsPanel);
+		}
 	}
 }
