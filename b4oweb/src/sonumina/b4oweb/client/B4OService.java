@@ -41,4 +41,12 @@ public interface B4OService extends RemoteService
 	 * @return
 	 */
 	SharedTerm [] getNamesOfTerms(String pattern, List<Integer> ids);
+
+	/**
+	 * Returns the results in form of an HTML text.
+	 * 
+	 * @param serverIds
+	 * @return
+	 */
+	String getResults(List<Integer> serverIds);
 }

@@ -59,4 +59,10 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 		}
 		return names;
 	}
+
+	@Override
+	public String getResults(List<Integer> serverIds)
+	{
+		return "<h2>Results</h2>";
+	}
 }

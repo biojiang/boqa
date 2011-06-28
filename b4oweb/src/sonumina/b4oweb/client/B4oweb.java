@@ -177,6 +177,11 @@ public class B4oweb implements EntryPoint
 	private List<LazyTerm> selectedTermsList = new ArrayList<LazyTerm>();
 
 	/**
+	 * The results are displayed here.
+	 */
+	private HTML resultHTML;
+	
+	/**
 	 * Updates the terms currently visible within the scroll panel.
 	 */
 	private void updateVisibleTerms()
@@ -280,7 +285,29 @@ public class B4oweb implements EntryPoint
 	private void populateSelectedTerms()
 	{
 		selectedTermsCellTable.setRowData(selectedTermsList);
-		GWT.log("" + selectedTermsCellTable.getRowCount());
+	}
+	
+	/**
+	 * This takes the currently selected terms and updates the results.
+	 */
+	private void updateResults()
+	{
+		ArrayList<Integer> ids = new ArrayList<Integer>();
+		for (LazyTerm t : selectedTermsList)
+		{
+			if (t.term != null)
+				ids.add(t.term.requestId);
+		}
+		
+		b4oService.getResults(ids, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				resultHTML.setHTML(result);
+			}
+			@Override
+			public void onFailure(Throwable caught) { GWT.log("Error", caught); }
+		});
+		
 	}
 	
 	/**
@@ -288,8 +315,11 @@ public class B4oweb implements EntryPoint
 	 */
 	public void onModuleLoad()
 	{
+		VerticalPanel rootVerticalPanel = new VerticalPanel();
+		RootLayoutPanel.get().add(rootVerticalPanel);
+
 		HorizontalPanel horizontalPanel = new HorizontalPanel();
-		RootLayoutPanel.get().add(horizontalPanel);
+		rootVerticalPanel.add(horizontalPanel);
 		
 		{
 			VerticalPanel availableTermsPanel = new VerticalPanel();
@@ -339,6 +369,7 @@ public class B4oweb implements EntryPoint
 								{
 									selectedTermsList.add(availableTermsBackendList.get(availableTermsSelectedIndex));
 									populateSelectedTerms();
+									updateResults();
 								}
 								break;
 					}
@@ -416,5 +447,9 @@ public class B4oweb implements EntryPoint
 			
 			horizontalPanel.add(selectedTermsPanel);
 		}
+		
+		resultHTML = new HTML("Hallo");
+		
+		rootVerticalPanel.add(resultHTML);
 	}
 }
