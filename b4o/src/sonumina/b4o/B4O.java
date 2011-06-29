@@ -1186,24 +1186,15 @@ public class B4O
 	   }
 	   
 	}
-	
-	/**
-	 * Main Entry.
-	 * 
-	 * @param args
-	 * @throws InterruptedException
-	 * @throws IOException
-	 */
-	@SuppressWarnings("unused")
-	public static void main(String[] args) throws InterruptedException, IOException
-	{
-		int i;
-		int numProcessors = MEASURE_TIME?1:Runtime.getRuntime().availableProcessors();
 
-		parseCommandLine(args);
-		
-		createHPOOntology();
-		
+	/**
+	 * Setups the B4O. 
+	 * 
+	 * @param ontology
+	 * @param associations
+	 */
+	private static void setup(Ontology ontology, AssociationContainer associations)
+	{
 //		graph.findRedundantISARelations();
 
 		HashSet<ByteString> itemsToBeConsidered = new HashSet<ByteString>(assoc.getAllAnnotatedGenes());
@@ -1221,7 +1212,7 @@ public class B4O
 			int oldSize = allItemList.size();
 
 			itemsToBeConsidered = new HashSet<ByteString>();
-			for (i = 0;i<allItemList.size();i++)
+			for (int i = 0;i<allItemList.size();i++)
 			{
 				if (itemHasFrequencies[i])
 					itemsToBeConsidered.add(allItemList.get(i));
@@ -1236,7 +1227,7 @@ public class B4O
 		if (PRECALCULATE_MAXICS)
 		{
 			int [][] newMaxICMatrix = new int[slimGraph.getNumberOfVertices()][];
-			for (i=0;i<slimGraph.getNumberOfVertices();i++)
+			for (int i=0;i<slimGraph.getNumberOfVertices();i++)
 			{
 				newMaxICMatrix[i] = new int[slimGraph.getNumberOfVertices() - i - 1];
 				for (int j=i+1;j<slimGraph.getNumberOfVertices();j++)
@@ -1286,6 +1277,29 @@ public class B4O
 				scoreDistributions = new Distributions(allItemList.size() * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1));
 		}
 
+
+	}
+
+	
+	/**
+	 * Main Entry.
+	 * 
+	 * @param args
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
+	@SuppressWarnings("unused")
+	public static void main(String[] args) throws InterruptedException, IOException
+	{
+		int i;
+		int numProcessors = MEASURE_TIME?1:Runtime.getRuntime().availableProcessors();
+
+		parseCommandLine(args);
+		
+		createHPOOntology();
+		
+		setup(graph, assoc);
+		
 		/**************************************************************************************************************************/
 		/* Write score distribution */
 		
