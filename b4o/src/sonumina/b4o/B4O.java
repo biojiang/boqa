@@ -1188,12 +1188,12 @@ public class B4O
 	}
 
 	/**
-	 * Setups the B4O. 
+	 * Setups the B4O for the given ontology and associations.
 	 * 
 	 * @param ontology
 	 * @param associations
 	 */
-	private static void setup(Ontology ontology, AssociationContainer associations)
+	public static void setup(Ontology ontology, AssociationContainer associations)
 	{
 //		graph.findRedundantISARelations();
 
@@ -2467,5 +2467,35 @@ public class B4O
 		}
 
 		return id;
+	}
+	
+	/**
+	 * Returns the current slim graph.
+	 * 
+	 * @return
+	 */
+	public static SlimDirectedGraphView<Term> getSlimGraph()
+	{
+		return slimGraph;
+	}
+
+	/**
+	 * Returns the ontology.
+	 * 
+	 * @return
+	 */
+	public static Ontology getOntology()
+	{
+		return graph;
+	}
+	
+	/**
+	 * Returns the association container.
+	 * 
+	 * @return
+	 */
+	public static AssociationContainer getAssociations()
+	{
+		return assoc;
 	}
 }
