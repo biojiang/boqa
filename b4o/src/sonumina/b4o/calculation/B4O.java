@@ -19,12 +19,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-
 import ontologizer.GODOTWriter;
 import ontologizer.GOTermEnumerator;
 import ontologizer.GlobalPreferences;
@@ -1153,41 +1147,6 @@ public class B4O
 	}
 
 	/**
-	 * Parses the command line.
-	 * 
-	 * @param args
-	 */
-	public static void parseCommandLine(String [] args)
-	{
-	   Options opt = new Options();
-	   opt.addOption("o", "ontology", true, "Path or URL to the ontology file. Default is \"" + ontologyPath + "\"");
-	   opt.addOption("a", "annotations", true, "Path or URL to files containing annotations. Default is \"" + annotationPath + "\"");
-	   opt.addOption("h", "help", false, "Shows this help");
-
-	   try
-	   {
-		   GnuParser parser = new GnuParser();
-		   CommandLine cl;
-		   cl = parser.parse(opt, args);
-
-		   if (cl.hasOption('h'))
-		   {
-			   HelpFormatter f = new HelpFormatter();
-			   f.printHelp(B4O.class.getName(), opt);
-			   System.exit(0);
-		   }
-		   
-		   ontologyPath = cl.getOptionValue('o',ontologyPath);
-		   annotationPath = cl.getOptionValue('a', annotationPath);
-	   } catch (ParseException e)
-	   {
-		   System.err.println("Faield to parse commandline: " + e.getLocalizedMessage());
-		   System.exit(1);
-	   }
-	   
-	}
-
-	/**
 	 * Setups the B4O for the given ontology and associations.
 	 * 
 	 * @param ontology
@@ -1289,13 +1248,15 @@ public class B4O
 	 * @throws IOException
 	 */
 	@SuppressWarnings("unused")
-	public static void main(String[] args) throws InterruptedException, IOException
+	public static void benchmark(String ontology, String associations) throws InterruptedException, IOException
 	{
 		int i;
 		int numProcessors = MEASURE_TIME?1:Runtime.getRuntime().availableProcessors();
 
-		parseCommandLine(args);
-		
+		/* Set global path, very ugly */
+		ontologyPath = ontology;
+		annotationPath = associations;
+	
 		createHPOOntology();
 		
 		setup(graph, assoc);
