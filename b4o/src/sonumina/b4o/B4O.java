@@ -1,5 +1,9 @@
 package sonumina.b4o;
 
+import java.io.IOException;
+
+import ontologizer.calculation.CalculationRegistry;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -51,11 +55,13 @@ public class B4O
 	 * The main entry.
 	 *  
 	 * @param args
+	 * @throws IOException 
+	 * @throws InterruptedException 
 	 */
-	public static void main(String[] args)
+	public static void main(String[] args) throws InterruptedException, IOException
 	{
 		parseCommandLine(args);
 
-		
+		sonumina.b4o.calculation.B4O.benchmark(ontologyPath, annotationPath);
 	}
 }
