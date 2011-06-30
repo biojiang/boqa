@@ -29,7 +29,7 @@ import ontologizer.enumeration.ItemEnumerator;
 import ontologizer.go.Ontology;
 import ontologizer.go.Term;
 import ontologizer.go.TermID;
-import ontologizer.PopulationSet;
+import ontologizer.set.PopulationSet;
 import ontologizer.types.ByteString;
 import sonumina.math.graph.SlimDirectedGraphView;
 
