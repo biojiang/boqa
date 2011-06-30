@@ -8,7 +8,7 @@ package sonumina.b4o.calculation;
  * @author Sebastian Bauer
  *
  */
-class Observations
+public class Observations
 {
 	int item;
 	boolean [] observations;
