@@ -1615,7 +1615,7 @@ public class B4O
 	 * @param takeFrequenciesIntoAccount
 	 * @return
 	 */
-	private static Result assignMarginals(Observations observations, boolean takeFrequenciesIntoAccount)
+	public static Result assignMarginals(Observations observations, boolean takeFrequenciesIntoAccount)
 	{
 		int i;
 		
