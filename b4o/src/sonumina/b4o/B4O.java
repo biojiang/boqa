@@ -2,7 +2,11 @@ package sonumina.b4o;
 
 import java.io.IOException;
 
+import ontologizer.GlobalPreferences;
+import ontologizer.association.AssociationContainer;
+import ontologizer.benchmark.Datafiles;
 import ontologizer.calculation.CalculationRegistry;
+import ontologizer.go.Ontology;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
@@ -62,6 +66,10 @@ public class B4O
 	{
 		parseCommandLine(args);
 
-		sonumina.b4o.calculation.B4O.benchmark(ontologyPath, annotationPath);
+		GlobalPreferences.setProxyPort(888);
+		GlobalPreferences.setProxyHost("realproxy.charite.de");
+
+		Datafiles df = new Datafiles(ontologyPath,annotationPath);
+		sonumina.b4o.calculation.B4O.benchmark(df.graph, df.assoc);
 	}
 }

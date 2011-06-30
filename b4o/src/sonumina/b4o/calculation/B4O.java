@@ -21,7 +21,6 @@ import java.util.regex.Pattern;
 
 import ontologizer.GODOTWriter;
 import ontologizer.GOTermEnumerator;
-import ontologizer.GlobalPreferences;
 import ontologizer.AbstractDotAttributesProvider;
 import ontologizer.ItemEnumerator;
 import ontologizer.OntologizerThreadGroups;
@@ -29,7 +28,6 @@ import ontologizer.PopulationSet;
 import ontologizer.association.Association;
 import ontologizer.association.AssociationContainer;
 import ontologizer.association.Gene2Associations;
-import ontologizer.benchmark.Datafiles;
 import ontologizer.go.Ontology;
 import ontologizer.go.ParentTermID;
 import ontologizer.go.Term;
@@ -366,8 +364,8 @@ public class B4O
 	public static Pattern frequencyFractionPattern = Pattern.compile("(\\d+)/(\\d+)");
 	
 	/* Settings */
-	private static String ontologyPath = "http://www.human-phenotype-ontology.org/human-phenotype-ontology.obo.gz";
-	private static String annotationPath = "http://www.human-phenotype-ontology.org/phenotype_annotation.omim.gz";
+//	private static String ontologyPath = "http://www.human-phenotype-ontology.org/human-phenotype-ontology.obo.gz";
+//	private static String annotationPath = "http://www.human-phenotype-ontology.org/phenotype_annotation.omim.gz";
 
 	private final static double ALPHA = 0.001; // 0.01
 	private final static double BETA = 0.10;   // 0.1
@@ -469,19 +467,6 @@ public class B4O
 	public static boolean respectFrequencies()
 	{
 		return (MODEL_VARIANT & VARIANT_RESPECT_FREQUENCIES) != 0;
-	}
-	
-	private static void createHPOOntology() throws InterruptedException, IOException
-	{
-		GlobalPreferences.setProxyPort(888);
-		GlobalPreferences.setProxyHost("realproxy.charite.de");
-
-		String oboPath = ontologyPath;
-		String assocPath = annotationPath;
-
-		Datafiles df = new Datafiles(oboPath,assocPath);
-		graph = df.graph;
-		assoc = df.assoc;
 	}
 	
 	private static void createInternalOntology(long seed)
@@ -1248,18 +1233,12 @@ public class B4O
 	 * @throws IOException
 	 */
 	@SuppressWarnings("unused")
-	public static void benchmark(String ontology, String associations) throws InterruptedException, IOException
+	public static void benchmark(Ontology newOntology, AssociationContainer newAssociations) throws InterruptedException, IOException
 	{
 		int i;
 		int numProcessors = MEASURE_TIME?1:Runtime.getRuntime().availableProcessors();
 
-		/* Set global path, very ugly */
-		ontologyPath = ontology;
-		annotationPath = associations;
-	
-		createHPOOntology();
-		
-		setup(graph, assoc);
+		setup(newOntology, newAssociations);
 		
 		/**************************************************************************************************************************/
 		/* Write score distribution */
