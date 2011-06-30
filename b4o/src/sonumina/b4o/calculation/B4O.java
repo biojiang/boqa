@@ -20,19 +20,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ontologizer.GODOTWriter;
-import ontologizer.GOTermEnumerator;
 import ontologizer.AbstractDotAttributesProvider;
-import ontologizer.ItemEnumerator;
-import ontologizer.PopulationSet;
 import ontologizer.association.Association;
 import ontologizer.association.AssociationContainer;
 import ontologizer.association.Gene2Associations;
+import ontologizer.enumeration.GOTermEnumerator;
+import ontologizer.enumeration.ItemEnumerator;
 import ontologizer.go.Ontology;
 import ontologizer.go.ParentTermID;
 import ontologizer.go.Term;
 import ontologizer.go.TermContainer;
 import ontologizer.go.TermID;
 import ontologizer.go.TermRelation;
+import ontologizer.PopulationSet;
 import ontologizer.types.ByteString;
 import sonumina.math.graph.SlimDirectedGraphView;
 
