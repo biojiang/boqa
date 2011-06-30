@@ -216,9 +216,24 @@ public class B4OCore
 		return idx2Sorted[slimGraph.getVertexIndex(t)];
 	}
 
+	/**
+	 * Score.
+	 * 
+	 * @param serverIds
+	 * @return
+	 */
 	public static List<ItemResultEntry> score(List<Integer> serverIds)
 	{
+		boolean [] observations = new boolean[slimGraph.getNumberOfVertices()];
+		for (int id : serverIds)
+		{
+			observations[sorted2Idx[id]] = true;
+			System.out.println(slimGraph.getVertex(sorted2Idx[id]).getName());
+		}
+		
 		List<ItemResultEntry> resultList = new ArrayList<ItemResultEntry>();
+
+		
 		return resultList;
 	}
 }
