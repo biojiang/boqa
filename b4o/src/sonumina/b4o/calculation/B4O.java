@@ -23,7 +23,6 @@ import ontologizer.GODOTWriter;
 import ontologizer.GOTermEnumerator;
 import ontologizer.AbstractDotAttributesProvider;
 import ontologizer.ItemEnumerator;
-import ontologizer.OntologizerThreadGroups;
 import ontologizer.PopulationSet;
 import ontologizer.association.Association;
 import ontologizer.association.AssociationContainer;
@@ -1438,8 +1437,6 @@ public class B4O
 		synchronized (summary) {
 			summary.close();
 		}
-
-		OntologizerThreadGroups.workerThreadGroup.interrupt();
 	}
 
 	/**
