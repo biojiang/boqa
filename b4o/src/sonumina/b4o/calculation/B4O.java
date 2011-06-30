@@ -1141,7 +1141,7 @@ public class B4O
 	{
 //		graph.findRedundantISARelations();
 
-		HashSet<ByteString> itemsToBeConsidered = new HashSet<ByteString>(assoc.getAllAnnotatedGenes());
+		HashSet<ByteString> itemsToBeConsidered = new HashSet<ByteString>(associations.getAllAnnotatedGenes());
 		provideGlobals(itemsToBeConsidered);
 		
 		/* Define the directory in which the distributions are stored */
@@ -1238,6 +1238,10 @@ public class B4O
 		int i;
 		int numProcessors = MEASURE_TIME?1:Runtime.getRuntime().availableProcessors();
 
+		/* TODO: Get rid of this uglyness */
+		graph = newOntology;
+		assoc = newAssociations;
+		
 		setup(newOntology, newAssociations);
 		
 		/**************************************************************************************************************************/
