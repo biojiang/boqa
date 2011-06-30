@@ -1,4 +1,4 @@
-package sonumina.b4o;
+package sonumina.b4o.calculation;
 
 /**
  * A class to generate stepwise subsets with cardinality not greater than

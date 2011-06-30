@@ -1,4 +1,4 @@
-package sonumina.b4o;
+package sonumina.b4o.calculation;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
