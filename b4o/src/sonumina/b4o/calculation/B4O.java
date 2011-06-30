@@ -1068,6 +1068,9 @@ public class B4O
 	 */
 	public static void setup(Ontology ontology, AssociationContainer associations)
 	{
+		assoc = associations;
+		graph = ontology;
+
 //		graph.findRedundantISARelations();
 
 		HashSet<ByteString> itemsToBeConsidered = new HashSet<ByteString>(associations.getAllAnnotatedGenes());
