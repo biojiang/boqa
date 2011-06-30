@@ -4,10 +4,7 @@ import java.io.IOException;
 
 import ontologizer.GlobalPreferences;
 import ontologizer.OntologizerThreadGroups;
-import ontologizer.association.AssociationContainer;
 import ontologizer.benchmark.Datafiles;
-import ontologizer.calculation.CalculationRegistry;
-import ontologizer.go.Ontology;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
