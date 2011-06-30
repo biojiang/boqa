@@ -185,20 +185,6 @@ class WeightedStats implements Iterable<Tupel>
 }
 
 /**
- * Class maintaining observations and stats regarding to
- * true positives.
- * 
- * @author Sebastian Bauer
- *
- */
-class Observations
-{
-	int item;
-	boolean [] observations;
-	Stats observationStats;
-}
-
-/**
  * Class representing different sets of queries.
  * 
  * @author Sebastian Bauer
