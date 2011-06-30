@@ -3,6 +3,7 @@ package sonumina.b4o;
 import java.io.IOException;
 
 import ontologizer.GlobalPreferences;
+import ontologizer.OntologizerThreadGroups;
 import ontologizer.association.AssociationContainer;
 import ontologizer.benchmark.Datafiles;
 import ontologizer.calculation.CalculationRegistry;
@@ -71,5 +72,8 @@ public class B4O
 
 		Datafiles df = new Datafiles(ontologyPath,annotationPath);
 		sonumina.b4o.calculation.B4O.benchmark(df.graph, df.assoc);
+		
+
+		OntologizerThreadGroups.workerThreadGroup.interrupt();
 	}
 }
