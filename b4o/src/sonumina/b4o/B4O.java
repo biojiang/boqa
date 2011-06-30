@@ -5,13 +5,13 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Random;
 
-import ontologizer.AbstractDotAttributesProvider;
-import ontologizer.GODOTWriter;
 import ontologizer.GlobalPreferences;
 import ontologizer.OntologizerThreadGroups;
 import ontologizer.association.Association;
 import ontologizer.association.AssociationContainer;
 import ontologizer.benchmark.Datafiles;
+import ontologizer.dotwriter.AbstractDotAttributesProvider;
+import ontologizer.dotwriter.GODOTWriter;
 import ontologizer.go.Ontology;
 import ontologizer.go.ParentTermID;
 import ontologizer.go.Term;

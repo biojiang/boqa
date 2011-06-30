@@ -19,11 +19,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ontologizer.GODOTWriter;
-import ontologizer.AbstractDotAttributesProvider;
 import ontologizer.association.Association;
 import ontologizer.association.AssociationContainer;
 import ontologizer.association.Gene2Associations;
+import ontologizer.dotwriter.AbstractDotAttributesProvider;
+import ontologizer.dotwriter.GODOTWriter;
 import ontologizer.enumeration.GOTermEnumerator;
 import ontologizer.enumeration.ItemEnumerator;
 import ontologizer.go.Ontology;
