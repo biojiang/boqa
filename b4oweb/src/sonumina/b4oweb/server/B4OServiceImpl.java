@@ -63,6 +63,10 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 	@Override
 	public String getResults(List<Integer> serverIds)
 	{
-		return "<h2>Results</h2>";
+		StringBuilder str = new StringBuilder("<h2>Results</h2>");
+		for (ItemResultEntry e : B4OCore.score(serverIds))
+			str.append(e.getItemId() + " " + e.getScore() + "<br />");
+		
+		return str.toString();
 	}
 }

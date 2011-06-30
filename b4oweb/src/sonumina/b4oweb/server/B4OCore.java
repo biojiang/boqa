@@ -1,9 +1,11 @@
 package sonumina.b4oweb.server;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import ontologizer.association.AssociationContainer;
@@ -13,6 +15,7 @@ import ontologizer.go.OBOParserException;
 import ontologizer.go.Ontology;
 import ontologizer.go.Term;
 import ontologizer.go.TermContainer;
+import sonumina.b4o.calculation.B4O;
 import sonumina.math.graph.SlimDirectedGraphView;
 
 public class B4OCore
@@ -62,11 +65,26 @@ public class B4OCore
 		TermContainer goTerms = new TermContainer(oboParser.getTermMap(), oboParser.getFormatVersion(), oboParser.getDate());
 		logger.info("OBO file \"" + DEFINITIONS_PATH + "\" parsed");
 
-		ontology = new Ontology(goTerms);
-		logger.info("Ontology graph with " + ontology.getNumberOfTerms() + " terms created");
+		Ontology localOntology = new Ontology(goTerms);
+		logger.info("Ontology graph with " + localOntology.getNumberOfTerms() + " terms created");
 		
-		slimGraph = ontology.getSlimGraphView();
-		logger.info("Slim graph greated");
+		/* Load associations */
+		AssociationContainer localAssociations;
+		try {
+			AssociationParser ap = new AssociationParser(ASSOCIATIONS_PATH,localOntology.getTermContainer(),null,null);
+			localAssociations = new AssociationContainer(ap.getAssociations(), ap.getSynonym2gene(), ap.getDbObject2gene());
+		} catch (IOException e) {
+			e.printStackTrace();
+			localAssociations = new AssociationContainer();
+		}
+		
+		B4O.setup(localOntology, localAssociations);
+
+		ontology = B4O.getOntology();
+		associations = B4O.getAssociations();
+		slimGraph = B4O.getSlimGraph();
+
+		logger.info("Got ontology, associations and slim graph");
 
 		/* Sort the term according to the alphabet */
 		class TermName
@@ -96,13 +114,6 @@ public class B4OCore
 			idx2Sorted[terms[i].index] = i;
 		}
 		
-		/* Load associations */
-		try {
-			AssociationParser ap = new AssociationParser(ASSOCIATIONS_PATH,ontology.getTermContainer(),null,null);
-			associations = new AssociationContainer(ap.getAssociations(), ap.getSynonym2gene(), ap.getDbObject2gene());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	/**
@@ -203,5 +214,11 @@ public class B4OCore
 	public static int getIdOfTerm(Term t)
 	{
 		return idx2Sorted[slimGraph.getVertexIndex(t)];
+	}
+
+	public static List<ItemResultEntry> score(List<Integer> serverIds)
+	{
+		List<ItemResultEntry> resultList = new ArrayList<ItemResultEntry>();
+		return resultList;
 	}
 }
