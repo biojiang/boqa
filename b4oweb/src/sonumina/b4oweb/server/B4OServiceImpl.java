@@ -65,7 +65,9 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 	{
 		StringBuilder str = new StringBuilder("<h2>Results</h2>");
 		for (ItemResultEntry e : B4OCore.score(serverIds))
-			str.append(e.getItemId() + " " + e.getScore() + "<br />");
+		{
+			str.append(B4OCore.getItemName(e.getItemId()) + " " + e.getScore() + "<br />");
+		}
 		
 		return str.toString();
 	}

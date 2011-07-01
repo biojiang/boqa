@@ -260,4 +260,15 @@ public class B4OCore
 		
 		return resultList;
 	}
+
+	/**
+	 * Returns the name of teh given item.
+	 * 
+	 * @param itemId
+	 * @return
+	 */
+	public static String getItemName(int itemId)
+	{
+		return B4O.allItemList.get(itemId).toString();
+	}
 }
