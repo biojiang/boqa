@@ -13,6 +13,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -41,6 +43,10 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.view.client.DefaultSelectionEventManager;
+import com.google.gwt.view.client.DefaultSelectionEventManager.EventTranslator;
+import com.google.gwt.view.client.CellPreviewEvent;
+import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
 
@@ -327,10 +333,18 @@ public class B4oweb implements EntryPoint
 			availableTermsCellList = new CellList<LazyTerm>(new LazyTermCell());
 			availableTermsCellList.setHeight("200px");
 			availableTermsCellList.setWidth("520px");
-			
-			final SelectionModel<LazyTerm> selectionModel = new SingleSelectionModel<LazyTerm>();
+
+			final SingleSelectionModel<LazyTerm> selectionModel = new SingleSelectionModel<LazyTerm>();
 			availableTermsCellList.setSelectionModel(selectionModel);
-			
+			availableTermsCellList.addDomHandler(new DoubleClickHandler() {
+				@Override
+				public void onDoubleClick(DoubleClickEvent event) {
+					LazyTerm t = selectionModel.getSelectedObject();
+					if (t.term != null)
+						addTermToSelectedList(t.term.requestId);
+				}
+			}, DoubleClickEvent.getType());
+
 			final TextBox termTextBox = new TextBox();
 			termTextBox.setWidth("520px");
 			termTextBox.addKeyUpHandler(new KeyUpHandler() {
@@ -345,9 +359,8 @@ public class B4oweb implements EntryPoint
 					}
 				}
 			});
-
+ 
 			termTextBox.addKeyDownHandler(new KeyDownHandler() {
-				
 				@Override
 				public void onKeyDown(KeyDownEvent event) {
 					switch (event.getNativeKeyCode())
@@ -366,11 +379,7 @@ public class B4oweb implements EntryPoint
 						
 						case	KeyCodes.KEY_ENTER:
 								if (availableTermsSelectedIndex != -1)
-								{
-									selectedTermsList.add(availableTermsBackendList.get(availableTermsSelectedIndex));
-									populateSelectedTerms();
-									updateResults();
-								}
+									addTermToSelectedList(availableTermsSelectedIndex);
 								break;
 					}
 				}
@@ -451,5 +460,17 @@ public class B4oweb implements EntryPoint
 		resultHTML = new HTML("Hallo");
 		
 		rootVerticalPanel.add(resultHTML);
+	}
+
+	/**
+	 * Adds the given term to the selected list and refreshes the list and recalculates.
+	 * 
+	 * @param newSelectedTermIndex
+	 */
+	private void addTermToSelectedList(int newSelectedTermIndex)
+	{
+		selectedTermsList.add(availableTermsBackendList.get(newSelectedTermIndex));
+		populateSelectedTerms();
+		updateResults();
 	}
 }
