@@ -10,7 +10,7 @@ package sonumina.b4o.calculation;
  */
 public class Observations
 {
-	int item;
-	boolean [] observations;
-	Stats observationStats;
+	public int item;
+	public boolean [] observations;
+	public Stats observationStats;
 }

@@ -996,7 +996,7 @@ public class B4O
 	 * @param i
 	 * @param observations
 	 */
-	private static void activateAncestors(int i, boolean[] observations)
+	public static void activateAncestors(int i, boolean[] observations)
 	{
 		int j;
 
@@ -1606,6 +1606,11 @@ public class B4O
 		{
 			return marginalsIdeal[i];
 		}
+		
+		public int size()
+		{
+			return marginals.length;
+		}
 	}
 
 	/**
@@ -1651,43 +1656,32 @@ public class B4O
 				}
 			}
 			normalization = Util.logAdd(normalization, res.scores[i]);
-			
-			/* Calculate ideal */
-			double fpr = observations.observationStats.falsePositiveRate();
-			if (fpr == 0) fpr = 0.0000001;
-			else if (fpr == 1.0) fpr = 0.999999;
-			else if (Double.isNaN(fpr))
-			{
-//				System.out.println("fpr is NaN");
-				exitNow = true;
-				fpr = 0.5;
-			}
 
-			double fnr = observations.observationStats.falseNegativeRate();
-			if (fnr == 0) fnr = 0.0000001;
-			else if (fnr == 1) fnr =0.999999;
-			else if (Double.isNaN(fnr))
+			/* This is used only for benchmarks, where we know the true configuration */
+			if (observations.observationStats != null)
 			{
-//				System.out.println("fnr is NaN");
-				exitNow = true;
-				fnr = 0.5;
+				/* Calculate ideal scores */
+				double fpr = observations.observationStats.falsePositiveRate();
+				if (fpr == 0) fpr = 0.0000001;
+				else if (fpr == 1.0) fpr = 0.999999;
+				else if (Double.isNaN(fpr))
+				{
+					exitNow = true;
+					fpr = 0.5;
+				}
+	
+				double fnr = observations.observationStats.falseNegativeRate();
+				if (fnr == 0) fnr = 0.0000001;
+				else if (fnr == 1) fnr =0.999999;
+				else if (Double.isNaN(fnr))
+				{
+					exitNow = true;
+					fnr = 0.5;
+				}
+				
+				idealScores[i] = stats.score(fpr,fnr);
+				idealNormalization = Util.logAdd(idealNormalization, idealScores[i]);
 			}
-			
-			idealScores[i] = stats.score(fpr,fnr);
-			idealNormalization = Util.logAdd(idealNormalization, idealScores[i]);
-
-//			if (Double.isNaN(idealScores[i]))
-//			{
-//				fnr = 0.01;
-//				
-//				System.out.println(observations.item + " NaN" + " " + fnr + "  " + fpr + "   "  + stats.score(fpr,fnr) + "  " + res.scores[i]);
-//			}
-			
-			
-//			for (int)
-			
-//			scores[i] = score(i, ALPHA, BETA, observations, takeFrequenciesIntoAccount);
-//			normalization = Util.logAdd(normalization, scores[i]);
 		}
 
 		for (i=0;i<allItemList.size();i++)
