@@ -3,6 +3,7 @@ package sonumina.b4oweb.server;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +17,8 @@ import ontologizer.go.Ontology;
 import ontologizer.go.Term;
 import ontologizer.go.TermContainer;
 import sonumina.b4o.calculation.B4O;
+import sonumina.b4o.calculation.B4O.Result;
+import sonumina.b4o.calculation.Observations;
 import sonumina.math.graph.SlimDirectedGraphView;
 
 public class B4OCore
@@ -227,12 +230,33 @@ public class B4OCore
 		boolean [] observations = new boolean[slimGraph.getNumberOfVertices()];
 		for (int id : serverIds)
 		{
-			observations[sorted2Idx[id]] = true;
 			System.out.println(slimGraph.getVertex(sorted2Idx[id]).getName());
+
+			observations[sorted2Idx[id]] = true;
+			B4O.activateAncestors(sorted2Idx[id],observations);
 		}
 		
 		List<ItemResultEntry> resultList = new ArrayList<ItemResultEntry>();
 
+		Observations o = new Observations();
+		o.observations = observations;
+
+		Result result = B4O.assignMarginals(o, true);
+		for (int i=0;i<result.size();i++)
+		{
+			ItemResultEntry newEntry = ItemResultEntry.create(i, result.getMarginal(i));
+			resultList.add(newEntry);
+		}
+		
+		Collections.sort(resultList, new Comparator<ItemResultEntry>() {
+			@Override
+			public int compare(ItemResultEntry o1, ItemResultEntry o2)
+			{
+				if (o1.getScore() < o2.getScore()) return 1;
+				if (o1.getScore() > o2.getScore()) return -1;
+				return 0;
+			}
+		});
 		
 		return resultList;
 	}
