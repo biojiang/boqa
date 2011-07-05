@@ -35,52 +35,6 @@ import ontologizer.types.ByteString;
 import sonumina.math.graph.SlimDirectedGraphView;
 
 /**
- * Represents a weighted stat.
- * 
- * @author Sebastian Bauer
- */
-class WeightedConfiguration
-{
-	public double factor;
-	public ConfigurationSummary stat;
-}
-
-/**
- * This is a list of weighted stats.
- *  
- * @author Sebastian Bauer
- */
-class WeigthedConfigurationList implements Iterable<WeightedConfiguration>
-{
-	private ArrayList<WeightedConfiguration> tupelList = new ArrayList<WeightedConfiguration>(10);
-
-	public Iterator<WeightedConfiguration> iterator()
-	{
-		return tupelList.iterator();
-	}
-	
-	public void add(ConfigurationSummary stat, double factor)
-	{
-		WeightedConfiguration t = new WeightedConfiguration();
-		t.stat = stat;
-		t.factor = factor;
-		tupelList.add(t);
-	}
-	
-	public double score(double alpha, double beta)
-	{
-		double sumOfScores = Math.log(0);
-		
-		for (WeightedConfiguration tupel : tupelList)
-		{
-			double score = tupel.stat.getScore(alpha, beta) + tupel.factor; /* Multiply score by factor, remember that we are operating in log space */
-			sumOfScores = Util.logAdd(sumOfScores, score);
-		}
-		return sumOfScores;
-	}
-}
-
-/**
  * Class representing different sets of queries.
  * 
  * @author Sebastian Bauer
@@ -399,7 +353,7 @@ public class B4O
 	 * @param observed
 	 * @return
 	 */
-	private static ConfigurationSummary.NodeCase getNodeCase(int node, boolean [] hidden, boolean [] observed)
+	private static Configuration.NodeCase getNodeCase(int node, boolean [] hidden, boolean [] observed)
 	{
 		if (areFalsePositivesPropagated())
 		{
@@ -409,12 +363,12 @@ public class B4O
 				int chld = term2Children[node][i];
 				if (observed[chld])
 				{
-					if (observed[node]) return ConfigurationSummary.NodeCase.INHERIT_TRUE;
+					if (observed[node]) return Configuration.NodeCase.INHERIT_TRUE;
 					else
 					{
 						/* NaN */
 						System.err.println("A child of a node is on although the parent is not: Impossible configuration encountered!");
-						return ConfigurationSummary.NodeCase.FAULT;
+						return Configuration.NodeCase.FAULT;
 					}
 				}
 			}
@@ -428,12 +382,12 @@ public class B4O
 				int parent = term2Parents[node][i];
 				if (!observed[parent])
 				{
-					if (!observed[node]) return ConfigurationSummary.NodeCase.INHERIT_FALSE;
+					if (!observed[node]) return Configuration.NodeCase.INHERIT_FALSE;
 					else
 					{
 						/* NaN */
 						System.err.println("A parent of a node is off although the child is not: Impossible configuration encountered!");
-						return ConfigurationSummary.NodeCase.FAULT;
+						return Configuration.NodeCase.FAULT;
 					}
 				}
 			}
@@ -442,13 +396,13 @@ public class B4O
 		if (hidden[node])
 		{
 			/* Term is truly on */
-			if (observed[node]) return ConfigurationSummary.NodeCase.TRUE_POSITIVE;
-			else return ConfigurationSummary.NodeCase.FALSE_NEGATIVE;
+			if (observed[node]) return Configuration.NodeCase.TRUE_POSITIVE;
+			else return Configuration.NodeCase.FALSE_NEGATIVE;
 		} else
 		{
 			/* Term is truly off */
-			if (!observed[node]) return ConfigurationSummary.NodeCase.TRUE_NEGATIVE;
-			else return ConfigurationSummary.NodeCase.FALSE_POSITIVE;
+			if (!observed[node]) return Configuration.NodeCase.TRUE_NEGATIVE;
+			else return Configuration.NodeCase.FALSE_POSITIVE;
 		}
 	}
 
@@ -460,11 +414,11 @@ public class B4O
 	 * @param hidden
 	 * @param stats
 	 */
-	private static void determineCases(boolean [] observedTerms, boolean [] hidden, ConfigurationSummary stats)
+	private static void determineCases(boolean [] observedTerms, boolean [] hidden, Configuration stats)
 	{
 		for (int i=0;i<slimGraph.getNumberOfVertices();i++)
 		{
-			ConfigurationSummary.NodeCase c = getNodeCase(i,hidden,observedTerms);
+			Configuration.NodeCase c = getNodeCase(i,hidden,observedTerms);
 			stats.increment(c);
 		}
 	}
@@ -569,7 +523,7 @@ public class B4O
 			}
 
 			/* Determine cases and store */
-			ConfigurationSummary stats = new ConfigurationSummary();
+			Configuration stats = new Configuration();
 			determineCases(observedTerms, hidden, stats);
 			statsList.add(stats,factor);
 		}
@@ -601,7 +555,7 @@ public class B4O
 	{
 		double score = 0.0;
 
-		ConfigurationSummary.NodeCase c = getNodeCase(termIndex,hidden,observed);
+		Configuration.NodeCase c = getNodeCase(termIndex,hidden,observed);
 
 		switch (c)
 		{
@@ -627,7 +581,7 @@ public class B4O
 	@SuppressWarnings("unused")
 	private static double scoreHidden(boolean [] observedTerms, double alpha, double beta, boolean [] hidden)
 	{
-		ConfigurationSummary stats = new ConfigurationSummary();
+		Configuration stats = new Configuration();
 		determineCases(observedTerms, hidden, stats);
 		double newScore = stats.getScore(alpha,beta);
 		return newScore;
@@ -877,10 +831,10 @@ public class B4O
 				continue;
 			}
 			
-			ConfigurationSummary stats = new ConfigurationSummary();
+			Configuration stats = new Configuration();
 			determineCases(observations, hidden, stats);
-			System.out.println("Number of modelled false postives " + stats.getCases(ConfigurationSummary.NodeCase.FALSE_POSITIVE) + " (alpha=" +  stats.falsePositiveRate() + "%)");
-			System.out.println("Number of modelled false negatives " + stats.getCases(ConfigurationSummary.NodeCase.FALSE_NEGATIVE) + " (beta=" +  stats.falseNegativeRate() + "%)");
+			System.out.println("Number of modelled false postives " + stats.getCases(Configuration.NodeCase.FALSE_POSITIVE) + " (alpha=" +  stats.falsePositiveRate() + "%)");
+			System.out.println("Number of modelled false negatives " + stats.getCases(Configuration.NodeCase.FALSE_NEGATIVE) + " (beta=" +  stats.falseNegativeRate() + "%)");
 		
 			o = new Observations();
 			o.item = itemNr;
@@ -1491,7 +1445,7 @@ public class B4O
 		double [] marginals;
 		double [] marginalsIdeal;
 		double [] scores;
-		ConfigurationSummary [] stats;
+		Configuration [] stats;
 		
 		public double getScore(int i)
 		{
@@ -1529,10 +1483,10 @@ public class B4O
 		res.scores = new double[allItemList.size()];
 		res.marginals = new double[allItemList.size()];
 		res.marginalsIdeal = new double[allItemList.size()];
-		res.stats = new ConfigurationSummary[allItemList.size()];
+		res.stats = new Configuration[allItemList.size()];
 		
 		for (i=0;i<res.stats.length;i++)
-			res.stats[i] = new ConfigurationSummary();
+			res.stats[i] = new Configuration();
 		for (i=0;i<res.scores.length;i++)
 			res.scores[i] = Math.log(0);
 

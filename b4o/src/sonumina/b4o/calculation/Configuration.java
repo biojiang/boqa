@@ -5,7 +5,7 @@ package sonumina.b4o.calculation;
  * 
  * @author Sebastian Bauer
  */
-public class ConfigurationSummary
+public class Configuration
 {
 	public static enum NodeCase
 	{
@@ -66,7 +66,7 @@ public class ConfigurationSummary
 	 */
 	public double falsePositiveRate()
 	{
-		 return getCases(ConfigurationSummary.NodeCase.FALSE_POSITIVE)/(double)(getCases(ConfigurationSummary.NodeCase.FALSE_POSITIVE) + getCases(ConfigurationSummary.NodeCase.TRUE_NEGATIVE)); 
+		 return getCases(Configuration.NodeCase.FALSE_POSITIVE)/(double)(getCases(Configuration.NodeCase.FALSE_POSITIVE) + getCases(Configuration.NodeCase.TRUE_NEGATIVE)); 
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class ConfigurationSummary
 	 */
 	public double falseNegativeRate()
 	{
-		 return getCases(ConfigurationSummary.NodeCase.FALSE_NEGATIVE)/(double)(getCases(ConfigurationSummary.NodeCase.FALSE_NEGATIVE) + getCases(ConfigurationSummary.NodeCase.TRUE_POSITIVE)); 
+		 return getCases(Configuration.NodeCase.FALSE_NEGATIVE)/(double)(getCases(Configuration.NodeCase.FALSE_NEGATIVE) + getCases(Configuration.NodeCase.TRUE_POSITIVE)); 
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class ConfigurationSummary
 	 * 
 	 * @param toAdd
 	 */
-	public void add(ConfigurationSummary toAdd)
+	public void add(Configuration toAdd)
 	{
 		for (int i=0;i<stats.length;i++)
 			stats[i] += toAdd.stats[i];
