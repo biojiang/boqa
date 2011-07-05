@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
@@ -431,11 +430,11 @@ public class B4O
 	 * 
 	 * 
 	 * @param item
-	 * @param observedTerms
+	 * @param observed
 	 * @param takeFrequenciesIntoAccount
 	 * @return
 	 */
-	private static WeigthedConfigurationList determineCasesForItem(int item, boolean [] observedTerms, boolean takeFrequenciesIntoAccount)
+	private static WeigthedConfigurationList determineCasesForItem(int item, boolean [] observed, boolean takeFrequenciesIntoAccount)
 	{
 		int numTerms = items2TermFrequencies[item].length;
 		int numTermsWithExplicitFrequencies = 0;
@@ -490,14 +489,14 @@ public class B4O
 //		boolean [] bestTaken = new boolean[numTermsWithExplicitFrequencies];
 		
 		WeigthedConfigurationList statsList = new WeigthedConfigurationList();
-		
+
 		while ((s = sg.next()) != null)
 		{
+			double factor = 0.0;
+
 			boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
 			boolean [] taken = new boolean[numTermsWithExplicitFrequencies];
 			
-			double factor = 0.0;
-
 			/* first, activate variable terms according to the current selection */
 			for (int i=0;i<s.r;i++)
 			{
@@ -524,7 +523,7 @@ public class B4O
 
 			/* Determine cases and store */
 			Configuration stats = new Configuration();
-			determineCases(observedTerms, hidden, stats);
+			determineCases(observed, hidden, stats);
 			statsList.add(stats,factor);
 		}
 		
