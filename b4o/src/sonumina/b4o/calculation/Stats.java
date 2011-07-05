@@ -1,7 +1,7 @@
 package sonumina.b4o.calculation;
 
 /**
- * Class containing the stats.
+ * Class to count the different cases.
  * 
  * @author Sebastian Bauer
  */
