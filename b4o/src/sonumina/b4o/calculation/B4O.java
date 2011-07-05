@@ -156,6 +156,13 @@ public class B4O
 	 */ 
 	public static double [][] items2TermFrequencies;
 	
+	/**
+	 * This contains the (ascending) order of the items2TermFrequencies,
+	 * E.g., use item2TermFrequenciesOrder[0][2] to determine the term
+	 * that is associated to first item and has the third lowest frequency.
+	 */
+	public static int [][] item2TermFrequenciesOrder;
+	
 	/** Indicates whether an item have explicit frequencies */
 	public static boolean [] itemHasFrequencies;
 	
@@ -434,7 +441,7 @@ public class B4O
 	 * @param takeFrequenciesIntoAccount
 	 * @return
 	 */
-	private static WeigthedConfigurationList determineCasesForItem(int item, boolean [] observed, boolean takeFrequenciesIntoAccount)
+	private static WeightedConfigurationList determineCasesForItem(int item, boolean [] observed, boolean takeFrequenciesIntoAccount)
 	{
 		int numTerms = items2TermFrequencies[item].length;
 		int numTermsWithExplicitFrequencies = 0;
@@ -444,30 +451,6 @@ public class B4O
 		if (MEASURE_TIME)
 			now = System.nanoTime();
 
-		/* Sort according to the frequencies */
-		class Freq implements Comparable<Freq>
-		{
-			public int termIdx;
-			public double freq;
-
-			public int compareTo(Freq o)
-			{
-				if (freq > o.freq) return 1;
-				if (freq < o.freq) return -1;
-				return 0;
-			}
-		}
-
-		/* Sort frequencies */
-		Freq [] freqs = new Freq[numTerms];
-		for (int i=0;i<numTerms;i++)
-		{
-			freqs[i] = new Freq();
-			freqs[i].termIdx = items2DirectTerms[item][i];
-			freqs[i].freq = items2TermFrequencies[item][i];
-		}
-		Arrays.sort(freqs);
-
 		if (takeFrequenciesIntoAccount)
 		{
 			/* Determine the number of terms that have non-1.0 frequency. We restrict them
@@ -475,7 +458,8 @@ public class B4O
 			 * a good enough approximation. */
 			for (int i=0;i<numTerms && i<6;i++)
 			{
-				if (freqs[i].freq >= 1.0) break;
+				if (items2TermFrequencies[item][item2TermFrequenciesOrder[item][i]] >= 1.0)
+					break;
 				numTermsWithExplicitFrequencies++;
 			}
 		}
@@ -488,7 +472,7 @@ public class B4O
 //		double bestScore = Double.NEGATIVE_INFINITY;
 //		boolean [] bestTaken = new boolean[numTermsWithExplicitFrequencies];
 		
-		WeigthedConfigurationList statsList = new WeigthedConfigurationList();
+		WeightedConfigurationList statsList = new WeightedConfigurationList();
 
 		while ((s = sg.next()) != null)
 		{
@@ -500,23 +484,25 @@ public class B4O
 			/* first, activate variable terms according to the current selection */
 			for (int i=0;i<s.r;i++)
 			{
-				int h = freqs[s.j[i]].termIdx;
+				int ti = item2TermFrequenciesOrder[item][s.j[i]]; /* index of term within the all directly associated indices */
+				int h = items2DirectTerms[item][ti];			  /* global index of term */
 				hidden[h] = true;
 				activateAncestors(h, hidden);
-				factor += Math.log(freqs[s.j[i]].freq);
+				factor += Math.log(items2TermFrequencies[item][ti]);
 				taken[s.j[i]] = true;
 			}
 			
 			for (int i=0;i<numTermsWithExplicitFrequencies;i++)
 			{
 				if (!taken[i])
-					factor += Math.log(1 - freqs[i].freq);
+					factor += Math.log(1 - items2TermFrequencies[item][item2TermFrequenciesOrder[item][i]]);
 			}
 
 			/* second, activate mandatory terms */
 			for (int i=numTermsWithExplicitFrequencies;i<numTerms;i++)
 			{
-				int h = freqs[i].termIdx;
+				int ti = item2TermFrequenciesOrder[item][i];
+				int h = items2DirectTerms[item][ti];  /* global index of term */
 				hidden[h] = true;
 				activateAncestors(h, hidden);
 			}
@@ -530,7 +516,7 @@ public class B4O
 		if (MEASURE_TIME)
 		{
 			timeDuration += System.nanoTime() - now;
-			System.out.println(timeDuration / (1000 * 1000));
+			System.out.println(timeDuration / (1000 * 1000) + " " + statsList.size());
 		}
 
 		return statsList;
@@ -597,7 +583,7 @@ public class B4O
 	 */
 	public static double score(int item, double alpha, double beta, boolean [] observedTerms, boolean takeFrequenciesIntoAccount)
 	{
-		WeigthedConfigurationList stats = determineCasesForItem(item,observedTerms,takeFrequenciesIntoAccount);
+		WeightedConfigurationList stats = determineCasesForItem(item,observedTerms,takeFrequenciesIntoAccount);
 		return stats.score(alpha,beta);
 	}
 
@@ -1344,12 +1330,34 @@ public class B4O
 			i++;
 		}
 
-		/* Fill in frequencies for directly annotated terms */
+		/* Fill in frequencies for directly annotated terms. Also sort them */
 		items2TermFrequencies = new double[allItemList.size()][];
 		itemHasFrequencies = new boolean[allItemList.size()];
+		item2TermFrequenciesOrder = new int[allItemList.size()][];
 		for (i=0;i<items2DirectTerms.length;i++)
 		{
+			/**
+			 * A term and the corresponding frequency. We use this
+			 * for sorting.
+			 * 
+			 * @author Sebastian Bauer
+			 */
+			class Freq implements Comparable<Freq>
+			{
+				public int termIdx;
+				public double freq;
+
+				public int compareTo(Freq o)
+				{
+					if (freq > o.freq) return 1;
+					if (freq < o.freq) return -1;
+					return 0;
+				}
+			}
+
 			items2TermFrequencies[i] = new double[items2DirectTerms[i].length];
+			item2TermFrequenciesOrder[i] = new int[items2DirectTerms[i].length];
+			Freq [] freqs = new Freq[items2DirectTerms[i].length];
 
 			ByteString item = allItemList.get(i);
 			Gene2Associations as = assoc.get(item);
@@ -1381,10 +1389,18 @@ public class B4O
 				}
 				
 				items2TermFrequencies[i][j] = f;
+				freqs[j] = new Freq();
+				freqs[j].termIdx = j;//items2DirectTerms[i][j];
+				freqs[j].freq = f;
 
 				if (hasExlipictFrequency)
 					itemHasFrequencies[i] = true;
 			}
+
+			/* Now sort and remember the indices */
+			Arrays.sort(freqs);
+			for (int j=0;j<items2DirectTerms[i].length;j++)
+				item2TermFrequenciesOrder[i][j] = freqs[j].termIdx;
 		}
 
 		/* Calculate IC */
@@ -1499,7 +1515,7 @@ public class B4O
 		
 		for (i=0;i<allItemList.size();i++)
 		{
-			WeigthedConfigurationList stats = determineCasesForItem(i,observations.observations,takeFrequenciesIntoAccount);
+			WeightedConfigurationList stats = determineCasesForItem(i,observations.observations,takeFrequenciesIntoAccount);
 			
 			for (int a=0;a<ALPHA_GRID.length;a++)
 			{

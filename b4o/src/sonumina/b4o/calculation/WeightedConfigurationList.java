@@ -8,7 +8,7 @@ import java.util.Iterator;
  *  
  * @author Sebastian Bauer
  */
-class WeigthedConfigurationList implements Iterable<WeightedConfiguration>
+public class WeightedConfigurationList implements Iterable<WeightedConfiguration>
 {
 	private ArrayList<WeightedConfiguration> tupelList = new ArrayList<WeightedConfiguration>(10);
 
@@ -36,4 +36,10 @@ class WeigthedConfigurationList implements Iterable<WeightedConfiguration>
 		}
 		return sumOfScores;
 	}
+
+	public int size()
+	{
+		return tupelList.size();
+	}
+	
 }
