@@ -12,5 +12,5 @@ public class Observations
 {
 	public int item;
 	public boolean [] observations;
-	public Stats observationStats;
+	public ConfigurationSummary observationStats;
 }

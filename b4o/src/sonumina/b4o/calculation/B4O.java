@@ -1,4 +1,5 @@
 package sonumina.b4o.calculation;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -33,24 +34,34 @@ import ontologizer.set.PopulationSet;
 import ontologizer.types.ByteString;
 import sonumina.math.graph.SlimDirectedGraphView;
 
-class Tupel
+/**
+ * Represents a weighted stat.
+ * 
+ * @author Sebastian Bauer
+ */
+class WeightedConfiguration
 {
 	public double factor;
-	public Stats stat;
+	public ConfigurationSummary stat;
 }
 
-class WeightedStats implements Iterable<Tupel>
+/**
+ * This is a list of weighted stats.
+ *  
+ * @author Sebastian Bauer
+ */
+class WeigthedConfigurationList implements Iterable<WeightedConfiguration>
 {
-	private ArrayList<Tupel> tupelList = new ArrayList<Tupel>(10);
+	private ArrayList<WeightedConfiguration> tupelList = new ArrayList<WeightedConfiguration>(10);
 
-	public Iterator<Tupel> iterator()
+	public Iterator<WeightedConfiguration> iterator()
 	{
 		return tupelList.iterator();
 	}
 	
-	public void add(Stats stat, double factor)
+	public void add(ConfigurationSummary stat, double factor)
 	{
-		Tupel t = new Tupel();
+		WeightedConfiguration t = new WeightedConfiguration();
 		t.stat = stat;
 		t.factor = factor;
 		tupelList.add(t);
@@ -60,7 +71,7 @@ class WeightedStats implements Iterable<Tupel>
 	{
 		double sumOfScores = Math.log(0);
 		
-		for (Tupel tupel : tupelList)
+		for (WeightedConfiguration tupel : tupelList)
 		{
 			double score = tupel.stat.getScore(alpha, beta) + tupel.factor; /* Multiply score by factor, remember that we are operating in log space */
 			sumOfScores = Util.logAdd(sumOfScores, score);
@@ -157,6 +168,11 @@ class Distributions
 	}
 }
 
+/**
+ * This is our class implementing the calculation.
+ * 
+ * @author Sebastian Bauer
+ */
 public class B4O
 {
 	public static Ontology graph;
@@ -383,7 +399,7 @@ public class B4O
 	 * @param observed
 	 * @return
 	 */
-	private static Stats.NodeCase getNodeCase(int node, boolean [] hidden, boolean [] observed)
+	private static ConfigurationSummary.NodeCase getNodeCase(int node, boolean [] hidden, boolean [] observed)
 	{
 		if (areFalsePositivesPropagated())
 		{
@@ -393,12 +409,12 @@ public class B4O
 				int chld = term2Children[node][i];
 				if (observed[chld])
 				{
-					if (observed[node]) return Stats.NodeCase.INHERIT_TRUE;
+					if (observed[node]) return ConfigurationSummary.NodeCase.INHERIT_TRUE;
 					else
 					{
 						/* NaN */
 						System.err.println("A child of a node is on although the parent is not: Impossible configuration encountered!");
-						return Stats.NodeCase.FAULT;
+						return ConfigurationSummary.NodeCase.FAULT;
 					}
 				}
 			}
@@ -412,12 +428,12 @@ public class B4O
 				int parent = term2Parents[node][i];
 				if (!observed[parent])
 				{
-					if (!observed[node]) return Stats.NodeCase.INHERIT_FALSE;
+					if (!observed[node]) return ConfigurationSummary.NodeCase.INHERIT_FALSE;
 					else
 					{
 						/* NaN */
 						System.err.println("A parent of a node is off although the child is not: Impossible configuration encountered!");
-						return Stats.NodeCase.FAULT;
+						return ConfigurationSummary.NodeCase.FAULT;
 					}
 				}
 			}
@@ -426,13 +442,13 @@ public class B4O
 		if (hidden[node])
 		{
 			/* Term is truly on */
-			if (observed[node]) return Stats.NodeCase.TRUE_POSITIVE;
-			else return Stats.NodeCase.FALSE_NEGATIVE;
+			if (observed[node]) return ConfigurationSummary.NodeCase.TRUE_POSITIVE;
+			else return ConfigurationSummary.NodeCase.FALSE_NEGATIVE;
 		} else
 		{
 			/* Term is truly off */
-			if (!observed[node]) return Stats.NodeCase.TRUE_NEGATIVE;
-			else return Stats.NodeCase.FALSE_POSITIVE;
+			if (!observed[node]) return ConfigurationSummary.NodeCase.TRUE_NEGATIVE;
+			else return ConfigurationSummary.NodeCase.FALSE_POSITIVE;
 		}
 	}
 
@@ -444,11 +460,11 @@ public class B4O
 	 * @param hidden
 	 * @param stats
 	 */
-	private static void determineCases(boolean [] observedTerms, boolean [] hidden, Stats stats)
+	private static void determineCases(boolean [] observedTerms, boolean [] hidden, ConfigurationSummary stats)
 	{
 		for (int i=0;i<slimGraph.getNumberOfVertices();i++)
 		{
-			Stats.NodeCase c = getNodeCase(i,hidden,observedTerms);
+			ConfigurationSummary.NodeCase c = getNodeCase(i,hidden,observedTerms);
 			stats.increment(c);
 		}
 	}
@@ -465,7 +481,7 @@ public class B4O
 	 * @param takeFrequenciesIntoAccount
 	 * @return
 	 */
-	private static WeightedStats determineCasesForItem(int item, boolean [] observedTerms, boolean takeFrequenciesIntoAccount)
+	private static WeigthedConfigurationList determineCasesForItem(int item, boolean [] observedTerms, boolean takeFrequenciesIntoAccount)
 	{
 		int numTerms = items2TermFrequencies[item].length;
 		int numTermsWithExplicitFrequencies = 0;
@@ -519,7 +535,7 @@ public class B4O
 //		double bestScore = Double.NEGATIVE_INFINITY;
 //		boolean [] bestTaken = new boolean[numTermsWithExplicitFrequencies];
 		
-		WeightedStats statsList = new WeightedStats();
+		WeigthedConfigurationList statsList = new WeigthedConfigurationList();
 		
 		while ((s = sg.next()) != null)
 		{
@@ -553,7 +569,7 @@ public class B4O
 			}
 
 			/* Determine cases and store */
-			Stats stats = new Stats();
+			ConfigurationSummary stats = new ConfigurationSummary();
 			determineCases(observedTerms, hidden, stats);
 			statsList.add(stats,factor);
 		}
@@ -585,7 +601,7 @@ public class B4O
 	{
 		double score = 0.0;
 
-		Stats.NodeCase c = getNodeCase(termIndex,hidden,observed);
+		ConfigurationSummary.NodeCase c = getNodeCase(termIndex,hidden,observed);
 
 		switch (c)
 		{
@@ -611,7 +627,7 @@ public class B4O
 	@SuppressWarnings("unused")
 	private static double scoreHidden(boolean [] observedTerms, double alpha, double beta, boolean [] hidden)
 	{
-		Stats stats = new Stats();
+		ConfigurationSummary stats = new ConfigurationSummary();
 		determineCases(observedTerms, hidden, stats);
 		double newScore = stats.getScore(alpha,beta);
 		return newScore;
@@ -628,7 +644,7 @@ public class B4O
 	 */
 	public static double score(int item, double alpha, double beta, boolean [] observedTerms, boolean takeFrequenciesIntoAccount)
 	{
-		WeightedStats stats = determineCasesForItem(item,observedTerms,takeFrequenciesIntoAccount);
+		WeigthedConfigurationList stats = determineCasesForItem(item,observedTerms,takeFrequenciesIntoAccount);
 		return stats.score(alpha,beta);
 	}
 
@@ -861,10 +877,10 @@ public class B4O
 				continue;
 			}
 			
-			Stats stats = new Stats();
+			ConfigurationSummary stats = new ConfigurationSummary();
 			determineCases(observations, hidden, stats);
-			System.out.println("Number of modelled false postives " + stats.getCases(Stats.NodeCase.FALSE_POSITIVE) + " (alpha=" +  stats.falsePositiveRate() + "%)");
-			System.out.println("Number of modelled false negatives " + stats.getCases(Stats.NodeCase.FALSE_NEGATIVE) + " (beta=" +  stats.falseNegativeRate() + "%)");
+			System.out.println("Number of modelled false postives " + stats.getCases(ConfigurationSummary.NodeCase.FALSE_POSITIVE) + " (alpha=" +  stats.falsePositiveRate() + "%)");
+			System.out.println("Number of modelled false negatives " + stats.getCases(ConfigurationSummary.NodeCase.FALSE_NEGATIVE) + " (beta=" +  stats.falseNegativeRate() + "%)");
 		
 			o = new Observations();
 			o.item = itemNr;
@@ -1475,7 +1491,7 @@ public class B4O
 		double [] marginals;
 		double [] marginalsIdeal;
 		double [] scores;
-		Stats [] stats;
+		ConfigurationSummary [] stats;
 		
 		public double getScore(int i)
 		{
@@ -1513,10 +1529,10 @@ public class B4O
 		res.scores = new double[allItemList.size()];
 		res.marginals = new double[allItemList.size()];
 		res.marginalsIdeal = new double[allItemList.size()];
-		res.stats = new Stats[allItemList.size()];
+		res.stats = new ConfigurationSummary[allItemList.size()];
 		
 		for (i=0;i<res.stats.length;i++)
-			res.stats[i] = new Stats();
+			res.stats[i] = new ConfigurationSummary();
 		for (i=0;i<res.scores.length;i++)
 			res.scores[i] = Math.log(0);
 
@@ -1530,7 +1546,7 @@ public class B4O
 		
 		for (i=0;i<allItemList.size();i++)
 		{
-			WeightedStats stats = determineCasesForItem(i,observations.observations,takeFrequenciesIntoAccount);
+			WeigthedConfigurationList stats = determineCasesForItem(i,observations.observations,takeFrequenciesIntoAccount);
 			
 			for (int a=0;a<ALPHA_GRID.length;a++)
 			{
