@@ -701,8 +701,8 @@ public class DataGrid<T> extends AbstractCellTable<T> implements RequiresResize 
 			return;
 		}
 
-		int first = ypos / rowHeight;
-		int visible = visibleHeight / rowHeight + 1;
+		verticalClientTopRow = ypos / rowHeight;
+		verticalClientVisibleElements = visibleHeight / rowHeight + 1;
       }
     });
   }
