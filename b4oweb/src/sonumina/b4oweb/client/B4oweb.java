@@ -20,13 +20,11 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.dom.client.ScrollEvent;
 import com.google.gwt.event.dom.client.ScrollHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.RangeChangeEvent;
@@ -143,22 +141,12 @@ public class B4oweb implements EntryPoint
 	/**
 	 * The available term cell list.
 	 */
-	private DataGrid<LazyTerm> availableTermsCellList;
-	
-	/**
-	 * And to which it is embedded.
-	 */
-	private ScrollPanel availableTermsScrollPanel;
+	private DataGrid<LazyTerm> availableTermsDataGrid;
 	
 	/**
 	 * The table holding the selected terms.
 	 */
-	private CellTable<LazyTerm> selectedTermsCellTable;
-
-	/**
-	 * And the panel to which it is embedded.
-	 */
-	private ScrollPanel selectedTermsScrollPanel;
+	private DataGrid<LazyTerm> selectedTermsDataGrid;
 
 	/**
 	 * The terms that are currently selected.
@@ -175,8 +163,8 @@ public class B4oweb implements EntryPoint
 	 */
 	private void updateVisibleTerms()
 	{
-		int first = availableTermsCellList.getVerticalClientTopRow();
-		int visible = availableTermsCellList.getVerticalClientVisibleElements();
+		int first = availableTermsDataGrid.getVerticalClientTopRow();
+		int visible = availableTermsDataGrid.getVerticalClientVisibleElements();
 		
 		ArrayList<Integer> toBeLoaded = new ArrayList<Integer>();
 
@@ -216,7 +204,7 @@ public class B4oweb implements EntryPoint
 							if (lz != null)
 							{
 								lz.term = t;
-								availableTermsCellList.setRowData(t.requestId,availableTermsBackendList.subList(t.requestId, t.requestId+1));
+								availableTermsDataGrid.setRowData(t.requestId,availableTermsBackendList.subList(t.requestId, t.requestId+1));
 							}
 						}
 					}
@@ -245,8 +233,8 @@ public class B4oweb implements EntryPoint
 				
 				long start = System.currentTimeMillis();
 
-				availableTermsCellList.setRowData(availableTermsBackendList);
-				availableTermsCellList.setRowCount(result,true);
+				availableTermsDataGrid.setRowData(availableTermsBackendList);
+				availableTermsDataGrid.setRowCount(result,true);
 				
 				GWT.log((System.currentTimeMillis() - start) + " " + availableTermsBackendList.size());
 			}
@@ -258,7 +246,7 @@ public class B4oweb implements EntryPoint
 	 */
 	private void populateSelectedTerms()
 	{
-		selectedTermsCellTable.setRowData(selectedTermsList);
+		selectedTermsDataGrid.setRowData(selectedTermsList);
 	}
 	
 	/**
@@ -298,10 +286,11 @@ public class B4oweb implements EntryPoint
 		{
 			VerticalPanel availableTermsPanel = new VerticalPanel();
 
-			availableTermsCellList = new DataGrid<LazyTerm>();//new LazyTermCell());
-			availableTermsCellList.setHeight("200px");
-			availableTermsCellList.setWidth("520px");
-			availableTermsCellList.addColumn(new TextColumn<LazyTerm>()
+			availableTermsDataGrid = new DataGrid<LazyTerm>();
+			availableTermsDataGrid.setHeight("220px");
+			availableTermsDataGrid.setWidth("528px");
+			availableTermsDataGrid.addStyleName("scrollable");
+			availableTermsDataGrid.addColumn(new TextColumn<LazyTerm>()
 					{
 						@Override
 						public String getValue(LazyTerm term)
@@ -313,8 +302,8 @@ public class B4oweb implements EntryPoint
 					});
 
 			final SingleSelectionModel<LazyTerm> selectionModel = new SingleSelectionModel<LazyTerm>();
-			availableTermsCellList.setSelectionModel(selectionModel);
-			availableTermsCellList.addDomHandler(new DoubleClickHandler() {
+			availableTermsDataGrid.setSelectionModel(selectionModel);
+			availableTermsDataGrid.addDomHandler(new DoubleClickHandler() {
 				@Override
 				public void onDoubleClick(DoubleClickEvent event) {
 					LazyTerm t = selectionModel.getSelectedObject();
@@ -322,7 +311,7 @@ public class B4oweb implements EntryPoint
 						addTermToSelectedList(t.term.requestId);
 				}
 			}, DoubleClickEvent.getType());
-			availableTermsCellList.addRangeChangeHandler(new Handler() {
+			availableTermsDataGrid.addRangeChangeHandler(new Handler() {
 				
 				@Override
 				public void onRangeChange(RangeChangeEvent event) {
@@ -352,14 +341,14 @@ public class B4oweb implements EntryPoint
 					{
 						case	KeyCodes.KEY_DOWN:
 								availableTermsSelectedIndex++;
-								selectionModel.setSelected(availableTermsCellList.getVisibleItem(availableTermsSelectedIndex), true);
+								selectionModel.setSelected(availableTermsDataGrid.getVisibleItem(availableTermsSelectedIndex), true);
 								break;
 
 						case	KeyCodes.KEY_UP:
 								if (availableTermsSelectedIndex == -1)
-									availableTermsSelectedIndex = availableTermsCellList.getRowCount();
+									availableTermsSelectedIndex = availableTermsDataGrid.getRowCount();
 								availableTermsSelectedIndex--;
-								selectionModel.setSelected(availableTermsCellList.getVisibleItem(availableTermsSelectedIndex), true);
+								selectionModel.setSelected(availableTermsDataGrid.getVisibleItem(availableTermsSelectedIndex), true);
 								break;
 						
 						case	KeyCodes.KEY_ENTER:
@@ -369,12 +358,9 @@ public class B4oweb implements EntryPoint
 					}
 				}
 			});
-			
+
 			availableTermsPanel.add(termTextBox);
-			
-			availableTermsScrollPanel = new ScrollPanel(availableTermsCellList);
-			availableTermsScrollPanel.addStyleName("scrollable");
-			availableTermsPanel.add(availableTermsScrollPanel);
+			availableTermsPanel.add(availableTermsDataGrid);
 
 			horizontalPanel.add(availableTermsPanel);
 			
@@ -394,8 +380,8 @@ public class B4oweb implements EntryPoint
 
 					long start = System.currentTimeMillis();
 
-					availableTermsCellList.setRowData(availableTermsBackendList);
-					availableTermsCellList.setRowCount(result,true);
+					availableTermsDataGrid.setRowData(availableTermsBackendList);
+					availableTermsDataGrid.setRowCount(result,true);
 
 					GWT.log((System.currentTimeMillis() - start) + " " + availableTermsBackendList.size());
 
@@ -407,7 +393,7 @@ public class B4oweb implements EntryPoint
 				public void onFailure(Throwable caught) { }
 			});
 			
-			availableTermsCellList.addScrollHandler(new ScrollHandler() {
+			availableTermsDataGrid.addScrollHandler(new ScrollHandler() {
 				@Override
 				public void onScroll(ScrollEvent event)
 				{
@@ -419,10 +405,11 @@ public class B4oweb implements EntryPoint
 		{
 			VerticalPanel selectedTermsPanel = new VerticalPanel();
 			
-			selectedTermsCellTable = new CellTable<LazyTerm>();
-			selectedTermsCellTable.setHeight("220px");
-			selectedTermsCellTable.setWidth("520px");
-			selectedTermsCellTable.addColumn(new TextColumn<LazyTerm>()
+			selectedTermsDataGrid = new DataGrid<LazyTerm>();
+			selectedTermsDataGrid.setHeight("240px");
+			selectedTermsDataGrid.setWidth("520px");
+			selectedTermsDataGrid.addStyleName("scrollable");
+			selectedTermsDataGrid.addColumn(new TextColumn<LazyTerm>()
 					{
 						@Override
 						public String getValue(LazyTerm term)
@@ -433,11 +420,7 @@ public class B4oweb implements EntryPoint
 						}
 					});
 
-			selectedTermsScrollPanel = new ScrollPanel(selectedTermsPanel);
-			selectedTermsScrollPanel.addStyleName("scrollable");
-			selectedTermsScrollPanel.setWidget(selectedTermsCellTable);
-
-			selectedTermsPanel.add(selectedTermsScrollPanel);
+			selectedTermsPanel.add(selectedTermsDataGrid);
 			
 			horizontalPanel.add(selectedTermsPanel);
 		}
