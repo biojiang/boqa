@@ -1,3 +1,5 @@
+package sonumina.b4oweb.client.gwt;
+
 /*
  * Copyright 2011 Google Inc.
  * 
@@ -13,7 +15,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.gwt.user.cellview.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
@@ -32,16 +33,35 @@ import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.resources.client.CssResource.ImportedWithPrefix;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.resources.client.ImageResource.ImageOptions;
+import com.google.gwt.user.cellview.client.AbstractCellTable;
 import com.google.gwt.user.cellview.client.LoadingStateChangeEvent.LoadingState;
 import com.google.gwt.user.client.ui.CustomScrollPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HeaderPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.RequiresResize;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ProvidesKey;
+
+/**
+ * Same as the custom scroll panel but makes 
+ * 
+ * @author Sebastian Bauer
+ */
+class MyCustomScrollPanel extends CustomScrollPanel
+{
+	public MyCustomScrollPanel(Widget widget)
+	{
+		super(widget);
+	}
+	
+	@Override
+	public com.google.gwt.user.client.Element getScrollableElement() {
+		// TODO Auto-generated method stub
+		return super.getScrollableElement();
+	}	
+}
 
 /**
  * A tabular view with a fixed header and footer section and a scrollable data
@@ -512,12 +532,18 @@ public class DataGrid<T> extends AbstractCellTable<T> implements RequiresResize 
   private final FlexTable loadingIndicatorContainer;
   private final Style style;
   private final Element tableDataContainer;
-  private final ScrollPanel tableDataScroller;
+  private final MyCustomScrollPanel tableDataScroller;
   private final SimplePanel tableFooterContainer;
   private final Element tableFooterScroller;
   private final SimplePanel tableHeaderContainer;
   private final Element tableHeaderScroller;
 
+  /** The first row that is visible or visible in parts */
+  private int verticalClientTopRow;
+  
+  /** Total number of visible rows */
+  private int verticalClientVisibleElements;
+  
   /**
    * Constructs a table with a default page size of 50.
    */
@@ -628,7 +654,7 @@ public class DataGrid<T> extends AbstractCellTable<T> implements RequiresResize 
       tableData.section = Document.get().createTBodyElement();
       tableData.tableElem.appendChild(tableData.section);
     }
-    tableDataScroller = new CustomScrollPanel(tableData);
+    tableDataScroller = new MyCustomScrollPanel(tableData);
     tableDataScroller.setHeight("100%");
     headerPanel.setContentWidget(tableDataScroller);
     tableDataContainer = tableData.getElement().getParentElement();
@@ -659,6 +685,24 @@ public class DataGrid<T> extends AbstractCellTable<T> implements RequiresResize 
         int scrollLeft = tableDataScroller.getHorizontalScrollPosition();
         tableHeaderScroller.setScrollLeft(scrollLeft);
         tableFooterScroller.setScrollLeft(scrollLeft);
+
+		int ypos = tableDataScroller.getVerticalScrollPosition();
+		int totalHeight = tableDataScroller.getScrollableElement().getScrollHeight();
+		int visibleHeight = getElement().getClientHeight();
+		int numberOfElements = getPageSize();
+
+		int rowHeight = totalHeight / numberOfElements;
+		if (totalHeight % numberOfElements != 0)
+			GWT.log("The row height couldn't be determined properly");
+		
+		if (rowHeight == 0)
+		{
+			GWT.log("Row height is 0");
+			return;
+		}
+
+		int first = ypos / rowHeight;
+		int visible = visibleHeight / rowHeight + 1;
       }
     });
   }
@@ -837,10 +881,10 @@ public class DataGrid<T> extends AbstractCellTable<T> implements RequiresResize 
     if (state == LoadingState.LOADING) {
       // Loading indicator.
       message = loadingIndicatorContainer;
-    } else if (state == LoadingState.LOADED && getPresenter().isEmpty()) {
+    }/* else if (state == LoadingState.LOADED && getPresenter().isEmpty()) {
       // Empty table.
       message = emptyTableWidgetContainer;
-    }
+    }*/
 
     // Switch out the message to display.
     tableDataScroller.setWidget(message);
@@ -858,5 +902,20 @@ public class DataGrid<T> extends AbstractCellTable<T> implements RequiresResize 
     tableHeader.hideUnusedColumns(columnCount);
     tableData.hideUnusedColumns(columnCount);
     tableFooter.hideUnusedColumns(columnCount);
+  }
+
+  public void addScrollHandler(ScrollHandler scrollHandler)
+  {
+	  tableDataScroller.addScrollHandler(scrollHandler);
+  }
+  
+  public int getVerticalClientTopRow()
+  {
+	return verticalClientTopRow;
+  }
+
+  public int getVerticalClientVisibleElements()
+  {
+	return verticalClientVisibleElements;
   }
 }

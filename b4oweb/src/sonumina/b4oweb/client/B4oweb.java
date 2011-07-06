@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import sonumina.b4oweb.client.gwt.DataGrid;
 import sonumina.b4oweb.shared.FieldVerifier;
 import sonumina.b4oweb.shared.SharedTerm;
 
@@ -30,6 +31,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.CellList;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
+//import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -46,6 +48,8 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.DefaultSelectionEventManager;
 import com.google.gwt.view.client.DefaultSelectionEventManager.EventTranslator;
 import com.google.gwt.view.client.CellPreviewEvent;
+import com.google.gwt.view.client.RangeChangeEvent;
+import com.google.gwt.view.client.RangeChangeEvent.Handler;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -160,7 +164,7 @@ public class B4oweb implements EntryPoint
 	/**
 	 * The available term cell list.
 	 */
-	private CellList<LazyTerm> availableTermsCellList;
+	private DataGrid<LazyTerm> availableTermsCellList;
 	
 	/**
 	 * And to which it is embedded.
@@ -330,9 +334,19 @@ public class B4oweb implements EntryPoint
 		{
 			VerticalPanel availableTermsPanel = new VerticalPanel();
 
-			availableTermsCellList = new CellList<LazyTerm>(new LazyTermCell());
+			availableTermsCellList = new DataGrid<LazyTerm>();//new LazyTermCell());
 			availableTermsCellList.setHeight("200px");
 			availableTermsCellList.setWidth("520px");
+			availableTermsCellList.addColumn(new TextColumn<LazyTerm>()
+					{
+						@Override
+						public String getValue(LazyTerm term)
+						{
+							if (term.term != null)
+								return term.term.term;
+							return "Unknown";
+						}
+					});
 
 			final SingleSelectionModel<LazyTerm> selectionModel = new SingleSelectionModel<LazyTerm>();
 			availableTermsCellList.setSelectionModel(selectionModel);
@@ -344,6 +358,13 @@ public class B4oweb implements EntryPoint
 						addTermToSelectedList(t.term.requestId);
 				}
 			}, DoubleClickEvent.getType());
+			availableTermsCellList.addRangeChangeHandler(new Handler() {
+				
+				@Override
+				public void onRangeChange(RangeChangeEvent event) {
+					GWT.log("jkk");
+				}
+			});
 
 			final TextBox termTextBox = new TextBox();
 			termTextBox.setWidth("520px");
@@ -422,7 +443,7 @@ public class B4oweb implements EntryPoint
 				public void onFailure(Throwable caught) { }
 			});
 			
-			availableTermsScrollPanel.addScrollHandler(new ScrollHandler() {
+			availableTermsCellList.addScrollHandler(new ScrollHandler() {
 				@Override
 				public void onScroll(ScrollEvent event)
 				{
