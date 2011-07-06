@@ -196,23 +196,8 @@ public class B4oweb implements EntryPoint
 	 */
 	private void updateVisibleTerms()
 	{
-		int ypos = availableTermsScrollPanel.getVerticalScrollPosition();
-		int totalHeight = availableTermsScrollPanel.getElement().getScrollHeight();
-		int visibleHeight = availableTermsCellList.getElement().getClientHeight();
-		int numberOfElements = availableTermsCellList.getPageSize();
-
-		int rowHeight = totalHeight / numberOfElements;
-		if (totalHeight % numberOfElements != 0)
-			GWT.log("The row height couldn't be determined properly");
-		
-		if (rowHeight == 0)
-		{
-			GWT.log("Row height is 0");
-			return;
-		}
-		
-		int first = ypos / rowHeight;
-		int visible = visibleHeight / rowHeight + 1;
+		int first = availableTermsCellList.getVerticalClientTopRow();
+		int visible = availableTermsCellList.getVerticalClientVisibleElements();
 		
 		ArrayList<Integer> toBeLoaded = new ArrayList<Integer>();
 
