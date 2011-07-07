@@ -1418,7 +1418,7 @@ public class B4O
 	 * @param i
 	 * @return
 	 */
-	public int getNumberOfItemsAnnotatedToTerm(int i)
+	public static int getNumberOfItemsAnnotatedToTerm(int i)
 	{
 		Term t = slimGraph.getVertex(i);
 		return termEnumerator.getAnnotatedGenes(t.getID()).totalAnnotatedCount();
