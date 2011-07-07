@@ -1413,6 +1413,18 @@ public class B4O
 	}
 
 	/**
+	 * Returns the number of items that are annotated to
+	 * term i. 
+	 * @param i
+	 * @return
+	 */
+	public int getNumberOfItemsAnnotatedToTerm(int i)
+	{
+		Term t = slimGraph.getVertex(i);
+		return termEnumerator.getAnnotatedGenes(t.getID()).totalAnnotatedCount();
+	}
+	
+	/**
 	 * Converts the frequency string to a double value.
 	 * 
 	 * @param freq
