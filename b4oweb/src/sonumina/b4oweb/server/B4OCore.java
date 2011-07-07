@@ -262,7 +262,7 @@ public class B4OCore
 	}
 
 	/**
-	 * Returns the name of teh given item.
+	 * Returns the name of the given item.
 	 * 
 	 * @param itemId
 	 * @return
@@ -270,5 +270,17 @@ public class B4OCore
 	public static String getItemName(int itemId)
 	{
 		return B4O.allItemList.get(itemId).toString();
+	}
+
+	/**
+	 * Returns the number of items annotated to the given term
+	 * represented by the user id.
+	 * 
+	 * @param serverId
+	 * @return
+	 */
+	public static int getNumberOfTermsAnnotatedToTerm(int serverId)
+	{
+		return B4O.getNumberOfItemsAnnotatedToTerm(sorted2Idx[serverId]);
 	}
 }

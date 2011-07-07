@@ -95,7 +95,7 @@ class LazyTermCell extends AbstractCell<LazyTerm>
 	@Override
 	public void render(Context context, LazyTerm value, SafeHtmlBuilder sb)
 	{
-		sb.appendHtmlConstant(value.term!=null?value.term.term:"Loading name...");
+		sb.appendHtmlConstant(value.term!=null?(value.term.term + value.term.numberOfItems):"Loading name...");
 	}	
 }
 
@@ -199,7 +199,7 @@ public class B4oweb implements EntryPoint
 					{
 						for (SharedTerm t : result)
 						{
-							GWT.log(t.serverId + " " + t.requestId + " " + t.term);
+							GWT.log(t.serverId + " " + t.requestId + " " + t.term + " " + t.numberOfItems);
 							LazyTerm lz = availableTermsBackendList.get(t.requestId);
 							if (lz != null)
 							{
@@ -296,7 +296,7 @@ public class B4oweb implements EntryPoint
 						public String getValue(LazyTerm term)
 						{
 							if (term.term != null)
-								return term.term.term;
+								return term.term.term + "(" + term.term.numberOfItems + ")";
 							return "Unknown";
 						}
 					});
