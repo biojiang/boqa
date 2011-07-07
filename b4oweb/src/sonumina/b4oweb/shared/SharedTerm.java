@@ -23,4 +23,9 @@ public class SharedTerm implements IsSerializable
 	 * The name of the term.
 	 */
 	public String term;
+	
+	/**
+	 * Number of items annotated to the term.
+	 */
+	public int numberOfItems;
 }
