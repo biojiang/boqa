@@ -5,6 +5,7 @@ import java.util.List;
 import ontologizer.go.Term;
 
 import sonumina.b4oweb.client.B4OService;
+import sonumina.b4oweb.shared.SharedItemResultEntry;
 import sonumina.b4oweb.shared.SharedTerm;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -62,14 +63,20 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 	}
 
 	@Override
-	public String getResults(List<Integer> serverIds)
+	public SharedItemResultEntry[] getResults(List<Integer> serverIds)
 	{
-		StringBuilder str = new StringBuilder("<h2>Results</h2>");
-		for (ItemResultEntry e : B4OCore.score(serverIds))
+		List<ItemResultEntry> rl = B4OCore.score(serverIds);
+		SharedItemResultEntry[] resultArray = new SharedItemResultEntry[rl.size()];
+		int i=0;
+		for (ItemResultEntry e : rl)
 		{
-			str.append(B4OCore.getItemName(e.getItemId()) + " " + e.getScore() + "<br />");
+			resultArray[i] = new SharedItemResultEntry();
+			resultArray[i].itemId = e.getItemId();
+			resultArray[i].marginal = e.getScore();
+			resultArray[i].itemName = B4OCore.getItemName(resultArray[i].itemId);
+			i++;
 		}
 		
-		return str.toString();
+		return resultArray;
 	}
 }

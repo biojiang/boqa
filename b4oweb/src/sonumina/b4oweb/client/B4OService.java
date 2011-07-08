@@ -2,6 +2,7 @@ package sonumina.b4oweb.client;
 
 import java.util.List;
 
+import sonumina.b4oweb.shared.SharedItemResultEntry;
 import sonumina.b4oweb.shared.SharedTerm;
 
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -48,5 +49,5 @@ public interface B4OService extends RemoteService
 	 * @param serverIds
 	 * @return
 	 */
-	String getResults(List<Integer> serverIds);
+	SharedItemResultEntry [] getResults(List<Integer> serverIds);
 }

@@ -2,6 +2,7 @@ package sonumina.b4oweb.client;
 
 import java.util.List;
 
+import sonumina.b4oweb.shared.SharedItemResultEntry;
 import sonumina.b4oweb.shared.SharedTerm;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -17,6 +18,6 @@ public interface B4OServiceAsync {
 	void getNamesOfTerms(String pattern, List<Integer> ids,
 			AsyncCallback<SharedTerm[]> callback);
 
-	void getResults(List<Integer> serverIds, AsyncCallback<String> callback);
+	void getResults(List<Integer> serverIds, AsyncCallback<SharedItemResultEntry[]> callback);
 
 }

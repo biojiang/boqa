@@ -5,9 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import sonumina.b4oweb.client.gwt.DataGrid;
+import sonumina.b4oweb.shared.SharedItemResultEntry;
 import sonumina.b4oweb.shared.SharedTerm;
 
-import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
@@ -19,16 +19,14 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.dom.client.ScrollEvent;
 import com.google.gwt.event.dom.client.ScrollHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.view.client.RangeChangeEvent;
-import com.google.gwt.view.client.RangeChangeEvent.Handler;
 import com.google.gwt.view.client.SingleSelectionModel;
 
 class LazyTerm
@@ -89,16 +87,6 @@ class LazyTerm
 
 }
 
-class LazyTermCell extends AbstractCell<LazyTerm>
-{
-
-	@Override
-	public void render(Context context, LazyTerm value, SafeHtmlBuilder sb)
-	{
-		sb.appendHtmlConstant(value.term!=null?(value.term.term + value.term.numberOfItems):"Loading name...");
-	}	
-}
-
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
@@ -154,9 +142,9 @@ public class B4oweb implements EntryPoint
 	private List<LazyTerm> selectedTermsList = new ArrayList<LazyTerm>();
 
 	/**
-	 * The results are displayed here.
+	 * The panel in which the results are placed.
 	 */
-	private HTML resultHTML;
+	private VerticalPanel resultPanel;
 	
 	/**
 	 * Updates the terms currently visible within the scroll panel.
@@ -199,7 +187,6 @@ public class B4oweb implements EntryPoint
 					{
 						for (SharedTerm t : result)
 						{
-							GWT.log(t.serverId + " " + t.requestId + " " + t.term + " " + t.numberOfItems);
 							LazyTerm lz = availableTermsBackendList.get(t.requestId);
 							if (lz != null)
 							{
@@ -261,10 +248,21 @@ public class B4oweb implements EntryPoint
 				ids.add(t.term.requestId);
 		}
 		
-		b4oService.getResults(ids, new AsyncCallback<String>() {
+		b4oService.getResults(ids, new AsyncCallback<SharedItemResultEntry[]>() {
 			@Override
-			public void onSuccess(String result) {
-				resultHTML.setHTML(result);
+			public void onSuccess(SharedItemResultEntry [] result)
+			{
+				int i;
+				
+				resultPanel.clear();
+
+				for (i=0;i<Math.min(20,result.length);i++)
+				{
+					SharedItemResultEntry r = result[i];
+					DisclosurePanel dp = new DisclosurePanel(r.itemName + " (" + r.marginal + ")");
+					dp.add(new HTML("test"));
+					resultPanel.add(dp);
+				}
 			}
 			@Override
 			public void onFailure(Throwable caught) { GWT.log("Error", caught); }
@@ -311,13 +309,6 @@ public class B4oweb implements EntryPoint
 						addTermToSelectedList(t.term.requestId);
 				}
 			}, DoubleClickEvent.getType());
-			availableTermsDataGrid.addRangeChangeHandler(new Handler() {
-				
-				@Override
-				public void onRangeChange(RangeChangeEvent event) {
-					GWT.log("jkk");
-				}
-			});
 
 			final TextBox termTextBox = new TextBox();
 			termTextBox.setWidth("520px");
@@ -424,10 +415,11 @@ public class B4oweb implements EntryPoint
 			
 			horizontalPanel.add(selectedTermsPanel);
 		}
-		
-		resultHTML = new HTML("Hallo");
-		
-		rootVerticalPanel.add(resultHTML);
+
+		{
+			resultPanel = new VerticalPanel();
+			rootVerticalPanel.add(resultPanel);
+		}
 	}
 
 	/**
