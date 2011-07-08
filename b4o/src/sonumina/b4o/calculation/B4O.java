@@ -2234,4 +2234,14 @@ public class B4O
 	{
 		return assoc;
 	}
+
+	/**
+	 * Returns the terms that are directly annotated to the given item.
+	 * @param itemId
+	 * @return
+	 */
+	public static int[] getTermsDirectlyAnnotatedTo(int itemId)
+	{
+		return items2DirectTerms[itemId]; 
+	}
 }
