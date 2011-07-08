@@ -1,7 +1,6 @@
 package sonumina.b4oweb.server;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import ontologizer.go.Term;
@@ -78,6 +77,7 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 			sire.marginal = e.getScore();
 			sire.rank = rank;
 			sire.itemName = B4OCore.getItemName(sire.itemId);
+			sire.directTerms = B4OCore.getTermsDirectlyAnnotatedTo(sire.itemId);
 			al.add(sire);
 		}
 		

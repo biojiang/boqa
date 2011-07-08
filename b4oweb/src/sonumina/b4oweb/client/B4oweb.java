@@ -263,7 +263,12 @@ public class B4oweb implements EntryPoint
 				{
 					SharedItemResultEntry r = result[i];
 					DisclosurePanel dp = new DisclosurePanel((r.rank + 1) + ". " + r.itemName + " (" + r.marginal + ")");
-					dp.add(new HTML("test"));
+					StringBuilder str = new StringBuilder();
+					for (int serverTid : r.directTerms)
+					{
+						str.append(serverTid + " ");
+					}
+					dp.add(new HTML(str.toString()));
 					resultPanel.add(dp);
 				}
 			}

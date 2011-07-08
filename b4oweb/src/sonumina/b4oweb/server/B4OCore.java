@@ -281,4 +281,20 @@ public class B4OCore
 	{
 		return B4O.getNumberOfItemsAnnotatedToTerm(sorted2Idx[serverId]);
 	}
+
+	/**
+	 * Returns the terms that are directly annotated to the given item.
+	 * 
+	 * @param itemId
+	 * @return
+	 */
+	public static int[] getTermsDirectlyAnnotatedTo(int itemId)
+	{
+		int [] t = B4O.getTermsDirectlyAnnotatedTo(itemId);
+		int [] st = new int[t.length];
+		
+		for (int i=0;i<t.length;i++)
+			st[i] = idx2Sorted[t[i]];
+		return st;
+	}
 }
