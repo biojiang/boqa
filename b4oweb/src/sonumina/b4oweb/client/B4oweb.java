@@ -8,6 +8,8 @@ import sonumina.b4oweb.client.gwt.DataGrid;
 import sonumina.b4oweb.shared.SharedItemResultEntry;
 import sonumina.b4oweb.shared.SharedTerm;
 
+import com.google.gwt.cell.client.ButtonCell;
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
@@ -19,6 +21,7 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.dom.client.ScrollEvent;
 import com.google.gwt.event.dom.client.ScrollHandler;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.DisclosurePanel;
@@ -410,6 +413,28 @@ public class B4oweb implements EntryPoint
 							return "Unknown";
 						}
 					});
+			Column<LazyTerm, String> buttonColumn = new Column<LazyTerm, String>(new ButtonCell())
+					{
+						@Override
+						public String getValue(LazyTerm object)
+						{
+							return "X";
+						}
+				
+					};
+			/* Add field updater for the cloumn which is invoken whenever somebody
+			 * clicks on the buttin.
+			 */
+			buttonColumn.setFieldUpdater(new FieldUpdater<LazyTerm, String>() {
+				@Override
+				public void update(int index, LazyTerm object, String value)
+				{
+					selectedTermsList.remove(index);
+					populateSelectedTerms();
+					updateResults();
+				}
+			});
+			selectedTermsDataGrid.addColumn(buttonColumn);
 
 			selectedTermsPanel.add(selectedTermsDataGrid);
 			
