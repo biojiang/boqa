@@ -1,5 +1,7 @@
 package sonumina.b4oweb.server;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import ontologizer.go.Term;
@@ -63,20 +65,22 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 	}
 
 	@Override
-	public SharedItemResultEntry[] getResults(List<Integer> serverIds)
+	public SharedItemResultEntry[] getResults(List<Integer> serverIds, int first, int length)
 	{
 		List<ItemResultEntry> rl = B4OCore.score(serverIds);
-		SharedItemResultEntry[] resultArray = new SharedItemResultEntry[rl.size()];
-		int i=0;
-		for (ItemResultEntry e : rl)
+		ArrayList<SharedItemResultEntry> al = new ArrayList<SharedItemResultEntry>(length);
+
+		for (int rank = first; rank < first + length; rank++)
 		{
-			resultArray[i] = new SharedItemResultEntry();
-			resultArray[i].itemId = e.getItemId();
-			resultArray[i].marginal = e.getScore();
-			resultArray[i].itemName = B4OCore.getItemName(resultArray[i].itemId);
-			i++;
+			SharedItemResultEntry sire = new SharedItemResultEntry();
+			ItemResultEntry e = rl.get(rank);
+			sire.itemId = e.getItemId();
+			sire.marginal = e.getScore();
+			sire.rank = rank;
+			sire.itemName = B4OCore.getItemName(sire.itemId);
+			al.add(sire);
 		}
 		
-		return resultArray;
+		return al.toArray(new SharedItemResultEntry[0]);
 	}
 }

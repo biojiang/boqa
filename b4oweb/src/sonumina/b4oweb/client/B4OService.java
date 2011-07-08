@@ -46,8 +46,10 @@ public interface B4OService extends RemoteService
 	/**
 	 * Returns the results in form of an HTML text.
 	 * 
-	 * @param serverIds
+	 * @param serverIds defines the terms to be used for the search.
+	 * @param first defines the index of the first transfered result.
+	 * @params length defines the number of results that are transfered.
 	 * @return
 	 */
-	SharedItemResultEntry [] getResults(List<Integer> serverIds);
+	SharedItemResultEntry [] getResults(List<Integer> serverIds, int first, int length);
 }

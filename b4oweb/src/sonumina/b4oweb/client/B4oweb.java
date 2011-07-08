@@ -251,7 +251,7 @@ public class B4oweb implements EntryPoint
 				ids.add(t.term.requestId);
 		}
 		
-		b4oService.getResults(ids, new AsyncCallback<SharedItemResultEntry[]>() {
+		b4oService.getResults(ids, 0, 20, new AsyncCallback<SharedItemResultEntry[]>() {
 			@Override
 			public void onSuccess(SharedItemResultEntry [] result)
 			{
@@ -262,7 +262,7 @@ public class B4oweb implements EntryPoint
 				for (i=0;i<Math.min(20,result.length);i++)
 				{
 					SharedItemResultEntry r = result[i];
-					DisclosurePanel dp = new DisclosurePanel(r.itemName + " (" + r.marginal + ")");
+					DisclosurePanel dp = new DisclosurePanel((r.rank + 1) + ". " + r.itemName + " (" + r.marginal + ")");
 					dp.add(new HTML("test"));
 					resultPanel.add(dp);
 				}

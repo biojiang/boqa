@@ -230,8 +230,6 @@ public class B4OCore
 		boolean [] observations = new boolean[slimGraph.getNumberOfVertices()];
 		for (int id : serverIds)
 		{
-			System.out.println(slimGraph.getVertex(sorted2Idx[id]).getName());
-
 			observations[sorted2Idx[id]] = true;
 			B4O.activateAncestors(sorted2Idx[id],observations);
 		}

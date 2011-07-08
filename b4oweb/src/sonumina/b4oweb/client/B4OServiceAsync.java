@@ -18,6 +18,7 @@ public interface B4OServiceAsync {
 	void getNamesOfTerms(String pattern, List<Integer> ids,
 			AsyncCallback<SharedTerm[]> callback);
 
-	void getResults(List<Integer> serverIds, AsyncCallback<SharedItemResultEntry[]> callback);
+	void getResults(List<Integer> serverIds, int first, int length,
+			AsyncCallback<SharedItemResultEntry[]> callback);
 
 }

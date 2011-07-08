@@ -12,4 +12,5 @@ public class SharedItemResultEntry implements IsSerializable
 	public int itemId;      /* The ID of the item */
 	public String itemName; /* Name of the item */
 	public double marginal; /* The items marginal */
+	public int rank;		/* The rank of this item (0-based) */
 }
