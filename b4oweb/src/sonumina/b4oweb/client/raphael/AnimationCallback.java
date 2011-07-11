@@ -1,4 +1,4 @@
-package com.hydro4ge.raphaelgwt.client;
+package sonumina.b4oweb.client.raphael;
 
 public abstract class AnimationCallback {
   public abstract void onComplete();

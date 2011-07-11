@@ -291,12 +291,12 @@ public class B4oweb implements EntryPoint
 		VerticalPanel rootVerticalPanel = new VerticalPanel();
 		RootLayoutPanel.get().add(rootVerticalPanel);
 
-		
-
 		GraphWidget gw = new GraphWidget();
 		gw.setHeight("200px");
 		gw.setWidth("400px");
 		rootVerticalPanel.add(gw);
+		
+		rootVerticalPanel.add(new MyDrawing(100,100));
 		
 		HorizontalPanel horizontalPanel = new HorizontalPanel();
 		rootVerticalPanel.add(horizontalPanel);

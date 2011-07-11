@@ -1,4 +1,4 @@
-package com.hydro4ge.raphaelgwt.client;
+package sonumina.b4oweb.client.raphael;
 
 import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.json.client.JSONNumber;

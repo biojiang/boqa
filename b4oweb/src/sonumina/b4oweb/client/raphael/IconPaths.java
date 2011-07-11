@@ -1,6 +1,4 @@
-package com.hydro4ge.raphaelgwt.client;
-
-import com.hydro4ge.raphaelgwt.client.Raphael.Path;
+package sonumina.b4oweb.client.raphael;
 
 /**
  * This interface contains the path constants for the icons available at

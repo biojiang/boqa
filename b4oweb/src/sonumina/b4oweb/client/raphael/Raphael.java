@@ -1,4 +1,4 @@
-package com.hydro4ge.raphaelgwt.client;
+package sonumina.b4oweb.client.raphael;
 
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
