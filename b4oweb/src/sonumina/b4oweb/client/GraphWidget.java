@@ -60,6 +60,10 @@ class LayoutJavaScriptObject extends JavaScriptObject
 		var layouter = new $wnd.Graph.Layout.Spring(g);
 		return layouter;
 	}-*/;
+	
+	public final native void layout() /*-{
+		this.layout();
+	}-*/;
 }
 
 class RendererJavaScriptObject extends JavaScriptObject
@@ -69,6 +73,10 @@ class RendererJavaScriptObject extends JavaScriptObject
 	public static final native RendererJavaScriptObject create(GraphJavaScriptObject g, String id, int width, int height) /*-{
 		var renderer = new $wnd.Graph.Renderer.Raphael(id, g, width, height)
 		return renderer;
+	}-*/;
+	
+	public final native void render() /*-{
+		this.draw();
 	}-*/;
 }
 
@@ -108,6 +116,8 @@ class GraphWidget extends Widget
 //	
 	private String myId;
 	private GraphJavaScriptObject graph;
+	private LayoutJavaScriptObject layout;
+	private RendererJavaScriptObject renderer;
 
 	public GraphWidget()
 	{
@@ -118,6 +128,23 @@ class GraphWidget extends Widget
 		setElement(div);
 		
 		graph = GraphJavaScriptObject.create();
+		layout = LayoutJavaScriptObject.create(graph);
+	}
+	
+	
+	public final void addNode(String id)
+	{
+		graph.addNode(id);
+	}
+
+	public final void addNode(String id, String l)
+	{
+		graph.addNode(id, l);
+	}
+
+	public final void addEdge(String from, String to)
+	{
+		graph.addEdge(from, to);
 	}
 
 	@Override
@@ -127,8 +154,10 @@ class GraphWidget extends Widget
 		graph.addNode("Hello");
 		graph.addNode("Bello");
 		graph.addEdge("Hello", "Bello");
-		LayoutJavaScriptObject.create(graph);
-		RendererJavaScriptObject.create(graph,"canvas", getElement().getClientWidth(), getElement().getClientHeight());
+		layout.layout();
+
+		renderer = RendererJavaScriptObject.create(graph,"canvas", getElement().getClientWidth(), getElement().getClientHeight());
+//		renderer.render();
 	}
 
 };
