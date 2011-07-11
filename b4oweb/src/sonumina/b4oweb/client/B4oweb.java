@@ -8,10 +8,13 @@ import sonumina.b4oweb.client.gwt.DataGrid;
 import sonumina.b4oweb.shared.SharedItemResultEntry;
 import sonumina.b4oweb.shared.SharedTerm;
 
+import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.cell.client.ButtonCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
 import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -24,12 +27,14 @@ import com.google.gwt.event.dom.client.ScrollHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SingleSelectionModel;
 
 class LazyTerm
@@ -278,9 +283,9 @@ public class B4oweb implements EntryPoint
 		
 	}
 	
-	public static native void test() /*-{
-		var width = 320;
-    	var height = 200;
+	public static native void test(String id, int w, int h) /*-{
+		var width = w;
+    	var height = h;
    		g = new $wnd.Graph();
 
     	g.addNode("strawberry");
@@ -305,7 +310,7 @@ public class B4oweb implements EntryPoint
 		// layout the graph using the Spring layout implementation
     	var layouter = new $wnd.Graph.Layout.Spring(g);
 //        // draw the graph using the RaphaelJS draw implementation
-    	var renderer = new $wnd.Graph.Renderer.Raphael('canvas', g, width, height);
+    	var renderer = new $wnd.Graph.Renderer.Raphael(id, g, width, height);
 	}-*/;
 
 	/**
@@ -316,7 +321,29 @@ public class B4oweb implements EntryPoint
 		VerticalPanel rootVerticalPanel = new VerticalPanel();
 		RootLayoutPanel.get().add(rootVerticalPanel);
 
-		test();
+		
+		class GraphWidget extends Widget
+		{
+			public GraphWidget()
+			{
+				DivElement div = Document.get().createDivElement();
+				div.setId("canvas");
+				setElement(div);
+			}
+
+			@Override
+			protected void onLoad() {
+				super.onLoad();
+
+				test("canvas", getElement().getClientWidth(), getElement().getClientHeight());
+			}
+		
+		};
+		GraphWidget gw = new GraphWidget();
+		gw.setHeight("200px");
+		gw.setWidth("400px");
+		rootVerticalPanel.add(gw);
+		
 		HorizontalPanel horizontalPanel = new HorizontalPanel();
 		rootVerticalPanel.add(horizontalPanel);
 		
