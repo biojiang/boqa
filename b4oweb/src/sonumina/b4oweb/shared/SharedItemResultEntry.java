@@ -14,4 +14,5 @@ public class SharedItemResultEntry implements IsSerializable
 	public double marginal; /* The items marginal */
 	public int rank;		/* The rank of this item (0-based) */
 	public int [] directTerms; /* Terms directly associated with the item in some form */
+	public double [] directedTermsFreq; /* The corresponding frequencies */
 }

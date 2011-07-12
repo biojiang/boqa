@@ -80,7 +80,7 @@ class RendererJavaScriptObject extends JavaScriptObject
 	}-*/;
 }
 
-class GraphWidget extends Widget
+class GraphWidget extends Widget implements IGraphWidget
 {
 //	public static native GraphJavaScriptObject test() /*-{
 //		var g = new $wnd.Graph();
@@ -145,6 +145,12 @@ class GraphWidget extends Widget
 	public final void addEdge(String from, String to)
 	{
 		graph.addEdge(from, to);
+	}
+	
+	public final void redraw()
+	{
+		layout.layout();
+		renderer.render();
 	}
 
 	@Override

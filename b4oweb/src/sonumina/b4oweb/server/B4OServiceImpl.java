@@ -78,6 +78,7 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 			sire.rank = rank;
 			sire.itemName = B4OCore.getItemName(sire.itemId);
 			sire.directTerms = B4OCore.getTermsDirectlyAnnotatedTo(sire.itemId);
+			sire.directedTermsFreq = B4OCore.getFrequenciesOfTermsDirectlyAnnotatedTo(sire.itemId);
 			al.add(sire);
 		}
 		

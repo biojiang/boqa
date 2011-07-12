@@ -297,4 +297,20 @@ public class B4OCore
 			st[i] = idx2Sorted[t[i]];
 		return st;
 	}
+
+	/**
+	 * Returns the frequencies of the terms directly annotated to the given
+	 * item. The order matches the order of getTermsDirectlyAnnotatedTo().
+	 * 
+	 * @param itemId
+	 * @return
+	 */
+	public static double[] getFrequenciesOfTermsDirectlyAnnotatedTo(int itemId)
+	{
+		double [] f = B4O.getFrequenciesOfTermsDirectlyAnnotatedTo(itemId);
+		double [] sf = new double[f.length];
+		for (int i=0;i<sf.length;i++)
+			sf[i] = f[i];
+		return sf;
+	}
 }

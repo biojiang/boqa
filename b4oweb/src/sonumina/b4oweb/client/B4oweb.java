@@ -269,10 +269,10 @@ public class B4oweb implements EntryPoint
 					SharedItemResultEntry r = result[i];
 					DisclosurePanel dp = new DisclosurePanel((r.rank + 1) + ". " + r.itemName + " (" + r.marginal + ")");
 					StringBuilder str = new StringBuilder();
-					for (int serverTid : r.directTerms)
-					{
-						str.append(serverTid + " ");
-					}
+					
+					for (int j=0;j<r.directTerms.length;j++)
+						str.append(r.directTerms[j] + " " + r.directedTermsFreq[j] + " ");
+					
 					dp.add(new HTML(str.toString()));
 					resultPanel.add(dp);
 				}
@@ -291,12 +291,12 @@ public class B4oweb implements EntryPoint
 		VerticalPanel rootVerticalPanel = new VerticalPanel();
 		RootLayoutPanel.get().add(rootVerticalPanel);
 
-		GraphWidget gw = new GraphWidget();
+		final GraphWidget gw = new GraphWidget();
 		gw.setHeight("200px");
 		gw.setWidth("400px");
 		rootVerticalPanel.add(gw);
 		
-		rootVerticalPanel.add(new MyDrawing(100,100));
+		rootVerticalPanel.add(new MyDrawing(400,400));
 		
 		HorizontalPanel horizontalPanel = new HorizontalPanel();
 		rootVerticalPanel.add(horizontalPanel);
@@ -324,6 +324,9 @@ public class B4oweb implements EntryPoint
 			availableTermsDataGrid.addDomHandler(new DoubleClickHandler() {
 				@Override
 				public void onDoubleClick(DoubleClickEvent event) {
+					gw.addNode("JJJi");
+					gw.redraw();
+					
 					LazyTerm t = selectionModel.getSelectedObject();
 					if (t.term != null)
 						addTermToSelectedList(t.term.requestId);
