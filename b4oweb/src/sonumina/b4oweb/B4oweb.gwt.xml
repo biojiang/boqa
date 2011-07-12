@@ -13,6 +13,7 @@
 
   <!-- Other module inherits                                      -->
   <!-- <inherits name="com.google.gwt.logging.Logging"/>  --> 
+  <inherits name="com.google.gwt.json.JSON" />
 
   <!-- Specify the app entry point class.                         -->
   <entry-point class='sonumina.b4oweb.client.B4oweb'/>
