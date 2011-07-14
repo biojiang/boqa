@@ -2,10 +2,12 @@ package sonumina.b4oweb.client;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import com.google.gwt.core.client.GWT;
 
 import sonumina.b4oweb.client.raphael.BBox;
+import sonumina.b4oweb.client.raphael.PathBuilder;
 import sonumina.b4oweb.client.raphael.Raphael;
 import sonumina.math.graph.DirectedGraph;
 import sonumina.math.graph.DirectedGraphLayout;
@@ -33,7 +35,6 @@ public class MyGraphWidget extends Raphael implements IGraphWidget
 
 	private DirectedGraph<Node> graph = new DirectedGraph<MyGraphWidget.Node>();
 	private HashMap<String,Node> id2Node = new HashMap<String, Node>();
-//	private ArrayList<Node> initialNodes = new ArrayList<Node>();
 	
 	public MyGraphWidget(int width, int height)
 	{
@@ -118,5 +119,22 @@ public class MyGraphWidget extends Raphael implements IGraphWidget
 				n.text.attr("align","left");
 			};
 		});
+		
+		/* Draw edges */
+		for (Node n : graph)
+		{
+			BBox nbb = n.rect.getBBox();
+			
+			Iterator<Node> child = graph.getChildNodes(n);
+			while (child.hasNext())
+			{
+				Node c = child.next();
+				BBox cbb = c.rect.getBBox();
+			    PathBuilder pb = new PathBuilder();
+			    pb.m(nbb.x() + nbb.width() / 2,nbb.y() + nbb.height()).L(cbb.x() + cbb.width() / 2,cbb.y());
+				Path p = new Raphael.Path(pb);
+				p.attr("stroke-width",2);
+			}
+		}
 	}
 }
