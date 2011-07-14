@@ -294,9 +294,14 @@ public class B4oweb implements EntryPoint
 		final GraphWidget gw = new GraphWidget();
 		gw.setHeight("200px");
 		gw.setWidth("400px");
+		gw.addNode("Huhu");
 		rootVerticalPanel.add(gw);
 		
-		rootVerticalPanel.add(new MyDrawing(400,400));
+		final MyGraphWidget mgw = new MyGraphWidget(400,200);
+		mgw.addNode("Node1");
+		mgw.addNode("Node2");
+		mgw.addEdge("Node1", "Node2");
+		rootVerticalPanel.add(mgw);
 		
 		HorizontalPanel horizontalPanel = new HorizontalPanel();
 		rootVerticalPanel.add(horizontalPanel);
