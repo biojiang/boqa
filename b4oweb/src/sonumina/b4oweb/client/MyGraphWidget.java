@@ -109,7 +109,11 @@ public class MyGraphWidget extends Raphael implements IGraphWidget
 			public void set(Node n, int left, int top)
 			{
 				n.rect = new Raphael.Rect(left + 10 - 5, top + 10 - 5, n.textWidth + 10, n.textHeight + 10);
-				n.rect.attr("fill", "#d1b48c");
+				n.rect.attr("fill", "#bfac00");
+				n.rect.attr("fill-opacity", "0.6");
+				n.rect.attr("stroke", "#bfac00");
+				n.rect.attr("stroke-width", 2);
+				n.rect.attr("r", 5);
 				n.text = new Raphael.Text(left + 10 + n.textWidth / 2, top + 10 + n.textHeight / 2, n.label);
 				n.text.attr("align","left");
 			};
