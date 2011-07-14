@@ -3,8 +3,7 @@ package sonumina.b4oweb.client;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import com.google.gwt.core.client.GWT;
+import java.util.Stack;
 
 import sonumina.b4oweb.client.raphael.BBox;
 import sonumina.b4oweb.client.raphael.PathBuilder;
@@ -26,6 +25,8 @@ public class MyGraphWidget extends Raphael implements IGraphWidget
 		public Text text;
 		public Rect rect;
 
+		public boolean visible;
+
 		public Node(String id, String label)
 		{
 			this.id = id;
@@ -35,6 +36,7 @@ public class MyGraphWidget extends Raphael implements IGraphWidget
 
 	private DirectedGraph<Node> graph = new DirectedGraph<MyGraphWidget.Node>();
 	private HashMap<String,Node> id2Node = new HashMap<String, Node>();
+	private Stack<Shape> shapeStack = new Stack<Shape>();
 	
 	public MyGraphWidget(int width, int height)
 	{
@@ -53,22 +55,6 @@ public class MyGraphWidget extends Raphael implements IGraphWidget
 		Node n = new Node(id,l);
 		id2Node.put(id, n);
 		graph.addVertex(n);
-
-//		GWT.log("addNode()\n");
-//		Text text = new Raphael.Text(10,10, l);
-//		BBox bb = text.getBBox();
-//
-//		Rect rect = new Raphael.Rect(10,10,bb.width(),20);
-//		rect.attr("fill", "#d1b48c");
-//        /* the default node drawing */
-//        var color = Raphael.getColor();
-//        var ellipse = r.ellipse(0, 0, 30, 20).attr({fill: color, stroke: color, "stroke-width": 2});
-//        /* set DOM node ID */
-//        ellipse.node.id = node.label || node.id;
-//        shape = r.set().
-//            push(ellipse).
-//            push(r.text(0, 30, node.label || node.id));
-//        return shape;
 	}
 
 	@Override
@@ -79,26 +65,46 @@ public class MyGraphWidget extends Raphael implements IGraphWidget
 		Edge<Node> e = new Edge<Node>(f,t);
 		graph.addEdge(e);
 	}
+	
+	private void removeFromDisplay(Node n)
+	{
+		if (n.text != null)
+		{
+			n.text.remove();
+			n.text = null;
+		}
+		
+		if (n.rect != null)
+		{
+			n.rect.remove();
+			n.rect = null;
+		}
+	}
 
 	@Override
 	public void redraw()
 	{
-	}
-	
-	@Override
-	protected void onLoad()
-	{
-		super.onLoad();
-		
-		/* Add all nodes and determine dimension */
+		/* Add all nodes and determine dimension. We also remove nodes that are currently
+		 * displayed "on the same go" */
 		for (Node n : graph)
 		{
-			Text text = new Raphael.Text(0, 0, n.label);
-			BBox bb = text.getBBox();
-			n.textWidth = bb.width();
-			n.textHeight = bb.height();
-			text.remove();
+			if (!n.visible)
+			{
+				Text text = new Raphael.Text(0, 0, n.label);
+				BBox bb = text.getBBox();
+				n.textWidth = bb.width();
+				n.textHeight = bb.height();
+				text.remove();
+			} else
+			{
+				removeFromDisplay(n);
+			}
 		}
+		
+		/* Remove additional shapes */
+		Shape s;
+		while (!shapeStack.isEmpty() && ((s = shapeStack.pop()) != null))
+			s.remove();
 		
 		DirectedGraphLayout.layout(graph, new DirectedGraphLayout.IGetDimension<Node>() {
 			public void get(Node n, DirectedGraphLayout.Dimension d)
@@ -117,6 +123,7 @@ public class MyGraphWidget extends Raphael implements IGraphWidget
 				n.rect.attr("r", 5);
 				n.text = new Raphael.Text(left + 10 + n.textWidth / 2, top + 10 + n.textHeight / 2, n.label);
 				n.text.attr("align","left");
+				n.visible = true;
 			};
 		});
 		
@@ -134,7 +141,15 @@ public class MyGraphWidget extends Raphael implements IGraphWidget
 			    pb.m(nbb.x() + nbb.width() / 2,nbb.y() + nbb.height()).L(cbb.x() + cbb.width() / 2,cbb.y());
 				Path p = new Raphael.Path(pb);
 				p.attr("stroke-width",2);
+				shapeStack.push(p);
 			}
 		}
+	}
+	
+	@Override
+	protected void onLoad()
+	{
+		super.onLoad();
+		redraw();
 	}
 }

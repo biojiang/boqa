@@ -15,6 +15,8 @@
   <!-- <inherits name="com.google.gwt.logging.Logging"/>  --> 
   <inherits name="com.google.gwt.json.JSON" />
 
+  <inherits name="graph" />
+
   <!-- Specify the app entry point class.                         -->
   <entry-point class='sonumina.b4oweb.client.B4oweb'/>
 
@@ -22,4 +24,5 @@
   <source path='client'/>
   <source path='shared'/>
 
+<!-- <super-source path="../../external" />  -->  
 </module>

@@ -8,13 +8,10 @@ import sonumina.b4oweb.client.gwt.DataGrid;
 import sonumina.b4oweb.shared.SharedItemResultEntry;
 import sonumina.b4oweb.shared.SharedTerm;
 
-import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.cell.client.ButtonCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
 import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -27,14 +24,12 @@ import com.google.gwt.event.dom.client.ScrollHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SingleSelectionModel;
 
 class LazyTerm
@@ -150,6 +145,11 @@ public class B4oweb implements EntryPoint
 	private List<LazyTerm> selectedTermsList = new ArrayList<LazyTerm>();
 
 	/**
+	 * The graph which displays all selected terms.
+	 */
+	private MyGraphWidget selectedTermsGraph;
+
+	/**
 	 * The panel in which the results are placed.
 	 */
 	private VerticalPanel resultPanel;
@@ -242,6 +242,13 @@ public class B4oweb implements EntryPoint
 	private void populateSelectedTerms()
 	{
 		selectedTermsDataGrid.setRowData(selectedTermsList);
+
+		for (LazyTerm st : selectedTermsList)
+		{
+			if (st.term != null)
+				selectedTermsGraph.addNode(st.term.term);
+		}
+		selectedTermsGraph.redraw();
 	}
 	
 	/**
@@ -269,11 +276,13 @@ public class B4oweb implements EntryPoint
 					SharedItemResultEntry r = result[i];
 					DisclosurePanel dp = new DisclosurePanel((r.rank + 1) + ". " + r.itemName + " (" + r.marginal + ")");
 					StringBuilder str = new StringBuilder();
-					
+
 					for (int j=0;j<r.directTerms.length;j++)
 						str.append(r.directTerms[j] + " " + r.directedTermsFreq[j] + " ");
-					
-					dp.add(new HTML(str.toString()));
+
+					VerticalPanel vp = new VerticalPanel();
+					vp.add(new HTML(str.toString()));
+					dp.add(vp);
 					resultPanel.add(dp);
 				}
 			}
@@ -291,18 +300,6 @@ public class B4oweb implements EntryPoint
 		VerticalPanel rootVerticalPanel = new VerticalPanel();
 		RootLayoutPanel.get().add(rootVerticalPanel);
 
-		final GraphWidget gw = new GraphWidget();
-		gw.setHeight("200px");
-		gw.setWidth("400px");
-		gw.addNode("Huhu");
-		rootVerticalPanel.add(gw);
-		
-		final MyGraphWidget mgw = new MyGraphWidget(400,200);
-		mgw.addNode("Node1");
-		mgw.addNode("Node2");
-		mgw.addEdge("Node1", "Node2");
-		rootVerticalPanel.add(mgw);
-		
 		HorizontalPanel horizontalPanel = new HorizontalPanel();
 		rootVerticalPanel.add(horizontalPanel);
 		
@@ -329,9 +326,6 @@ public class B4oweb implements EntryPoint
 			availableTermsDataGrid.addDomHandler(new DoubleClickHandler() {
 				@Override
 				public void onDoubleClick(DoubleClickEvent event) {
-					gw.addNode("JJJi");
-					gw.redraw();
-					
 					LazyTerm t = selectionModel.getSelectedObject();
 					if (t.term != null)
 						addTermToSelectedList(t.term.requestId);
@@ -426,7 +420,7 @@ public class B4oweb implements EntryPoint
 			
 			selectedTermsDataGrid = new DataGrid<LazyTerm>();
 			selectedTermsDataGrid.setHeight("240px");
-			selectedTermsDataGrid.setWidth("520px");
+			selectedTermsDataGrid.setWidth("420px");
 			selectedTermsDataGrid.addStyleName("scrollable");
 			selectedTermsDataGrid.addColumn(new TextColumn<LazyTerm>()
 					{
@@ -460,10 +454,11 @@ public class B4oweb implements EntryPoint
 				}
 			});
 			selectedTermsDataGrid.addColumn(buttonColumn);
-
 			selectedTermsPanel.add(selectedTermsDataGrid);
-			
 			horizontalPanel.add(selectedTermsPanel);
+			
+			selectedTermsGraph = new MyGraphWidget(400, 200);
+			horizontalPanel.add(selectedTermsGraph);
 		}
 
 		{
