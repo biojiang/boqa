@@ -4,6 +4,7 @@ import java.util.List;
 
 import sonumina.b4oweb.shared.SharedItemResultEntry;
 import sonumina.b4oweb.shared.SharedTerm;
+import sonumina.b4oweb.shared.SharedParents;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -52,4 +53,13 @@ public interface B4OService extends RemoteService
 	 * @return
 	 */
 	SharedItemResultEntry [] getResults(List<Integer> serverIds, int first, int length);
+	
+	
+	/**
+	 * Returns the ancestors of the given server terms.
+	 * 
+	 * @param serverIds
+	 * @return
+	 */
+	SharedParents [] getAncestors(List<Integer> serverIds);
 }

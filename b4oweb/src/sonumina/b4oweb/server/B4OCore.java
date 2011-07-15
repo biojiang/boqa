@@ -313,4 +313,19 @@ public class B4OCore
 			sf[i] = f[i];
 		return sf;
 	}
+
+	/**
+	 * Returns the parents of the term.
+	 * 
+	 * @param sid
+	 * @return
+	 */
+	public static int[] getParents(int t)
+	{
+		int [] p = B4O.getParents(sorted2Idx[t]);
+		int [] np = new int[p.length];
+		for (int i=0;i<p.length;i++)
+			np[i] = idx2Sorted[p[i]];
+		return np;
+	}
 }

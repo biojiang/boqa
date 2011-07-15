@@ -6,6 +6,7 @@ import java.util.List;
 
 import sonumina.b4oweb.client.gwt.DataGrid;
 import sonumina.b4oweb.shared.SharedItemResultEntry;
+import sonumina.b4oweb.shared.SharedParents;
 import sonumina.b4oweb.shared.SharedTerm;
 import sonumina.math.graph.DirectedGraph;
 
@@ -253,7 +254,34 @@ public class B4oweb implements EntryPoint
 		for (LazyTerm st : selectedTermsList)
 		{
 			if (!selectedTermsGraph.containsNode(st))
+			{
+				if (st.term != null)
+				{
+					b4oService.getAncestors(Arrays.asList(st.term.serverId), new AsyncCallback<SharedParents[]>() {
+						
+						@Override
+						public void onSuccess(SharedParents[] result)
+						{
+							for (SharedParents ps : result)
+							{
+								LazyTerm plz = allTermsList.get(ps.serverId);
+								
+								for (int p : ps.parentIds)
+								{
+									LazyTerm lz = allTermsList.get(p);
+									selectedTermsGraph.addNode(lz);
+									selectedTermsGraph.addEdge(lz, plz);
+								}
+							}
+							selectedTermsGraph.redraw();
+						}
+						
+						@Override
+						public void onFailure(Throwable caught) { GWT.log("Error", caught); }
+					});
+				}
 				selectedTermsGraph.addNode(st);
+			}
 		}
 		selectedTermsGraph.redraw();
 	}

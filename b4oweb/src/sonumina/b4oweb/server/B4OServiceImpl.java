@@ -7,6 +7,7 @@ import ontologizer.go.Term;
 
 import sonumina.b4oweb.client.B4OService;
 import sonumina.b4oweb.shared.SharedItemResultEntry;
+import sonumina.b4oweb.shared.SharedParents;
 import sonumina.b4oweb.shared.SharedTerm;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -83,5 +84,20 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 		}
 		
 		return al.toArray(new SharedItemResultEntry[0]);
+	}
+
+	@Override
+	public SharedParents[] getAncestors(List<Integer> serverIds)
+	{
+		SharedParents [] p = new SharedParents[serverIds.size()];
+		int i = 0;
+		for (int sid : serverIds)
+		{
+			p[i] = new SharedParents();
+			p[i].serverId = sid;
+			p[i].parentIds = B4OCore.getParents(sid);
+			i++;
+		}
+		return p;
 	}
 }

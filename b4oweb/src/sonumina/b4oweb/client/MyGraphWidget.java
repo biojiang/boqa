@@ -58,12 +58,16 @@ public class MyGraphWidget<T> extends Raphael
 	}
 
 	/**
-	 * Adds a new node to the graph.
+	 * Adds a new node to the graph. If the to-be-added
+	 * node is already contained in the graph, this is a noop.
 	 * 
 	 * @param n
 	 */
 	public void addNode(T n)
 	{
+		if (id2Node.containsKey(n))
+			return;
+
 		Node n2 = new Node(n);
 		id2Node.put(n,n2);
 		graph.addVertex(n2);
