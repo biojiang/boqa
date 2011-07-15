@@ -2244,4 +2244,28 @@ public class B4O
 	{
 		return items2DirectTerms[itemId]; 
 	}
+
+	/**
+	 * Returns the frequencies of terms directly annotated to the given
+	 * item. The order of the entries match the order of 
+	 * getTermsDirectlyAnnotatedTo().
+	 * 
+	 * @param itemId
+	 * @return
+	 */
+	public static double[] getFrequenciesOfTermsDirectlyAnnotatedTo(int itemId)
+	{
+		return items2TermFrequencies[itemId];
+	}
+	
+	/**
+	 * Returns the parents of a given term.
+	 * 
+	 * @param t
+	 * @return
+	 */
+	public static int[] getParents(int t)
+	{
+		return term2Parents[t];
+	}
 }
