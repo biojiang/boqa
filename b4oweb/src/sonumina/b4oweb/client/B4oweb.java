@@ -7,6 +7,7 @@ import java.util.List;
 import sonumina.b4oweb.client.gwt.DataGrid;
 import sonumina.b4oweb.shared.SharedItemResultEntry;
 import sonumina.b4oweb.shared.SharedTerm;
+import sonumina.math.graph.DirectedGraph;
 
 import com.google.gwt.cell.client.ButtonCell;
 import com.google.gwt.cell.client.FieldUpdater;
@@ -112,6 +113,11 @@ public class B4oweb implements EntryPoint
 	 * Our local term storage.
 	 */
 	private List<LazyTerm> allTermsList = new ArrayList<LazyTerm>();
+
+	/**
+	 * The corresponding directed graph.
+	 */
+	private DirectedGraph<LazyTerm> allTermsGraph = new DirectedGraph<LazyTerm>();
 	
 	/**
 	 * The filter string that is used in the term filter.
@@ -219,6 +225,7 @@ public class B4oweb implements EntryPoint
 			@Override
 			public void onSuccess(Integer result)
 			{
+				/* Update available backend list */
 			    availableTermsBackendList = new ArrayList<LazyTerm>(result);
 				for (int i=0;i<result;i++)
 				{
@@ -381,17 +388,22 @@ public class B4oweb implements EntryPoint
 				@Override
 				public void onSuccess(Integer result)
 				{
-					/* Fill the client store first */
+					long start = System.currentTimeMillis();
+
+					/* Fill the global client store first */
+					allTermsGraph = new DirectedGraph<LazyTerm>();
 					allTermsList = new ArrayList<LazyTerm>(result);
 					for (int i=0;i<result;i++)
 					{
 						LazyTerm t = new LazyTerm();
 						allTermsList.add(t);
+						allTermsGraph.addVertex(t);
 					}
+					GWT.log("Setup " + (System.currentTimeMillis() - start) + "ms for " + allTermsList.size() + " terms");
 
 				    availableTermsBackendList = new ArrayList<LazyTerm>(allTermsList);
 
-					long start = System.currentTimeMillis();
+					start = System.currentTimeMillis();
 
 					availableTermsDataGrid.setRowData(availableTermsBackendList);
 					availableTermsDataGrid.setRowCount(result,true);
