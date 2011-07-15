@@ -1,6 +1,5 @@
 package sonumina.b4oweb.client;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Stack;
@@ -12,12 +11,17 @@ import sonumina.math.graph.DirectedGraph;
 import sonumina.math.graph.DirectedGraphLayout;
 import sonumina.math.graph.Edge;
 
-public class MyGraphWidget extends Raphael implements IGraphWidget
+/**
+ * A Graph widget
+ * @author Sebastian Bauer
+ *
+ * @param <T>
+ */
+public class MyGraphWidget<T> extends Raphael
 {
 	class Node
 	{
-		public final String id;
-		public final String label;
+		public final T data;
 		
 		public double textWidth;
 		public double textHeight;
@@ -27,15 +31,14 @@ public class MyGraphWidget extends Raphael implements IGraphWidget
 
 		public boolean visible;
 
-		public Node(String id, String label)
+		public Node(T data)
 		{
-			this.id = id;
-			this.label = label;
+			this.data = data;
 		}
 	}
 
-	private DirectedGraph<Node> graph = new DirectedGraph<MyGraphWidget.Node>();
-	private HashMap<String,Node> id2Node = new HashMap<String, Node>();
+	private DirectedGraph<Node> graph = new DirectedGraph<MyGraphWidget<T>.Node>();
+	private HashMap<T,Node> id2Node = new HashMap<T, Node>();
 	private Stack<Shape> shapeStack = new Stack<Shape>();
 	
 	public MyGraphWidget(int width, int height)
@@ -43,22 +46,35 @@ public class MyGraphWidget extends Raphael implements IGraphWidget
 		super(width, height);
 	}
 
-	@Override
-	public void addNode(String id)
+	/**
+	 * Returns whether n is contained in the graph.
+	 * 
+	 * @param n
+	 * @return
+	 */
+	public boolean containsNode(T n)
 	{
-		addNode(id, id);
+		return id2Node.containsKey(n);
 	}
 
-	@Override
-	public void addNode(String id, String l)
+	/**
+	 * Adds a new node to the graph.
+	 * 
+	 * @param n
+	 */
+	public void addNode(T n)
 	{
-		Node n = new Node(id,l);
-		id2Node.put(id, n);
-		graph.addVertex(n);
+		Node n2 = new Node(n);
+		id2Node.put(n,n2);
+		graph.addVertex(n2);
 	}
 
-	@Override
-	public void addEdge(String from, String to)
+	/**
+	 * Adds a new edge from "from" to "to".
+	 * @param from
+	 * @param to
+	 */
+	public void addEdge(T from, T to)
 	{
 		Node f = id2Node.get(from);
 		Node t = id2Node.get(to);
@@ -81,7 +97,6 @@ public class MyGraphWidget extends Raphael implements IGraphWidget
 		}
 	}
 
-	@Override
 	public void redraw()
 	{
 		/* Add all nodes and determine dimension. We also remove nodes that are currently
@@ -90,7 +105,7 @@ public class MyGraphWidget extends Raphael implements IGraphWidget
 		{
 			if (!n.visible)
 			{
-				Text text = new Raphael.Text(0, 0, n.label);
+				Text text = new Raphael.Text(0, 0, getLabel(n.data));
 				BBox bb = text.getBBox();
 				n.textWidth = bb.width();
 				n.textHeight = bb.height();
@@ -121,7 +136,7 @@ public class MyGraphWidget extends Raphael implements IGraphWidget
 				n.rect.attr("stroke", "#bfac00");
 				n.rect.attr("stroke-width", 2);
 				n.rect.attr("r", 5);
-				n.text = new Raphael.Text(left + 10 + n.textWidth / 2, top + 10 + n.textHeight / 2, n.label);
+				n.text = new Raphael.Text(left + 10 + n.textWidth / 2, top + 10 + n.textHeight / 2, getLabel(n.data));
 				n.text.attr("align","left");
 				n.visible = true;
 			};
@@ -146,10 +161,40 @@ public class MyGraphWidget extends Raphael implements IGraphWidget
 		}
 	}
 	
+
+	/**
+	 * Clears the graph
+	 */
+	public void clear()
+	{
+		for (Node n : graph)
+		{
+			removeFromDisplay(n);
+			graph.removeVertex(n);
+		}
+
+		/* Remove additional shapes */
+		Shape s;
+		while (!shapeStack.isEmpty() && ((s = shapeStack.pop()) != null))
+			s.remove();
+	}
+
+	
 	@Override
 	protected void onLoad()
 	{
 		super.onLoad();
 		redraw();
+	}
+	
+	/**
+	 * Returns the label of the node. May be overwritten by subclasses.
+	 * 
+	 * @param n
+	 * @return
+	 */
+	protected String getLabel(T n)
+	{
+		return n.toString();
 	}
 }

@@ -153,7 +153,7 @@ public class B4oweb implements EntryPoint
 	/**
 	 * The graph which displays all selected terms.
 	 */
-	private MyGraphWidget selectedTermsGraph;
+	private MyGraphWidget<LazyTerm> selectedTermsGraph;
 
 	/**
 	 * The panel in which the results are placed.
@@ -252,8 +252,8 @@ public class B4oweb implements EntryPoint
 
 		for (LazyTerm st : selectedTermsList)
 		{
-			if (st.term != null)
-				selectedTermsGraph.addNode(st.term.term);
+			if (!selectedTermsGraph.containsNode(st))
+				selectedTermsGraph.addNode(st);
 		}
 		selectedTermsGraph.redraw();
 	}
@@ -469,7 +469,16 @@ public class B4oweb implements EntryPoint
 			selectedTermsPanel.add(selectedTermsDataGrid);
 			horizontalPanel.add(selectedTermsPanel);
 			
-			selectedTermsGraph = new MyGraphWidget(400, 200);
+			selectedTermsGraph = new MyGraphWidget<LazyTerm>(400, 200)
+			{
+				@Override
+				protected String getLabel(LazyTerm n)
+				{
+					if (n.term != null)
+						return n.term.term;
+					return "Unknown";
+				}
+			};
 			horizontalPanel.add(selectedTermsGraph);
 		}
 
