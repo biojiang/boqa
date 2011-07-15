@@ -3,6 +3,7 @@ package sonumina.b4oweb.server;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -19,6 +20,7 @@ import ontologizer.go.TermContainer;
 import sonumina.b4o.calculation.B4O;
 import sonumina.b4o.calculation.B4O.Result;
 import sonumina.b4o.calculation.Observations;
+import sonumina.math.graph.DirectedGraph;
 import sonumina.math.graph.SlimDirectedGraphView;
 
 public class B4OCore
@@ -327,5 +329,34 @@ public class B4OCore
 		for (int i=0;i<p.length;i++)
 			np[i] = idx2Sorted[p[i]];
 		return np;
+	}
+
+	public static interface IAncestorVisitor
+	{
+		public void visit(int t);
+	}
+	
+	/**
+	 * Visits the ancestors of the given terms. For every visit,
+	 * the visit method of the IAncestorVisitor interface is
+	 * called.
+	 * 
+	 * @param t
+	 */
+	public static void visitAncestors(Collection<Integer> terms, final IAncestorVisitor visitor)
+	{
+		/* Get initial terms */
+		ArrayList<Term> initTerms = new ArrayList<Term>(terms.size());
+		for (int t : terms)
+			initTerms.add(slimGraph.getVertex(sorted2Idx[t]));
+
+		/* Invoke bfs */
+		ontology.getGraph().bfs(initTerms,true,new DirectedGraph.IVisitor<Term>() {
+			@Override
+			public boolean visited(Term vertex) {
+				visitor.visit(idx2Sorted[slimGraph.getVertexIndex(vertex)]);
+				return true;
+			}
+		});
 	}
 }

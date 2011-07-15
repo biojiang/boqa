@@ -89,15 +89,20 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 	@Override
 	public SharedParents[] getAncestors(List<Integer> serverIds)
 	{
-		SharedParents [] p = new SharedParents[serverIds.size()];
-		int i = 0;
-		for (int sid : serverIds)
+		final ArrayList<SharedParents> ancestorList = new ArrayList<SharedParents>();
+	
+		B4OCore.visitAncestors(serverIds,new B4OCore.IAncestorVisitor()
 		{
-			p[i] = new SharedParents();
-			p[i].serverId = sid;
-			p[i].parentIds = B4OCore.getParents(sid);
-			i++;
-		}
-		return p;
+			@Override
+			public void visit(int t)
+			{
+				SharedParents p = new SharedParents();
+				p.serverId = t;
+				p.parentIds = B4OCore.getParents(t);
+				ancestorList.add(p);
+			}
+		});
+		
+		return ancestorList.toArray(new SharedParents[0]);
 	}
 }
