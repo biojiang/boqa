@@ -111,17 +111,29 @@ public class MyGraphWidget<T> extends Raphael
 
 	public void redraw()
 	{
+		redraw(false);
+	}
+
+	/**
+	 * Redraw the graph.
+	 * 
+	 * @param dimsChanged set to true if the dimensions of any of the graph object was changed.
+	 */
+	public void redraw(boolean dimsChanged)
+	{
 		/* Add all nodes and determine dimension. We also remove nodes that are currently
 		 * displayed "on the same go" */
 		for (Node n : graph)
 		{
-			if (!n.visible)
+			if (!n.visible || dimsChanged)
 			{
 				Text text = new Raphael.Text(0, 0, getLabel(n.data));
 				BBox bb = text.getBBox();
 				n.textWidth = bb.width();
 				n.textHeight = bb.height();
 				text.remove();
+				
+				if (dimsChanged) removeFromDisplay(n);
 			} else
 			{
 				removeFromDisplay(n);
@@ -157,7 +169,6 @@ public class MyGraphWidget<T> extends Raphael
 				set.push(n.text);
 
 				MouseOverHandler mov = new MouseOverHandler() {
-					
 					@Override
 					public void onMouseOver(MouseOverEvent event)
 					{
@@ -167,7 +178,6 @@ public class MyGraphWidget<T> extends Raphael
 					}
 				};
 				MouseOutHandler mot = new MouseOutHandler() {
-					
 					@Override
 					public void onMouseOut(MouseOutEvent event) {
 						JSONObject attrs = new JSONObject();

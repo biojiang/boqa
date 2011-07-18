@@ -221,7 +221,7 @@ public class B4oweb implements EntryPoint
 		b4oService.getNumberOfTerms(availableTermsFilterString, new AsyncCallback<Integer>() {
 
 			@Override
-			public void onFailure(Throwable caught) { }
+			public void onFailure(Throwable caught) { GWT.log("Error", caught);};
 
 			@Override
 			public void onSuccess(Integer result)
@@ -262,6 +262,8 @@ public class B4oweb implements EntryPoint
 						@Override
 						public void onSuccess(SharedParents[] result)
 						{
+							ArrayList<Integer> requestTermList = new ArrayList<Integer>();
+
 							for (SharedParents ps : result)
 							{
 								LazyTerm plz = allTermsList.get(ps.serverId);
@@ -271,9 +273,36 @@ public class B4oweb implements EntryPoint
 									LazyTerm lz = allTermsList.get(p);
 									selectedTermsGraph.addNode(lz);
 									selectedTermsGraph.addEdge(lz, plz);
+
+									if (lz.term == null)
+									{
+										GWT.log("Adding " + p + "  " + lz.toString());
+										requestTermList.add(p);
+									}
 								}
 							}
 							selectedTermsGraph.redraw();
+
+							if (requestTermList.size() > 0)
+							{
+								/* TODO: Merge with updateTerms() */
+								b4oService.getNamesOfTerms(requestTermList, new AsyncCallback<SharedTerm[]>()
+										{
+											public void onFailure(Throwable caught) { GWT.log("Error", caught);};
+											@Override
+											public void onSuccess(SharedTerm[] result)
+											{
+												for (SharedTerm st : result)
+												{
+													GWT.log(st.serverId + " " + allTermsList.size());
+													LazyTerm lz = allTermsList.get(st.serverId);
+													if (lz.term == null)
+														lz.term = st;
+												}
+												selectedTermsGraph.redraw(true);
+											}
+										});
+							}
 						}
 						
 						@Override
@@ -481,8 +510,9 @@ public class B4oweb implements EntryPoint
 						}
 				
 					};
-			/* Add field updater for the cloumn which is invoken whenever somebody
-			 * clicks on the buttin.
+			selectedTermsDataGrid.setColumnWidth(buttonColumn, "60px");
+			/* Add field updater for the column which is invoked whenever somebody
+			 * clicks on the button.
 			 */
 			buttonColumn.setFieldUpdater(new FieldUpdater<LazyTerm, String>() {
 				@Override

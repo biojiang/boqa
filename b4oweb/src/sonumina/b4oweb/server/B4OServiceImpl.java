@@ -1,6 +1,7 @@
 package sonumina.b4oweb.server;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import ontologizer.go.Term;
@@ -10,6 +11,7 @@ import sonumina.b4oweb.shared.SharedItemResultEntry;
 import sonumina.b4oweb.shared.SharedParents;
 import sonumina.b4oweb.shared.SharedTerm;
 
+import com.google.gwt.user.client.rpc.core.java.util.Collections;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 @SuppressWarnings("serial")
@@ -42,12 +44,16 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 
 		int i=0, j=0;
 		SharedTerm [] names = new SharedTerm[ids.size()];
-
+		List<Integer> sortedIds = new ArrayList<Integer>(ids);
+		
+		/* Note that the out order does not need to match the out order */
+		java.util.Collections.sort(sortedIds);
+		
 		/* Go through all terms of the given pattern and then fill
 		 * our returning array as requested by the caller */
 		for (Term t : B4OCore.getTerms(pattern))
 		{
-			if (ids.get(j) == i)
+			if (sortedIds.get(j) == i)
 			{
 				names[j] = new SharedTerm();
 				names[j].requestId = i;
@@ -56,7 +62,7 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 				names[j].numberOfItems = B4OCore.getNumberOfTermsAnnotatedToTerm(names[j].serverId);
 				j++;
 
-				if (j >= ids.size())
+				if (j >= sortedIds.size())
 					break;
 			}
 			i++;
