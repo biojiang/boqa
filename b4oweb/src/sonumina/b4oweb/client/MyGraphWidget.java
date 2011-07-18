@@ -4,6 +4,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Stack;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
+import com.google.gwt.json.client.JSONNumber;
+import com.google.gwt.json.client.JSONObject;
+
 import sonumina.b4oweb.client.raphael.BBox;
 import sonumina.b4oweb.client.raphael.PathBuilder;
 import sonumina.b4oweb.client.raphael.Raphael;
@@ -132,8 +140,9 @@ public class MyGraphWidget<T> extends Raphael
 				d.height = (int)n.textHeight + 16;
 			};
 		}, new DirectedGraphLayout.IPosition<Node>() {
-			public void set(Node n, int left, int top)
+			public void set(final Node n, int left, int top)
 			{
+				final Raphael.Set set = new Raphael.Set();
 				n.rect = new Raphael.Rect(left + 10 - 5, top + 10 - 5, n.textWidth + 10, n.textHeight + 10);
 				n.rect.attr("fill", "#bfac00");
 				n.rect.attr("fill-opacity", "0.6");
@@ -143,6 +152,34 @@ public class MyGraphWidget<T> extends Raphael
 				n.text = new Raphael.Text(left + 10 + n.textWidth / 2, top + 10 + n.textHeight / 2, getLabel(n.data));
 				n.text.attr("align","left");
 				n.visible = true;
+
+				set.push(n.rect);
+				set.push(n.text);
+
+				MouseOverHandler mov = new MouseOverHandler() {
+					
+					@Override
+					public void onMouseOver(MouseOverEvent event)
+					{
+						JSONObject attrs = new JSONObject();
+						attrs.put("fill-opacity", new JSONNumber(0.2));
+						n.rect.animate(attrs, 200);
+					}
+				};
+				MouseOutHandler mot = new MouseOutHandler() {
+					
+					@Override
+					public void onMouseOut(MouseOutEvent event) {
+						JSONObject attrs = new JSONObject();
+						attrs.put("fill-opacity", new JSONNumber(0.6));
+						n.rect.animate(attrs, 200);
+					}
+				};
+				
+				n.rect.addDomHandler(mov, MouseOverEvent.getType());
+				n.rect.addDomHandler(mot, MouseOutEvent.getType());
+				n.text.addDomHandler(mov, MouseOverEvent.getType());
+				n.text.addDomHandler(mot, MouseOutEvent.getType());
 			};
 		});
 		
