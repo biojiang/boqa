@@ -250,6 +250,7 @@ public class B4oweb implements EntryPoint
 	private void populateSelectedTerms()
 	{
 		selectedTermsDataGrid.setRowData(selectedTermsList);
+		selectedTermsGraph.clear();
 
 		for (LazyTerm st : selectedTermsList)
 		{
@@ -527,7 +528,7 @@ public class B4oweb implements EntryPoint
 			selectedTermsPanel.add(selectedTermsDataGrid);
 			horizontalPanel.add(selectedTermsPanel);
 			
-			selectedTermsGraph = new MyGraphWidget<LazyTerm>(400, 200)
+			selectedTermsGraph = new MyGraphWidget<LazyTerm>(400, 240)
 			{
 				@Override
 				protected String getLabel(LazyTerm n)

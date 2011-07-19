@@ -1,5 +1,6 @@
 package sonumina.b4oweb.client;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Stack;
@@ -218,16 +219,20 @@ public class MyGraphWidget<T> extends Raphael
 	 */
 	public void clear()
 	{
+		ArrayList<Node> nodes = new ArrayList<Node>(graph.getNumberOfVertices());
 		for (Node n : graph)
 		{
 			removeFromDisplay(n);
-			graph.removeVertex(n);
+			nodes.add(n);
 		}
 
 		/* Remove additional shapes */
 		Shape s;
 		while (!shapeStack.isEmpty() && ((s = shapeStack.pop()) != null))
 			s.remove();
+
+		graph = new DirectedGraph<MyGraphWidget<T>.Node>();
+		id2Node.clear();
 	}
 
 	
