@@ -12,6 +12,7 @@ import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 
+import sonumina.b4oweb.client.raphael.Attr;
 import sonumina.b4oweb.client.raphael.BBox;
 import sonumina.b4oweb.client.raphael.PathBuilder;
 import sonumina.b4oweb.client.raphael.Raphael;
@@ -163,10 +164,12 @@ public class MyGraphWidget<T> extends Raphael
 				final Raphael.Set set = new Raphael.Set();
 				n.rect = new Raphael.Rect(left + 10 - 5, top + 10 - 5, n.textWidth + 10, n.textHeight + 10);
 				n.rect.attr("fill", "#bfac00");
-				n.rect.attr("fill-opacity", "0.6");
+				n.rect.attr("fill-opacity", opacity(n.data));
 				n.rect.attr("stroke", "#bfac00");
 				n.rect.attr("stroke-width", 2);
 				n.rect.attr("r", 5);
+				
+				
 				n.text = new Raphael.Text(left + 10 + n.textWidth / 2, top + 10 + n.textHeight / 2, getLabel(n.data));
 				n.text.attr("align","left");
 				n.visible = true;
@@ -187,7 +190,7 @@ public class MyGraphWidget<T> extends Raphael
 					@Override
 					public void onMouseOut(MouseOutEvent event) {
 						JSONObject attrs = new JSONObject();
-						attrs.put("fill-opacity", new JSONNumber(0.6));
+						attrs.put("fill-opacity", new JSONNumber(opacity(n.data)));
 						n.rect.animate(attrs, 200);
 					}
 				};
@@ -257,5 +260,15 @@ public class MyGraphWidget<T> extends Raphael
 	protected String getLabel(T n)
 	{
 		return n.toString();
+	}
+
+	/**
+	 * Returns the opacity of the given node.
+	 * @param n
+	 * @return
+	 */
+	protected double opacity(T n)
+	{
+		return 0.6;
 	}
 }

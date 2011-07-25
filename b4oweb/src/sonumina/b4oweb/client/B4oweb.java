@@ -510,7 +510,7 @@ public class B4oweb implements EntryPoint
 			VerticalPanel selectedTermsPanel = new VerticalPanel();
 			
 			selectedTermsDataGrid = new DataGrid<LazyTerm>();
-			selectedTermsDataGrid.setHeight("240px");
+			selectedTermsDataGrid.setHeight("249px");
 			selectedTermsDataGrid.setWidth("420px");
 			selectedTermsDataGrid.addStyleName("scrollable");
 			selectedTermsDataGrid.addColumn(new TextColumn<LazyTerm>()
@@ -558,10 +558,20 @@ public class B4oweb implements EntryPoint
 						return n.term.term;
 					return "Unknown";
 				}
+				
+				@Override
+				protected double opacity(LazyTerm n)
+				{
+					if (selectedTermsList.contains(n))
+					{
+						return 1;
+					} else return super.opacity(n);
+				}
 			};
 			selectedTermsGraphScrollPanel = new MyCustomScrollPanel(selectedTermsGraph);
 			selectedTermsGraphScrollPanel.setWidth("400px");
-			selectedTermsGraphScrollPanel.setHeight("240px");
+			selectedTermsGraphScrollPanel.setHeight("249px");
+			selectedTermsGraphScrollPanel.addStyleName("scrollable");
 			horizontalPanel.add(selectedTermsGraphScrollPanel);
 		}
 
