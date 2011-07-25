@@ -44,24 +44,6 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ProvidesKey;
 
-/**
- * Same as the custom scroll panel but makes 
- * 
- * @author Sebastian Bauer
- */
-class MyCustomScrollPanel extends CustomScrollPanel
-{
-	public MyCustomScrollPanel(Widget widget)
-	{
-		super(widget);
-	}
-	
-	@Override
-	public com.google.gwt.user.client.Element getScrollableElement() {
-		// TODO Auto-generated method stub
-		return super.getScrollableElement();
-	}	
-}
 
 /**
  * A tabular view with a fixed header and footer section and a scrollable data
