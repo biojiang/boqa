@@ -2,9 +2,12 @@ package sonumina.b4oweb.client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import sonumina.b4oweb.client.gwt.DataGrid;
+import sonumina.b4oweb.client.gwt.MyCustomScrollPanel;
 import sonumina.b4oweb.shared.SharedItemResultEntry;
 import sonumina.b4oweb.shared.SharedParents;
 import sonumina.b4oweb.shared.SharedTerm;
@@ -152,6 +155,11 @@ public class B4oweb implements EntryPoint
 	private List<LazyTerm> selectedTermsList = new ArrayList<LazyTerm>();
 
 	/**
+	 * The panel which holds the graph.
+	 */
+	private MyCustomScrollPanel selectedTermsGraphScrollPanel;
+
+	/**
 	 * The graph which displays all selected terms.
 	 */
 	private MyGraphWidget<LazyTerm> selectedTermsGraph;
@@ -245,74 +253,87 @@ public class B4oweb implements EntryPoint
 	}
 	
 	/**
-	 * 
+	 * Populate the nodes in the graph and in the list.
 	 */
 	private void populateSelectedTerms()
 	{
+		final boolean VERSION1 = false;
+
 		selectedTermsDataGrid.setRowData(selectedTermsList);
 		selectedTermsGraph.clear();
 
+		/* Determine the nodes which needs to be added to the graph
+		 * (incl. their ancestors)
+		 */
+		LinkedHashSet<Integer> serverIds = new LinkedHashSet<Integer>();
 		for (LazyTerm st : selectedTermsList)
 		{
 			if (!selectedTermsGraph.containsNode(st))
 			{
 				if (st.term != null)
-				{
-					b4oService.getAncestors(Arrays.asList(st.term.serverId), new AsyncCallback<SharedParents[]>() {
-						
-						@Override
-						public void onSuccess(SharedParents[] result)
-						{
-							ArrayList<Integer> requestTermList = new ArrayList<Integer>();
-
-							for (SharedParents ps : result)
-							{
-								LazyTerm plz = allTermsList.get(ps.serverId);
-								
-								for (int p : ps.parentIds)
-								{
-									LazyTerm lz = allTermsList.get(p);
-									selectedTermsGraph.addNode(lz);
-									selectedTermsGraph.addEdge(lz, plz);
-
-									if (lz.term == null)
-									{
-										GWT.log("Adding " + p + "  " + lz.toString());
-										requestTermList.add(p);
-									}
-								}
-							}
-							selectedTermsGraph.redraw();
-
-							if (requestTermList.size() > 0)
-							{
-								/* TODO: Merge with updateTerms() */
-								b4oService.getNamesOfTerms(requestTermList, new AsyncCallback<SharedTerm[]>()
-										{
-											public void onFailure(Throwable caught) { GWT.log("Error", caught);};
-											@Override
-											public void onSuccess(SharedTerm[] result)
-											{
-												for (SharedTerm st : result)
-												{
-													GWT.log(st.serverId + " " + allTermsList.size());
-													LazyTerm lz = allTermsList.get(st.serverId);
-													if (lz.term == null)
-														lz.term = st;
-												}
-												selectedTermsGraph.redraw(true);
-											}
-										});
-							}
-						}
-						
-						@Override
-						public void onFailure(Throwable caught) { GWT.log("Error", caught); }
-					});
-				}
-				selectedTermsGraph.addNode(st);
+					serverIds.add(st.term.serverId);
+				else if (VERSION1) selectedTermsGraph.addNode(st);
 			}
 		}
+
+		/* Now retrieve the ancestors */
+		b4oService.getAncestors(new ArrayList<Integer>(serverIds), new AsyncCallback<SharedParents[]>() {
+			@Override
+			public void onSuccess(SharedParents[] result)
+			{
+				/* The terms of which further information shall be requested, usually
+				 * all ancestors.
+				 */
+				ArrayList<Integer> requestTermList = new ArrayList<Integer>();
+
+				for (SharedParents ps : result)
+				{
+					LazyTerm plz = allTermsList.get(ps.serverId);
+
+					if (!VERSION1) 
+						selectedTermsGraph.addNode(plz);
+
+					for (int p : ps.parentIds)
+					{
+						LazyTerm lz = allTermsList.get(p);
+						selectedTermsGraph.addNode(lz);
+						selectedTermsGraph.addEdge(lz, plz);
+
+						if (lz.term == null)
+							requestTermList.add(p);
+					}
+				}
+
+				if (requestTermList.size() > 0)
+				{
+					/* TODO: Merge with updateTerms() */
+					b4oService.getNamesOfTerms(requestTermList, new AsyncCallback<SharedTerm[]>()
+							{
+								public void onFailure(Throwable caught) { GWT.log("Error", caught);};
+								@Override
+								public void onSuccess(SharedTerm[] result)
+								{
+									for (SharedTerm st : result)
+									{
+										GWT.log(st.serverId + " " + allTermsList.size());
+										LazyTerm lz = allTermsList.get(st.serverId);
+										if (lz.term == null)
+											lz.term = st;
+									}
+									selectedTermsGraph.redraw(true);
+								}
+							});
+				} else
+				{
+					selectedTermsGraph.redraw();
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) { GWT.log("Error", caught); }
+		});
+
+		
 		selectedTermsGraph.redraw();
 	}
 	
@@ -528,7 +549,7 @@ public class B4oweb implements EntryPoint
 			selectedTermsPanel.add(selectedTermsDataGrid);
 			horizontalPanel.add(selectedTermsPanel);
 			
-			selectedTermsGraph = new MyGraphWidget<LazyTerm>(400, 240)
+			selectedTermsGraph = new MyGraphWidget<LazyTerm>(400, 200)
 			{
 				@Override
 				protected String getLabel(LazyTerm n)
@@ -538,7 +559,10 @@ public class B4oweb implements EntryPoint
 					return "Unknown";
 				}
 			};
-			horizontalPanel.add(selectedTermsGraph);
+			selectedTermsGraphScrollPanel = new MyCustomScrollPanel(selectedTermsGraph);
+			selectedTermsGraphScrollPanel.setWidth("400px");
+			selectedTermsGraphScrollPanel.setHeight("240px");
+			horizontalPanel.add(selectedTermsGraphScrollPanel);
 		}
 
 		{

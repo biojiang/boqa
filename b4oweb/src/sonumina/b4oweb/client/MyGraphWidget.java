@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Stack;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
@@ -122,6 +121,8 @@ public class MyGraphWidget<T> extends Raphael
 	 */
 	public void redraw(boolean dimsChanged)
 	{
+		final MyGraphWidget<T> THIS = this;
+
 		/* Add all nodes and determine dimension. We also remove nodes that are currently
 		 * displayed "on the same go" */
 		for (Node n : graph)
@@ -153,6 +154,10 @@ public class MyGraphWidget<T> extends Raphael
 				d.height = (int)n.textHeight + 16;
 			};
 		}, new DirectedGraphLayout.IPosition<Node>() {
+			public void setSize(int width, int height)
+			{
+				THIS.setSize(width+10,height+10);
+			}
 			public void set(final Node n, int left, int top)
 			{
 				final Raphael.Set set = new Raphael.Set();
