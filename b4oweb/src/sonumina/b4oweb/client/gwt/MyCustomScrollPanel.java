@@ -10,7 +10,7 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * @author Sebastian Bauer
  */
-class MyCustomScrollPanel extends CustomScrollPanel
+public class MyCustomScrollPanel extends CustomScrollPanel
 {
 	public MyCustomScrollPanel(Widget widget)
 	{
