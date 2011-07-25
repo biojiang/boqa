@@ -17,6 +17,7 @@ import com.google.gwt.cell.client.ButtonCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
 import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -26,12 +27,16 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.dom.client.ScrollEvent;
 import com.google.gwt.event.dom.client.ScrollHandler;
+import com.google.gwt.i18n.client.HasDirection.Direction;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment.HorizontalAlignmentConstant;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -385,7 +390,7 @@ public class B4oweb implements EntryPoint
 	{
 		VerticalPanel rootVerticalPanel = new VerticalPanel();
 		RootLayoutPanel.get().add(rootVerticalPanel);
-
+		RootLayoutPanel.get().setWidgetLeftRight(rootVerticalPanel, 0, Unit.PCT, 0, Unit.PCT);
 		HorizontalPanel horizontalPanel = new HorizontalPanel();
 		rootVerticalPanel.add(horizontalPanel);
 		
@@ -512,6 +517,8 @@ public class B4oweb implements EntryPoint
 			selectedTermsDataGrid = new DataGrid<LazyTerm>();
 			selectedTermsDataGrid.setHeight("249px");
 			selectedTermsDataGrid.setWidth("420px");
+			selectedTermsDataGrid.setLoadingIndicator(new HTML("No feature selected"));
+			selectedTermsDataGrid.setEmptyTableWidget(new HTML("No feature selected"));
 			selectedTermsDataGrid.addStyleName("scrollable");
 			selectedTermsDataGrid.addColumn(new TextColumn<LazyTerm>()
 					{
