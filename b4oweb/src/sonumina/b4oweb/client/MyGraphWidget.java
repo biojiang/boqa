@@ -163,9 +163,9 @@ public class MyGraphWidget<T> extends Raphael
 			{
 				final Raphael.Set set = new Raphael.Set();
 				n.rect = new Raphael.Rect(left + 10 - 5, top + 10 - 5, n.textWidth + 10, n.textHeight + 10);
-				n.rect.attr("fill", "#bfac00");
+				n.rect.attr("fill", color(n.data));
 				n.rect.attr("fill-opacity", opacity(n.data));
-				n.rect.attr("stroke", "#bfac00");
+				n.rect.attr("stroke", color(n.data));
 				n.rect.attr("stroke-width", 2);
 				n.rect.attr("r", 5);
 				
@@ -270,5 +270,16 @@ public class MyGraphWidget<T> extends Raphael
 	protected double opacity(T n)
 	{
 		return 0.6;
+	}
+	
+	/**
+	 * Returns the color of the given node.
+	 * 
+	 * @param n
+	 * @return
+	 */
+	protected String color(T n)
+	{
+		return "#bfac00";
 	}
 }
