@@ -27,6 +27,8 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.dom.client.ScrollEvent;
 import com.google.gwt.event.dom.client.ScrollHandler;
+import com.google.gwt.event.logical.shared.OpenEvent;
+import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.i18n.client.HasDirection.Direction;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -98,6 +100,26 @@ class LazyTerm
 		return (flags & STATE_MASK) == LoadingState.STATE_LOADED.ordinal();
 	}
 
+}
+
+/**
+ * Widget drawing graphs of terms.
+ * 
+ * @author Sebastian Bauer
+ */
+class TermGraphWidget extends MyGraphWidget<LazyTerm>
+{
+	public TermGraphWidget(int width, int height) {
+		super(width, height);
+	}
+
+	@Override
+	protected String getLabel(LazyTerm n)
+	{
+		if (n.term != null)
+			return n.term.term;
+		return "Unknown";
+	}
 }
 
 /**
@@ -364,17 +386,85 @@ public class B4oweb implements EntryPoint
 
 				for (i=0;i<Math.min(20,result.length);i++)
 				{
-					SharedItemResultEntry r = result[i];
+					final SharedItemResultEntry r = result[i];
 					DisclosurePanel dp = new DisclosurePanel((r.rank + 1) + ". " + r.itemName + " (" + r.marginal + ")");
 					StringBuilder str = new StringBuilder();
 
 					for (int j=0;j<r.directTerms.length;j++)
 						str.append(r.directTerms[j] + " " + r.directedTermsFreq[j] + " ");
 
-					VerticalPanel vp = new VerticalPanel();
+					final VerticalPanel vp = new VerticalPanel();
 					vp.add(new HTML(str.toString()));
+					final MyGraphWidget<LazyTerm> resultTermGraph = new TermGraphWidget(500,300);
+					vp.add(resultTermGraph);
+					
 					dp.add(vp);
 					resultPanel.add(dp);
+
+					dp.addOpenHandler(new OpenHandler<DisclosurePanel>() {
+						@Override
+						public void onOpen(OpenEvent<DisclosurePanel> event)
+						{
+							ArrayList<Integer> serverIds = new ArrayList<Integer>(r.directTerms.length);
+							for (int id : r.directTerms)
+								serverIds.add(id);
+
+							b4oService.getAncestors(serverIds, new AsyncCallback<SharedParents[]>()
+									{
+										@Override
+										public void onFailure(Throwable caught) { GWT.log("Error", caught); }
+										public void onSuccess(SharedParents[] result)
+										{
+											/* The terms of which further information shall be requested, usually
+											 * all ancestors.
+											 */
+											LinkedHashSet<Integer> requestTermList = new LinkedHashSet<Integer>();
+
+											for (SharedParents ps : result)
+											{
+												LazyTerm plz = allTermsList.get(ps.serverId);
+												resultTermGraph.addNode(plz);
+
+												if (plz.term == null)
+													requestTermList.add(ps.serverId);
+
+												for (int p : ps.parentIds)
+												{
+													LazyTerm lz = allTermsList.get(p);
+													resultTermGraph.addNode(lz);
+													resultTermGraph.addEdge(lz, plz);
+
+													if (lz.term == null)
+														requestTermList.add(p);
+												}
+											}
+											
+											if (requestTermList.size()>0)
+											{
+												b4oService.getNamesOfTerms(new ArrayList<Integer>(requestTermList), new AsyncCallback<SharedTerm[]>()
+														{
+															public void onFailure(Throwable caught) { GWT.log("Error", caught);};
+															@Override
+															public void onSuccess(SharedTerm[] result)
+															{
+																for (SharedTerm st : result)
+																{
+																	LazyTerm lz = allTermsList.get(st.serverId);
+																	if (lz.term == null)
+																		lz.term = st;
+																}
+																resultTermGraph.redraw(true);
+															}
+														});
+
+											} else resultTermGraph.redraw();
+										};
+									});
+							
+//							vp.add(new HTML("koo"));
+						}
+					});
+
 				}
 			}
 			@Override
@@ -556,16 +646,8 @@ public class B4oweb implements EntryPoint
 			selectedTermsPanel.add(selectedTermsDataGrid);
 			horizontalPanel.add(selectedTermsPanel);
 			
-			selectedTermsGraph = new MyGraphWidget<LazyTerm>(400, 200)
+			selectedTermsGraph = new TermGraphWidget(400, 200)
 			{
-				@Override
-				protected String getLabel(LazyTerm n)
-				{
-					if (n.term != null)
-						return n.term.term;
-					return "Unknown";
-				}
-				
 				@Override
 				protected double opacity(LazyTerm n)
 				{

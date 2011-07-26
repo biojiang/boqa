@@ -37,6 +37,10 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 		return getNamesOfTerms(null,ids);
 	}
 
+	/**
+	 * @FIXME The out order does not need to match the in order
+	 * @FIXME Repetitions are not allowed
+	 */
 	@Override
 	public SharedTerm[] getNamesOfTerms(String pattern, List<Integer> ids)
 	{
@@ -46,7 +50,7 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 		SharedTerm [] names = new SharedTerm[ids.size()];
 		List<Integer> sortedIds = new ArrayList<Integer>(ids);
 		
-		/* Note that the out order does not need to match the out order */
+		/* FIXME: Note that the out order does not need to match the in order */
 		java.util.Collections.sort(sortedIds);
 		
 		/* Go through all terms of the given pattern and then fill
@@ -67,6 +71,7 @@ public class B4OServiceImpl extends RemoteServiceServlet implements B4OService
 			}
 			i++;
 		}
+		
 		return names;
 	}
 
