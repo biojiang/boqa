@@ -11,6 +11,7 @@ import sonumina.b4oweb.shared.SharedItemResultEntry;
 import sonumina.b4oweb.shared.SharedParents;
 import sonumina.b4oweb.shared.SharedTerm;
 import sonumina.math.graph.DirectedGraph;
+import sonumina.math.graph.Edge;
 
 import com.google.gwt.cell.client.ButtonCell;
 import com.google.gwt.cell.client.FieldUpdater;
@@ -325,19 +326,23 @@ public class B4oweb implements EntryPoint
 
 						for (SharedParents ps : result)
 						{
-							LazyTerm plz = allTermsList.get(ps.serverId);
-							resultTermGraph.addNode(plz);
+							LazyTerm lz = allTermsList.get(ps.serverId);
+							resultTermGraph.addNode(lz);
 
-							if (plz.term == null)
+							if (lz.term == null)
 								requestTermList.add(ps.serverId);
 
 							for (int p : ps.parentIds)
 							{
-								LazyTerm lz = allTermsList.get(p);
-								resultTermGraph.addNode(lz);
-								resultTermGraph.addEdge(lz, plz);
+								LazyTerm plz = allTermsList.get(p);
+								resultTermGraph.addNode(plz);
+								resultTermGraph.addEdge(plz, lz);
 
-								if (lz.term == null)
+								/* update our global view */
+								if (!allTermsGraph.areNeighbors(plz,lz))
+									allTermsGraph.addEdge(new Edge<LazyTerm>(plz,lz));
+
+								if (plz.term == null)
 									requestTermList.add(p);
 							}
 						}
@@ -413,9 +418,15 @@ public class B4oweb implements EntryPoint
 						@Override
 						public void onOpen(OpenEvent<DisclosurePanel> event)
 						{
-							ArrayList<Integer> serverIds = new ArrayList<Integer>(r.directTerms.length);
+							ArrayList<Integer> serverIds = new ArrayList<Integer>(r.directTerms.length + selectedTermsList.size());
 							for (int id : r.directTerms)
 								serverIds.add(id);
+
+							for (LazyTerm lt : selectedTermsList)
+							{
+								if (lt.term != null)
+									serverIds.add(lt.term.serverId);
+							}
 
 							addTermsToTermGraph(resultTermGraph, serverIds);
 						}
