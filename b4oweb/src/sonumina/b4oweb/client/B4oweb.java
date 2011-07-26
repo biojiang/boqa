@@ -189,7 +189,7 @@ public class B4oweb implements EntryPoint
 	/**
 	 * The graph which displays all selected terms.
 	 */
-	private MyGraphWidget<LazyTerm> selectedTermsGraph;
+	private TermGraphWidget selectedTermsGraph;
 
 	/**
 	 * The panel in which the results are placed.
@@ -304,63 +304,7 @@ public class B4oweb implements EntryPoint
 		}
 
 		/* Now retrieve the ancestors */
-		b4oService.getAncestors(new ArrayList<Integer>(serverIds), new AsyncCallback<SharedParents[]>() {
-			@Override
-			public void onSuccess(SharedParents[] result)
-			{
-				/* The terms of which further information shall be requested, usually
-				 * all ancestors.
-				 */
-				ArrayList<Integer> requestTermList = new ArrayList<Integer>();
-
-				for (SharedParents ps : result)
-				{
-					LazyTerm plz = allTermsList.get(ps.serverId);
-
-					if (!VERSION1) 
-						selectedTermsGraph.addNode(plz);
-
-					for (int p : ps.parentIds)
-					{
-						LazyTerm lz = allTermsList.get(p);
-						selectedTermsGraph.addNode(lz);
-						selectedTermsGraph.addEdge(lz, plz);
-
-						if (lz.term == null)
-							requestTermList.add(p);
-					}
-				}
-
-				if (requestTermList.size() > 0)
-				{
-					/* TODO: Merge with updateTerms() */
-					b4oService.getNamesOfTerms(requestTermList, new AsyncCallback<SharedTerm[]>()
-							{
-								public void onFailure(Throwable caught) { GWT.log("Error", caught);};
-								@Override
-								public void onSuccess(SharedTerm[] result)
-								{
-									for (SharedTerm st : result)
-									{
-										GWT.log(st.serverId + " " + allTermsList.size());
-										LazyTerm lz = allTermsList.get(st.serverId);
-										if (lz.term == null)
-											lz.term = st;
-									}
-									selectedTermsGraph.redraw(true);
-								}
-							});
-				} else
-				{
-					selectedTermsGraph.redraw();
-				}
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) { GWT.log("Error", caught); }
-		});
-
-		
+		addTermsToTermGraph(selectedTermsGraph, new ArrayList<Integer>(serverIds));
 		selectedTermsGraph.redraw();
 	}
 	
