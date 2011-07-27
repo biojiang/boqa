@@ -461,9 +461,7 @@ public class B4oweb implements EntryPoint
 		updateAncestors(serverIds, new MyCallback() {
 			@Override
 			public void cb() {
-				ArrayList<LazyTerm> lzList = new ArrayList<LazyTerm>(serverIds.size());
-				for (int sid : serverIds)
-					lzList.add(allTermsList.get(sid));
+				ArrayList<LazyTerm> lzList = getListOfTermsFromServerIDs(serverIds);
 
 				final ArrayList<LazyTerm> ancestorList = getAncestorsAsList(lzList);
 
@@ -526,36 +524,57 @@ public class B4oweb implements EntryPoint
 
 							final VerticalPanel vp = new VerticalPanel();
 							vp.add(new HTML(str.toString()));
-							final TermGraphWidget resultTermGraph = new TermGraphWidget(500,300){
-								protected String color(LazyTerm n)
-								{
-									/* Terms that are annotated to the item but not in the query (and hence forgotten) */
-									if (!inducedQueryTerms.contains(n))
-										return "#c5ffb6";
-									return "#26bf00";
-								};
-								
-							};
-							vp.add(resultTermGraph);
-							
 							dp.add(vp);
 							resultPanel.add(dp);
 
 							dp.addOpenHandler(new OpenHandler<DisclosurePanel>() {
+								private boolean hasAdded = false;
+
 								@Override
 								public void onOpen(OpenEvent<DisclosurePanel> event)
 								{
-									ArrayList<Integer> serverIds = new ArrayList<Integer>(r.directTerms.length + selectedTermsList.size());
-									for (int id : r.directTerms)
-										serverIds.add(id);
-
-									for (LazyTerm lt : selectedTermsList)
+									if (!hasAdded)
 									{
-										if (lt.term != null)
-											serverIds.add(lt.term.serverId);
-									}
+										final Set<LazyTerm> inducedItemTerms = new HashSet<LazyTerm>();
+										final TermGraphWidget resultTermGraph = new TermGraphWidget(500,300){
+											protected String color(LazyTerm n)
+											{
+												/* Terms that are annotated to the item but not in the query (and hence assumed to be missed) */
+												if (!inducedQueryTerms.contains(n))
+													return "#c5ffb6";
+												if (!inducedItemTerms.contains(n))
+													return "#bf000c";
+												return "#26bf00";
+											};
+											
+										};
+										vp.add(resultTermGraph);
+										hasAdded = true;
+	
+										/* Get the list of server term ids of terms annoatted to the item represented by the result */
+										final ArrayList<Integer> serverIds = new ArrayList<Integer>(r.directTerms.length + selectedTermsList.size());
+										for (int id : r.directTerms)
+											serverIds.add(id);
 
-									addTermsToTermGraph(resultTermGraph, serverIds);
+										/* Determine all ancestors */
+										updateAncestors(serverIds, new MyCallback() {
+											@Override
+											public void cb()
+											{
+												ArrayList<LazyTerm> terms = getListOfTermsFromServerIDs(serverIds);
+														
+												inducedItemTerms.addAll(getAncestorsAsList(terms));
+												
+												for (LazyTerm lt : selectedTermsList)
+												{
+													if (lt.term != null)
+														serverIds.add(lt.term.serverId);
+												}
+			
+												addTermsToTermGraph(resultTermGraph, serverIds);
+											}
+										});
+									}
 								}
 							});
 
@@ -782,5 +801,19 @@ public class B4oweb implements EntryPoint
 		selectedTermsList.add(availableTermsBackendList.get(newSelectedTermIndex));
 		populateSelectedTerms();
 		updateResults();
+	}
+
+	/**
+	 * From the a list of server ids return a list of lazy terms.
+	 * 
+	 * @param serverIds
+	 * @return
+	 */
+	private ArrayList<LazyTerm> getListOfTermsFromServerIDs(Collection <Integer> serverIds)
+	{
+		ArrayList<LazyTerm> terms = new ArrayList<LazyTerm>(serverIds.size());
+		for (int id : serverIds)
+			terms.add(allTermsList.get(id));
+		return terms;
 	}
 }
