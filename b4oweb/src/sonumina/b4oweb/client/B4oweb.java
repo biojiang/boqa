@@ -2,6 +2,8 @@ package sonumina.b4oweb.client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -10,6 +12,7 @@ import sonumina.b4oweb.client.gwt.MyCustomScrollPanel;
 import sonumina.b4oweb.shared.SharedItemResultEntry;
 import sonumina.b4oweb.shared.SharedParents;
 import sonumina.b4oweb.shared.SharedTerm;
+import sonumina.math.graph.AbstractGraph.IVisitor;
 import sonumina.math.graph.DirectedGraph;
 import sonumina.math.graph.Edge;
 
@@ -193,6 +196,16 @@ public class B4oweb implements EntryPoint
 	private VerticalPanel resultPanel;
 	
 	/**
+	 * A simple callback interface
+	 *
+	 * @author Sebastian Bauer
+	 */
+	private static interface MyCallback
+	{
+		public void cb();
+	};
+	
+	/**
 	 * Updates the terms currently visible within the scroll panel.
 	 */
 	private void updateVisibleTerms()
@@ -305,14 +318,35 @@ public class B4oweb implements EntryPoint
 	}
 	
 	/**
-	 * Adds the terms represented by the given ids to the graph. If necessary, this call performs
-	 * RPC in order to determine the graph structure.
+	 * This method updates the local graph with the ancestors of the specified terms.
+	 * If this is done, the callback is issued.
 	 * 
-	 * @param resultTermGraph
 	 * @param serverIds
 	 */
-	private void addTermsToTermGraph(final TermGraphWidget resultTermGraph, ArrayList<Integer> serverIds)
+	private void updateAncestors(ArrayList<Integer> serverIds, final MyCallback cb)
 	{
+		/* First filter the ids for ids that are already contained. If a term is present
+		 * then always all ancestors are present as well. FIXME: At the moment all terms
+		 * are added to the graph during initialization. Therefore we need to check whether
+		 * the node has any in and outgoing edges. */
+		ArrayList<Integer> newServerIds = new ArrayList<Integer>();
+		for (Integer sid : serverIds)
+		{
+			LazyTerm lz = allTermsList.get(sid);
+			if (!allTermsGraph.containsVertex(lz))
+				newServerIds.add(sid);
+			if (allTermsGraph.getInDegree(lz)==0 && allTermsGraph.getOutDegree(lz) == 0)
+				newServerIds.add(sid);
+		}
+
+		/* Short cut */
+		if (newServerIds.size() == 0)
+		{
+			cb.cb();
+			return;
+		}
+
+		/* Now receive the ids of the ancestors */
 		b4oService.getAncestors(serverIds, new AsyncCallback<SharedParents[]>()
 				{
 					@Override
@@ -327,16 +361,15 @@ public class B4oweb implements EntryPoint
 						for (SharedParents ps : result)
 						{
 							LazyTerm lz = allTermsList.get(ps.serverId);
-							resultTermGraph.addNode(lz);
 
+							allTermsGraph.addVertex(lz);
 							if (lz.term == null)
 								requestTermList.add(ps.serverId);
 
 							for (int p : ps.parentIds)
 							{
 								LazyTerm plz = allTermsList.get(p);
-								resultTermGraph.addNode(plz);
-								resultTermGraph.addEdge(plz, lz);
+								allTermsGraph.addVertex(plz);
 
 								/* update our global view */
 								if (!allTermsGraph.areNeighbors(plz,lz))
@@ -347,11 +380,12 @@ public class B4oweb implements EntryPoint
 							}
 						}
 
+						/* Request additional information */
 						if (requestTermList.size()>0)
 						{
 							b4oService.getNamesOfTerms(new ArrayList<Integer>(requestTermList), new AsyncCallback<SharedTerm[]>()
 									{
-										public void onFailure(Throwable caught) { GWT.log("Error", caught);};
+										public void onFailure(Throwable caught) { GWT.log("Error", caught); };
 										@Override
 										public void onSuccess(SharedTerm[] result)
 										{
@@ -361,30 +395,73 @@ public class B4oweb implements EntryPoint
 												if (lz.term == null)
 													lz.term = st;
 											}
-											resultTermGraph.redraw(true);
+											cb.cb();
 										}
 									});
 
-						} else resultTermGraph.redraw();
+						} else cb.cb();
 					};
 				});
-		
+	}
+	
+	/**
+	 * Adds the terms represented by the given ids to the graph. If necessary, this call performs
+	 * RPC in order to determine the graph structure.
+	 * 
+	 * @param resultTermGraph
+	 * @param serverIds
+	 */
+	private void addTermsToTermGraph(final TermGraphWidget resultTermGraph, final ArrayList<Integer> serverIds)
+	{
+		updateAncestors(serverIds, new MyCallback() {
+			@Override
+			public void cb() {
+				ArrayList<LazyTerm> lzList = new ArrayList<LazyTerm>(serverIds.size());
+				for (int sid : serverIds)
+					lzList.add(allTermsList.get(sid));
+
+				/* Determine all ancestors */
+				final ArrayList<LazyTerm> ancestorList = new ArrayList<LazyTerm>();
+				allTermsGraph.bfs(lzList, true, new IVisitor<LazyTerm>() {
+
+					@Override
+					public boolean visited(LazyTerm vertex)
+					{
+						ancestorList.add(vertex);
+						return true;
+					}
+				});
+
+				/* Add all nodes */
+				for (LazyTerm t : ancestorList)
+					resultTermGraph.addNode(t);
+
+				/* Now the edges */
+				for (LazyTerm t : ancestorList)
+				{
+					Iterator<LazyTerm> p = allTermsGraph.getParentNodes(t);
+					while (p.hasNext())
+						resultTermGraph.addEdge(p.next(), t);
+				}
+				resultTermGraph.redraw(true);
+			}
+		});
 	}
 
-	
 	/**
 	 * This takes the currently selected terms and updates the results.
 	 */
 	private void updateResults()
 	{
-		ArrayList<Integer> ids = new ArrayList<Integer>();
+		final ArrayList<Integer> queryIDs = new ArrayList<Integer>();
+		final HashSet<Integer> inducedQueryIDs = new HashSet<Integer>();
 		for (LazyTerm t : selectedTermsList)
 		{
 			if (t.term != null)
-				ids.add(t.term.requestId);
+				queryIDs.add(t.term.requestId);
 		}
-		
-		b4oService.getResults(ids, 0, 20, new AsyncCallback<SharedItemResultEntry[]>() {
+
+		b4oService.getResults(queryIDs, 0, 20, new AsyncCallback<SharedItemResultEntry[]>() {
 			@Override
 			public void onSuccess(SharedItemResultEntry [] result)
 			{
@@ -395,6 +472,7 @@ public class B4oweb implements EntryPoint
 				for (i=0;i<Math.min(20,result.length);i++)
 				{
 					final SharedItemResultEntry r = result[i];
+
 					DisclosurePanel dp = new DisclosurePanel((r.rank + 1) + ". " + r.itemName + " (" + r.marginal + ")");
 					StringBuilder str = new StringBuilder();
 
