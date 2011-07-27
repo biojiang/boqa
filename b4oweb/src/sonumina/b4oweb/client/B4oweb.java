@@ -2,10 +2,12 @@ package sonumina.b4oweb.client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import sonumina.b4oweb.client.gwt.DataGrid;
 import sonumina.b4oweb.client.gwt.MyCustomScrollPanel;
@@ -316,7 +318,50 @@ public class B4oweb implements EntryPoint
 		addTermsToTermGraph(selectedTermsGraph, new ArrayList<Integer>(serverIds));
 		selectedTermsGraph.redraw();
 	}
+
+	/**
+	 * Get the ancestors according to the given list.
+	 * 
+	 * @param lzList
+	 * @return
+	 */
+	private ArrayList<LazyTerm> getAncestorsAsList(Collection<LazyTerm> lzList)
+	{
+		/* Determine all ancestors */
+		final ArrayList<LazyTerm> ancestorList = new ArrayList<LazyTerm>();
+		allTermsGraph.bfs(lzList, true, new IVisitor<LazyTerm>() {
+
+			@Override
+			public boolean visited(LazyTerm vertex)
+			{
+				ancestorList.add(vertex);
+				return true;
+			}
+		});
+		return ancestorList;
+	}
 	
+	/**
+	 * Get the ancestors according to the given list.
+	 * 
+	 * @param lzList
+	 * @return
+	 */
+	private Set<LazyTerm> getAncestorsAsSet(Collection<LazyTerm> lzList)
+	{
+		/* Determine all ancestors */
+		final Set<LazyTerm> ancestorList = new HashSet<LazyTerm>();
+		allTermsGraph.bfs(lzList, true, new IVisitor<LazyTerm>() {
+			@Override
+			public boolean visited(LazyTerm vertex)
+			{
+				ancestorList.add(vertex);
+				return true;
+			}
+		});
+		return ancestorList;
+	}
+
 	/**
 	 * This method updates the local graph with the ancestors of the specified terms.
 	 * If this is done, the callback is issued.
@@ -420,17 +465,7 @@ public class B4oweb implements EntryPoint
 				for (int sid : serverIds)
 					lzList.add(allTermsList.get(sid));
 
-				/* Determine all ancestors */
-				final ArrayList<LazyTerm> ancestorList = new ArrayList<LazyTerm>();
-				allTermsGraph.bfs(lzList, true, new IVisitor<LazyTerm>() {
-
-					@Override
-					public boolean visited(LazyTerm vertex)
-					{
-						ancestorList.add(vertex);
-						return true;
-					}
-				});
+				final ArrayList<LazyTerm> ancestorList = getAncestorsAsList(lzList);
 
 				/* Add all nodes */
 				for (LazyTerm t : ancestorList)
@@ -453,8 +488,8 @@ public class B4oweb implements EntryPoint
 	 */
 	private void updateResults()
 	{
+		/* Determine query ids */
 		final ArrayList<Integer> queryIDs = new ArrayList<Integer>();
-		final HashSet<Integer> inducedQueryIDs = new HashSet<Integer>();
 		for (LazyTerm t : selectedTermsList)
 		{
 			if (t.term != null)
@@ -463,54 +498,71 @@ public class B4oweb implements EntryPoint
 
 		b4oService.getResults(queryIDs, 0, 20, new AsyncCallback<SharedItemResultEntry[]>() {
 			@Override
-			public void onSuccess(SharedItemResultEntry [] result)
+			public void onSuccess(final SharedItemResultEntry [] result)
 			{
-				int i;
-				
 				resultPanel.clear();
 
-				for (i=0;i<Math.min(20,result.length);i++)
-				{
-					final SharedItemResultEntry r = result[i];
+				/* Retrieve all ancestors */
+				updateAncestors(queryIDs,new MyCallback() {
+					@Override
+					public void cb()
+					{
+						final ArrayList<LazyTerm> queryTerms = new ArrayList<LazyTerm>();
+						for (int queryID : queryIDs)
+							queryTerms.add(allTermsList.get(queryID));
 
-					DisclosurePanel dp = new DisclosurePanel((r.rank + 1) + ". " + r.itemName + " (" + r.marginal + ")");
-					StringBuilder str = new StringBuilder();
+						/* Contains the set of all terms in the query */
+						final Set<LazyTerm> inducedQueryTerms = getAncestorsAsSet(queryTerms);
 
-					for (int j=0;j<r.directTerms.length;j++)
-						str.append(r.directTerms[j] + " " + r.directedTermsFreq[j] + " ");
-
-					final VerticalPanel vp = new VerticalPanel();
-					vp.add(new HTML(str.toString()));
-					final TermGraphWidget resultTermGraph = new TermGraphWidget(500,300){
-						protected String color(LazyTerm n)
+						for (int i=0;i<Math.min(20,result.length);i++)
 						{
-							return "#26bf00";
-						};
-					};
-					vp.add(resultTermGraph);
-					
-					dp.add(vp);
-					resultPanel.add(dp);
+							final SharedItemResultEntry r = result[i];
 
-					dp.addOpenHandler(new OpenHandler<DisclosurePanel>() {
-						@Override
-						public void onOpen(OpenEvent<DisclosurePanel> event)
-						{
-							ArrayList<Integer> serverIds = new ArrayList<Integer>(r.directTerms.length + selectedTermsList.size());
-							for (int id : r.directTerms)
-								serverIds.add(id);
+							DisclosurePanel dp = new DisclosurePanel((r.rank + 1) + ". " + r.itemName + " (" + r.marginal + ")");
+							StringBuilder str = new StringBuilder();
 
-							for (LazyTerm lt : selectedTermsList)
-							{
-								if (lt.term != null)
-									serverIds.add(lt.term.serverId);
-							}
+							for (int j=0;j<r.directTerms.length;j++)
+								str.append(r.directTerms[j] + " " + r.directedTermsFreq[j] + " ");
 
-							addTermsToTermGraph(resultTermGraph, serverIds);
+							final VerticalPanel vp = new VerticalPanel();
+							vp.add(new HTML(str.toString()));
+							final TermGraphWidget resultTermGraph = new TermGraphWidget(500,300){
+								protected String color(LazyTerm n)
+								{
+									/* Terms that are annotated to the item but not in the query (and hence forgotten) */
+									if (!inducedQueryTerms.contains(n))
+										return "#c5ffb6";
+									return "#26bf00";
+								};
+								
+							};
+							vp.add(resultTermGraph);
+							
+							dp.add(vp);
+							resultPanel.add(dp);
+
+							dp.addOpenHandler(new OpenHandler<DisclosurePanel>() {
+								@Override
+								public void onOpen(OpenEvent<DisclosurePanel> event)
+								{
+									ArrayList<Integer> serverIds = new ArrayList<Integer>(r.directTerms.length + selectedTermsList.size());
+									for (int id : r.directTerms)
+										serverIds.add(id);
+
+									for (LazyTerm lt : selectedTermsList)
+									{
+										if (lt.term != null)
+											serverIds.add(lt.term.serverId);
+									}
+
+									addTermsToTermGraph(resultTermGraph, serverIds);
+								}
+							});
+
 						}
-					});
 
-				}
+					}
+				});
 			}
 			@Override
 			public void onFailure(Throwable caught) { GWT.log("Error", caught); }
