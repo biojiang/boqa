@@ -22,6 +22,7 @@ import com.google.gwt.cell.client.ButtonCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
 import com.google.gwt.event.dom.client.DoubleClickHandler;
@@ -41,6 +42,7 @@ import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -594,12 +596,9 @@ public class B4oweb implements EntryPoint
 	 */
 	public void onModuleLoad()
 	{
-		VerticalPanel rootVerticalPanel = new VerticalPanel();
-		RootLayoutPanel.get().add(rootVerticalPanel);
-		RootLayoutPanel.get().setWidgetLeftRight(rootVerticalPanel, 0, Unit.PCT, 0, Unit.PCT);
 		HorizontalPanel horizontalPanel = new HorizontalPanel();
-		rootVerticalPanel.add(horizontalPanel);
-		
+		RootPanel.get().add(horizontalPanel);
+	
 		{
 			VerticalPanel availableTermsPanel = new VerticalPanel();
 
@@ -785,10 +784,9 @@ public class B4oweb implements EntryPoint
 			horizontalPanel.add(selectedTermsGraphScrollPanel);
 		}
 
-		{
-			resultPanel = new VerticalPanel();
-			rootVerticalPanel.add(resultPanel);
-		}
+		/* The result panel */
+		resultPanel = new VerticalPanel();
+		RootPanel.get().add(resultPanel);
 	}
 
 	/**
