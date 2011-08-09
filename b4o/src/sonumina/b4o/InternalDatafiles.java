@@ -6,6 +6,7 @@ import java.util.Random;
 
 import ontologizer.association.Association;
 import ontologizer.association.AssociationContainer;
+import ontologizer.benchmark.Datafiles;
 import ontologizer.dotwriter.AbstractDotAttributesProvider;
 import ontologizer.dotwriter.GODOTWriter;
 import ontologizer.go.Ontology;
@@ -21,12 +22,9 @@ import ontologizer.types.ByteString;
  * 
  * @author Sebastian Bauer
  */
-public class InternalDatafiles
+public class InternalDatafiles extends Datafiles
 {
 	public static long seed = 1;
-	
-	private AssociationContainer assoc;
-	private Ontology graph;
 	
 	public InternalDatafiles()
 	{
