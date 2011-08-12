@@ -146,6 +146,17 @@ public class B4O
 	/** Links items to terms */
 	public static int [][] items2Terms;
 
+	/**
+	 * For each item, contains the term ids which need to be switched on, if
+	 * the previous item was on.
+	 */
+	public static int [][] diffOnTerms;
+	
+	/**
+	 * Same as diffOnTerms but for switching off terms.
+	 */
+	public static int [][] diffOffTerms;
+
 	/** Links items to directly associated terms */
 	public static int [][] items2DirectTerms;
 
@@ -168,7 +179,7 @@ public class B4O
 	
 	/** Contains all the ancestors of the terms */
 	public static int [][] term2Ancestors;
-	
+
 	/** Contains the parents of the terms */
 	public static int [][] term2Parents;
 	
@@ -1199,6 +1210,41 @@ public class B4O
 	}
 
 	/**
+	 * Calculates the set difference of a minus b.
+	 * 
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	private static int [] setDiff(int [] a, int [] b)
+	{
+		int [] c = new int[a.length];
+		int cc = 0; /* current c */
+
+		/* Obviously, this could be optimized to linear time if a and b would be assumed to be sorted */
+		for (int i=0;i<a.length;i++)
+		{
+			boolean inB = false;
+
+			for (int j=0;j<b.length;j++)
+			{
+				if (a[i] == b[j])
+				{
+					inB = true;
+					break;
+				}
+			}
+			
+			if (!inB)
+				c[cc++] = a[i];
+		}
+		int [] nc = new int[cc];
+		for (int i=0;i<cc;i++)
+			nc[i] = c[i];
+		return nc;
+	}
+
+	/**
 	 * Provides some global variables, given the global graph, the global
 	 * associations and the items.
 	 * 
@@ -1296,6 +1342,23 @@ public class B4O
 				items2Terms[i][j++] = slimGraph.getVertexIndex(graph.getTerm(tid));
 			
 			i++;
+		}
+
+		/* Fill diff matrix */
+		diffOnTerms = new int[allItemList.size()][];
+		diffOffTerms = new int[allItemList.size()][];
+		diffOnTerms[0] = items2Terms[0]; /* For the first step, all terms must be activated */
+		diffOffTerms[0] = new int[0];
+		for (i=1;i<allItems.getGeneCount();i++)
+		{
+			int prevOnTerms[] = items2Terms[i-1];
+			int newOnTerms[] = items2Terms[i];
+			
+			diffOnTerms[i] = setDiff(newOnTerms, prevOnTerms);
+			diffOffTerms[i] = setDiff(prevOnTerms, newOnTerms);
+			
+			System.out.println(diffOnTerms.length + " " + diffOffTerms);
+			
 		}
 
 		/* Fill direct item matrix */
