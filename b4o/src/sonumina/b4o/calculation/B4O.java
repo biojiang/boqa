@@ -157,6 +157,9 @@ public class B4O
 	 */
 	public static int [][] diffOffTerms;
 
+	public static int [][][] diffOnTermsFreqs;
+	public static int [][][] diffOffTermsFreqs;
+
 	/** Links items to directly associated terms */
 	public static int [][] items2DirectTerms;
 
@@ -491,7 +494,7 @@ public class B4O
 
 			boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
 			boolean [] taken = new boolean[numTermsWithExplicitFrequencies];
-			
+
 			/* first, activate variable terms according to the current selection */
 			for (int i=0;i<s.r;i++)
 			{
@@ -840,6 +843,17 @@ public class B4O
 		return o;
 	}
 
+	/**
+	 * Deactivate the ancestors of the given node.
+	 * 
+	 * @param i
+	 * @param observations
+	 */
+	public static void deactivateAncestors(int i, boolean [] observations)
+	{
+		for (int j=0;j<term2Ancestors[i].length;j++)
+			observations[term2Ancestors[i][j]] = false;
+	}
 
 	/**
 	 * Activates the ancestors of the given node.
@@ -849,9 +863,7 @@ public class B4O
 	 */
 	public static void activateAncestors(int i, boolean[] observations)
 	{
-		int j;
-
-		for (j=0;j<term2Ancestors[i].length;j++)
+		for (int j=0;j<term2Ancestors[i].length;j++)
 			observations[term2Ancestors[i][j]] = true;
 	}
 
@@ -863,9 +875,7 @@ public class B4O
 	 */
 	private static void deactivateDecendants(int i, boolean[] observations)
 	{
-		int j;
-
-		for (j=0;j<term2Descendants[i].length;j++)
+		for (int j=0;j<term2Descendants[i].length;j++)
 			observations[term2Descendants[i][j]] = false;
 	}
 
@@ -1243,6 +1253,48 @@ public class B4O
 			nc[i] = c[i];
 		return nc;
 	}
+	
+	/**
+	 * Helper function to create sub array of length elements from
+	 * the given array.
+	 * 
+	 * @param array
+	 * @param length
+	 * @return
+	 */
+	private static int [] subArray(int [] array, int length)
+	{
+		int [] a = new int[length];
+		for (int i=0;i<length;i++)
+			a[i] = array[i];
+		return a;
+	}
+	
+	/**
+	 * A simple class maintaining ints.
+	 * 
+	 * @author Sebastian Bauer
+	 */
+	private static class IntArray
+	{
+		private int [] array;
+		private int length;
+
+		public IntArray(int maxLength)
+		{
+			array = new int[maxLength];
+		}
+		
+		public void add(int e)
+		{
+			array[length++] = e;
+		}
+		
+		public int [] get()
+		{
+			return subArray(array, length);
+		}
+	}
 
 	/**
 	 * Provides some global variables, given the global graph, the global
@@ -1342,23 +1394,6 @@ public class B4O
 				items2Terms[i][j++] = slimGraph.getVertexIndex(graph.getTerm(tid));
 			
 			i++;
-		}
-
-		/* Fill diff matrix */
-		diffOnTerms = new int[allItemList.size()][];
-		diffOffTerms = new int[allItemList.size()][];
-		diffOnTerms[0] = items2Terms[0]; /* For the first step, all terms must be activated */
-		diffOffTerms[0] = new int[0];
-		for (i=1;i<allItems.getGeneCount();i++)
-		{
-			int prevOnTerms[] = items2Terms[i-1];
-			int newOnTerms[] = items2Terms[i];
-			
-			diffOnTerms[i] = setDiff(newOnTerms, prevOnTerms);
-			diffOffTerms[i] = setDiff(prevOnTerms, newOnTerms);
-			
-			System.out.println(diffOnTerms.length + " " + diffOffTerms);
-			
 		}
 
 		/* Fill direct item matrix */
@@ -1464,6 +1499,103 @@ public class B4O
 			Arrays.sort(freqs);
 			for (int j=0;j<items2DirectTerms[i].length;j++)
 				item2TermFrequenciesOrder[i][j] = freqs[j].termIdx;
+		}
+
+		/* Fill diff matrix */
+		diffOnTerms = new int[allItemList.size()][];
+		diffOffTerms = new int[allItemList.size()][];
+		diffOnTerms[0] = items2Terms[0]; /* For the first step, all terms must be activated */
+		diffOffTerms[0] = new int[0];
+		for (i=1;i<allItems.getGeneCount();i++)
+		{
+			int prevOnTerms[] = items2Terms[i-1];
+			int newOnTerms[] = items2Terms[i];
+
+			diffOnTerms[i] = setDiff(newOnTerms, prevOnTerms);
+			diffOffTerms[i] = setDiff(prevOnTerms, newOnTerms);
+		}
+
+		diffOnTermsFreqs = new int[allItemList.size()][][];
+		diffOffTermsFreqs = new int[allItemList.size()][][];
+		for (int item=0;item<allItems.getGeneCount();item++)
+		{
+			int numTerms = items2TermFrequencies[item].length;
+			int numTermsWithExplicitFrequencies = 0;
+			int numConfigs = 0;
+
+			/* Determine the number of terms that have non-1.0 frequency. We restrict them
+			 * to the top 6 (the less probable) due to complexity issues and hope that this
+			 * a good enough approximation. */
+			for (i=0;i<numTerms && i<6;i++)
+			{
+				if (items2TermFrequencies[item][item2TermFrequenciesOrder[item][i]] >= 1.0)
+					break;
+				numTermsWithExplicitFrequencies++;
+			}
+
+			/* We try each possible activity/inactivity combination of terms with explicit frequencies */
+			SubsetGenerator sg = new SubsetGenerator(numTermsWithExplicitFrequencies,numTermsWithExplicitFrequencies);
+			SubsetGenerator.Subset s;
+
+			/* First, determine the number of configs (could calculate binomial coefficient of course) */
+			while ((s = sg.next()) != null)
+				numConfigs++;
+
+			diffOnTermsFreqs[item] = new int[numConfigs][];  
+			diffOffTermsFreqs[item] = new int[numConfigs][];
+
+			/* Contains the settings of the previous run */
+			IntArray prevArray = new IntArray(slimGraph.getNumberOfVertices());
+
+			int config = 0;
+
+			while ((s = sg.next()) != null)
+			{
+				IntArray newArray = new IntArray(slimGraph.getNumberOfVertices());
+
+				boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
+				boolean [] taken = new boolean[numTermsWithExplicitFrequencies];
+				int numTermsChoosen = 0;
+
+				double factor = 0.0;
+
+				/* First, activate variable terms according to the current selection */
+				for (i=0;i<s.r;i++)
+				{
+					int ti = item2TermFrequenciesOrder[item][s.j[i]]; /* index of term within the all directly associated indices */
+					int h = items2DirectTerms[item][ti];			  /* global index of term */
+					hidden[h] = true;
+					activateAncestors(h, hidden);
+					factor += Math.log(items2TermFrequencies[item][ti]);
+					taken[s.j[i]] = true;
+				}
+				
+				/* Needs also respect the inactive terms in the factor */
+				for (i=0;i<numTermsWithExplicitFrequencies;i++)
+				{
+					if (!taken[i])
+						factor += Math.log(1 - items2TermFrequencies[item][item2TermFrequenciesOrder[item][i]]);
+				}
+
+				/* Second, activate mandatory terms */
+				for (i=numTermsWithExplicitFrequencies;i<numTerms;i++)
+				{
+					int ti = item2TermFrequenciesOrder[item][i];
+					int h = items2DirectTerms[item][ti];  /* global index of term */
+					hidden[h] = true;
+					activateAncestors(h, hidden);
+					/* Factor is always 0 */
+				}
+
+				/* Now make a sparse representation */
+				for (i=0;i<slimGraph.getNumberOfVertices();i++)
+					if (hidden[i])
+						newArray.add(i);
+
+				diffOnTermsFreqs[item][config] = setDiff(newArray.get(), prevArray.get());
+				diffOffTermsFreqs[item][config] = setDiff(prevArray.get(), newArray.get());
+				config++;
+			}
 		}
 
 		/* Calculate IC */
