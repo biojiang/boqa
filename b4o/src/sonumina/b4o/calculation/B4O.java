@@ -489,43 +489,63 @@ public class B4O
 		
 		WeightedConfigurationList statsList = new WeightedConfigurationList();
 
-		while ((s = sg.next()) != null)
+		if (false)
 		{
-			double factor = 0.0;
-
 			boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
-			boolean [] taken = new boolean[numTermsWithExplicitFrequencies];
-
-			/* first, activate variable terms according to the current selection */
-			for (int i=0;i<s.r;i++)
-			{
-				int ti = item2TermFrequenciesOrder[item][s.j[i]]; /* index of term within the all directly associated indices */
-				int h = items2DirectTerms[item][ti];			  /* global index of term */
-				hidden[h] = true;
-				activateAncestors(h, hidden);
-				factor += Math.log(items2TermFrequencies[item][ti]);
-				taken[s.j[i]] = true;
-			}
 			
-			for (int i=0;i<numTermsWithExplicitFrequencies;i++)
+			for (int c=0;c<diffOnTermsFreqs[item].length;c++)
 			{
-				if (!taken[i])
-					factor += Math.log(1 - items2TermFrequencies[item][item2TermFrequenciesOrder[item][i]]);
-			}
+				for (int i=0;i<diffOnTermsFreqs[item][c].length;i++)
+					hidden[diffOnTermsFreqs[item][c][i]] = true;
 
-			/* second, activate mandatory terms */
-			for (int i=numTermsWithExplicitFrequencies;i<numTerms;i++)
+				for (int i=0;i<diffOffTermsFreqs[item][c].length;i++)
+					hidden[diffOnTermsFreqs[item][c][i]] = false;
+
+				/* Determine cases and store */
+				Configuration stats = new Configuration();
+				determineCases(observed, hidden, stats);
+				statsList.add(stats,factors[item][c]);
+			}
+		} else
+		{
+			while ((s = sg.next()) != null)
 			{
-				int ti = item2TermFrequenciesOrder[item][i];
-				int h = items2DirectTerms[item][ti];  /* global index of term */
-				hidden[h] = true;
-				activateAncestors(h, hidden);
+				double factor = 0.0;
+	
+				boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
+				boolean [] taken = new boolean[numTermsWithExplicitFrequencies];
+	
+				/* first, activate variable terms according to the current selection */
+				for (int i=0;i<s.r;i++)
+				{
+					int ti = item2TermFrequenciesOrder[item][s.j[i]]; /* index of term within the all directly associated indices */
+					int h = items2DirectTerms[item][ti];			  /* global index of term */
+					hidden[h] = true;
+					activateAncestors(h, hidden);
+					factor += Math.log(items2TermFrequencies[item][ti]);
+					taken[s.j[i]] = true;
+				}
+				
+				for (int i=0;i<numTermsWithExplicitFrequencies;i++)
+				{
+					if (!taken[i])
+						factor += Math.log(1 - items2TermFrequencies[item][item2TermFrequenciesOrder[item][i]]);
+				}
+	
+				/* second, activate mandatory terms */
+				for (int i=numTermsWithExplicitFrequencies;i<numTerms;i++)
+				{
+					int ti = item2TermFrequenciesOrder[item][i];
+					int h = items2DirectTerms[item][ti];  /* global index of term */
+					hidden[h] = true;
+					activateAncestors(h, hidden);
+				}
+	
+				/* Determine cases and store */
+				Configuration stats = new Configuration();
+				determineCases(observed, hidden, stats);
+				statsList.add(stats,factor);
 			}
-
-			/* Determine cases and store */
-			Configuration stats = new Configuration();
-			determineCases(observed, hidden, stats);
-			statsList.add(stats,factor);
 		}
 		
 		if (MEASURE_TIME)
