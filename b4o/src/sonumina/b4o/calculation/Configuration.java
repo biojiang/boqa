@@ -5,7 +5,7 @@ package sonumina.b4o.calculation;
  * 
  * @author Sebastian Bauer
  */
-public class Configuration
+final public class Configuration implements Cloneable
 {
 	public static enum NodeCase
 	{
@@ -18,11 +18,16 @@ public class Configuration
 		INHERIT_FALSE
 	}
 
-	private int [] stats = new int[NodeCase.values().length];
+	final private int [] stats = new int[NodeCase.values().length];
 	
-	public void increment(NodeCase c)
+	final public void increment(NodeCase c)
 	{
 		stats[c.ordinal()]++;
+	}
+	
+	final public void decrement(NodeCase c)
+	{
+		stats[c.ordinal()]--;
 	}
 	
 	@Override
@@ -41,7 +46,7 @@ public class Configuration
 	 * @param c
 	 * @return
 	 */
-	public int getCases(NodeCase c)
+	final public int getCases(NodeCase c)
 	{
 		return stats[c.ordinal()];
 	}
@@ -51,7 +56,7 @@ public class Configuration
 	 * 
 	 * @return
 	 */
-	public int getTotalCases()
+	final public int getTotalCases()
 	{
 		int c = 0;
 		for (int i=0;i<stats.length;i++)
@@ -64,7 +69,7 @@ public class Configuration
 	 * 
 	 * @return
 	 */
-	public double falsePositiveRate()
+	final public double falsePositiveRate()
 	{
 		 return getCases(Configuration.NodeCase.FALSE_POSITIVE)/(double)(getCases(Configuration.NodeCase.FALSE_POSITIVE) + getCases(Configuration.NodeCase.TRUE_NEGATIVE)); 
 	}
@@ -74,7 +79,7 @@ public class Configuration
 	 * 
 	 * @return
 	 */
-	public double falseNegativeRate()
+	final public double falseNegativeRate()
 	{
 		 return getCases(Configuration.NodeCase.FALSE_NEGATIVE)/(double)(getCases(Configuration.NodeCase.FALSE_NEGATIVE) + getCases(Configuration.NodeCase.TRUE_POSITIVE)); 
 	}
@@ -86,7 +91,7 @@ public class Configuration
 	 * @param beta
 	 * @return
 	 */
-	public double getScore(double alpha, double beta)
+	final public double getScore(double alpha, double beta)
 	{
 		return  Math.log(beta) * getCases(NodeCase.FALSE_NEGATIVE) +
 				Math.log(alpha) * getCases(NodeCase.FALSE_POSITIVE) + 
@@ -101,7 +106,7 @@ public class Configuration
 	 * 
 	 * @param toAdd
 	 */
-	public void add(Configuration toAdd)
+	final public void add(Configuration toAdd)
 	{
 		for (int i=0;i<stats.length;i++)
 			stats[i] += toAdd.stats[i];
@@ -110,9 +115,18 @@ public class Configuration
 	/**
 	 * Clear the stats.
 	 */
-	public void clear()
+	final public void clear()
 	{
 		for (int i=0;i<stats.length;i++)
 			stats[i] = 0;
+	}
+	
+	@Override
+	final public Configuration clone()
+	{
+		Configuration c = new Configuration();
+		for (int i=0;i<stats.length;i++)
+			c.stats[i] = stats[i];
+		return c;
 	}
 }
