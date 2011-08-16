@@ -31,6 +31,7 @@ import ontologizer.go.Term;
 import ontologizer.go.TermID;
 import ontologizer.set.PopulationSet;
 import ontologizer.types.ByteString;
+import sonumina.b4o.calculation.Configuration.NodeCase;
 import sonumina.math.graph.SlimDirectedGraphView;
 
 /**
@@ -489,22 +490,41 @@ public class B4O
 		
 		WeightedConfigurationList statsList = new WeightedConfigurationList();
 
-		if (false)
+		if (true)
 		{
 			boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
 			
+			Configuration stats = new Configuration();
+			
+			/* Initialize stats */
+			determineCases(observed, hidden, stats);
+
+			/* FIXME: Do the non-frequency case */ 
 			for (int c=0;c<diffOnTermsFreqs[item].length;c++)
 			{
-				for (int i=0;i<diffOnTermsFreqs[item][c].length;i++)
-					hidden[diffOnTermsFreqs[item][c][i]] = true;
+				int [] diffOn = diffOnTermsFreqs[item][c];
+				int [] diffOff = diffOffTermsFreqs[item][c];
 
-				for (int i=0;i<diffOffTermsFreqs[item][c].length;i++)
-					hidden[diffOffTermsFreqs[item][c][i]] = false;
+				/* Decrement config stats of the nodes we are going to change */
+				for (int i=0;i<diffOn.length;i++)
+					stats.decrement(getNodeCase(diffOn[i],hidden,observed));
+				for (int i=0;i<diffOff.length;i++)
+					stats.decrement(getNodeCase(diffOff[i],hidden,observed));
+
+				/* Change nodes states */
+				for (int i=0;i<diffOn.length;i++)
+					hidden[diffOn[i]] = true;
+				for (int i=0;i<diffOff.length;i++)
+					hidden[diffOff[i]] = false;
+
+				/* Increment config states of nodes that we have just changed */
+				for (int i=0;i<diffOn.length;i++)
+					stats.increment(getNodeCase(diffOn[i],hidden,observed));
+				for (int i=0;i<diffOff.length;i++)
+					stats.increment(getNodeCase(diffOff[i],hidden,observed));
 
 				/* Determine cases and store */
-				Configuration stats = new Configuration();
-				determineCases(observed, hidden, stats);
-				statsList.add(stats,factors[item][c]);
+				statsList.add(stats.clone(),factors[item][c]);
 			}
 		} else
 		{
