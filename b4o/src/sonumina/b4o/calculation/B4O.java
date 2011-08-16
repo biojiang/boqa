@@ -499,7 +499,7 @@ public class B4O
 					hidden[diffOnTermsFreqs[item][c][i]] = true;
 
 				for (int i=0;i<diffOffTermsFreqs[item][c].length;i++)
-					hidden[diffOnTermsFreqs[item][c][i]] = false;
+					hidden[diffOffTermsFreqs[item][c][i]] = false;
 
 				/* Determine cases and store */
 				Configuration stats = new Configuration();
@@ -511,7 +511,6 @@ public class B4O
 			while ((s = sg.next()) != null)
 			{
 				double factor = 0.0;
-	
 				boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
 				boolean [] taken = new boolean[numTermsWithExplicitFrequencies];
 	
@@ -1306,6 +1305,21 @@ public class B4O
 			array = new int[maxLength];
 		}
 		
+		public IntArray(boolean [] dense)
+		{
+			int c = 0;
+			for (int i=0;i<dense.length;i++)
+				if (dense[i])
+					c++;
+
+			array = new int[c];
+			c = 0;
+			for (int i=0;i<dense.length;i++)
+				if (dense[i])
+					array[c++] = i;
+			length = c;
+		}
+		
 		public void add(int e)
 		{
 			array[length++] = e;
@@ -1574,8 +1588,6 @@ public class B4O
 
 			while ((s = sg.next()) != null)
 			{
-				IntArray newArray = new IntArray(slimGraph.getNumberOfVertices());
-
 				boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
 				boolean [] taken = new boolean[numTermsWithExplicitFrequencies];
 				int numTermsChoosen = 0;
@@ -1611,13 +1623,14 @@ public class B4O
 				}
 				
 				/* Now make a sparse representation */
-				for (i=0;i<slimGraph.getNumberOfVertices();i++)
-					if (hidden[i])
-						newArray.add(i);
+				IntArray newArray = new IntArray(hidden);
 
+				/* And record the difference */
 				diffOnTermsFreqs[item][config] = setDiff(newArray.get(), prevArray.get());
 				diffOffTermsFreqs[item][config] = setDiff(prevArray.get(), newArray.get());
 				factors[item][config] = factor;
+
+				prevArray = newArray;
 				config++;
 			}
 		}
