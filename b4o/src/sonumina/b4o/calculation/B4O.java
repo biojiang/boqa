@@ -159,6 +159,7 @@ public class B4O
 
 	public static int [][][] diffOnTermsFreqs;
 	public static int [][][] diffOffTermsFreqs;
+	public static double [][] factors;
 
 	/** Links items to directly associated terms */
 	public static int [][] items2DirectTerms;
@@ -1517,6 +1518,7 @@ public class B4O
 
 		diffOnTermsFreqs = new int[allItemList.size()][][];
 		diffOffTermsFreqs = new int[allItemList.size()][][];
+		factors = new double[allItemList.size()][];
 		for (int item=0;item<allItems.getGeneCount();item++)
 		{
 			int numTerms = items2TermFrequencies[item].length;
@@ -1543,6 +1545,7 @@ public class B4O
 
 			diffOnTermsFreqs[item] = new int[numConfigs][];  
 			diffOffTermsFreqs[item] = new int[numConfigs][];
+			factors[item] = new double[numConfigs];
 
 			/* Contains the settings of the previous run */
 			IntArray prevArray = new IntArray(slimGraph.getNumberOfVertices());
@@ -1586,7 +1589,7 @@ public class B4O
 					activateAncestors(h, hidden);
 					/* Factor is always 0 */
 				}
-
+				
 				/* Now make a sparse representation */
 				for (i=0;i<slimGraph.getNumberOfVertices();i++)
 					if (hidden[i])
@@ -1594,6 +1597,7 @@ public class B4O
 
 				diffOnTermsFreqs[item][config] = setDiff(newArray.get(), prevArray.get());
 				diffOffTermsFreqs[item][config] = setDiff(prevArray.get(), newArray.get());
+				factors[item][config] = factor;
 				config++;
 			}
 		}
