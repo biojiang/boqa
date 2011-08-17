@@ -862,11 +862,11 @@ public class B4O
 					int [] newTerms = new int[maxTerms];
 
 					/* Now randomly choose maxTerms and place them in new Terms */
-					for (int j=0;i<maxTerms;j++)
+					for (int j=0;j<maxTerms;j++)
 					{
-						int r = rnd.nextInt(maxTerms-j);
+						int r = rnd.nextInt(mostSpecific.length-j);
 						newTerms[j] = mostSpecific[r];
-						mostSpecific[r] = mostSpecific[maxTerms-j-1]; /* Move last selectable term into the place of the chosen one */
+						mostSpecific[r] = mostSpecific[mostSpecific.length-j-1]; /* Move last selectable term into the place of the chosen one */
 					}
 					for (int j=0;j<hidden.length;j++)
 						hidden[j] = false;
