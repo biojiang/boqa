@@ -868,12 +868,12 @@ public class B4O
 						newTerms[j] = mostSpecific[r];
 						mostSpecific[r] = mostSpecific[mostSpecific.length-j-1]; /* Move last selectable term into the place of the chosen one */
 					}
-					for (int j=0;j<hidden.length;j++)
-						hidden[j] = false;
+					for (int j=0;j<observations.length;j++)
+						observations[j] = false;
 					for (int t : newTerms)
 					{
-						hidden[t] = true;
-						activateAncestors(t, hidden);
+						observations[t] = true;
+						activateAncestors(t, observations);
 					}
 				}
 			}
