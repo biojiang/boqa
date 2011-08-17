@@ -463,8 +463,6 @@ public class B4O
 
 		long now;
 		
-		takeFrequenciesIntoAccount = false;
-		
 		if (MEASURE_TIME)
 			now = System.nanoTime();
 
