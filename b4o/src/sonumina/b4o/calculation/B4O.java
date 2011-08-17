@@ -445,7 +445,7 @@ public class B4O
 		}
 	}
 	
-	static final boolean MEASURE_TIME = true;
+	static final boolean MEASURE_TIME = false;
 
 	static long timeDuration;
 	
@@ -460,30 +460,14 @@ public class B4O
 	private static WeightedConfigurationList determineCasesForItem(int item, boolean [] observed, boolean takeFrequenciesIntoAccount)
 	{
 		int numTerms = items2TermFrequencies[item].length;
-		int numTermsWithExplicitFrequencies = 0;
 
 		long now;
+		
+		takeFrequenciesIntoAccount = false;
 		
 		if (MEASURE_TIME)
 			now = System.nanoTime();
 
-		if (takeFrequenciesIntoAccount)
-		{
-			/* Determine the number of terms that have non-1.0 frequency. We restrict them
-			 * to the top 6 (the less probable) due to complexity issues and hope that this
-			 * a good enough approximation. */
-			for (int i=0;i<numTerms && i<6;i++)
-			{
-				if (items2TermFrequencies[item][item2TermFrequenciesOrder[item][i]] >= 1.0)
-					break;
-				numTermsWithExplicitFrequencies++;
-			}
-		}
-
-		/* We try each possible activity/inactivity combination of terms with explicit frequencies */
-		SubsetGenerator sg = new SubsetGenerator(numTermsWithExplicitFrequencies,numTermsWithExplicitFrequencies);//numTermsWithExplicitFrequencies);
-		SubsetGenerator.Subset s;
-		
 		/* Tracks the hidden state configuration that matches the observed state best */
 //		double bestScore = Double.NEGATIVE_INFINITY;
 //		boolean [] bestTaken = new boolean[numTermsWithExplicitFrequencies];
@@ -492,42 +476,74 @@ public class B4O
 
 		if (true)
 		{
-			boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
-			
-			Configuration stats = new Configuration();
-			
-			/* Initialize stats */
-			determineCases(observed, hidden, stats);
-
-			/* FIXME: Do the non-frequency case */ 
-			for (int c=0;c<diffOnTermsFreqs[item].length;c++)
+			if (!takeFrequenciesIntoAccount)
 			{
-				int [] diffOn = diffOnTermsFreqs[item][c];
-				int [] diffOff = diffOffTermsFreqs[item][c];
-
-				/* Decrement config stats of the nodes we are going to change */
-				for (int i=0;i<diffOn.length;i++)
-					stats.decrement(getNodeCase(diffOn[i],hidden,observed));
-				for (int i=0;i<diffOff.length;i++)
-					stats.decrement(getNodeCase(diffOff[i],hidden,observed));
-
-				/* Change nodes states */
-				for (int i=0;i<diffOn.length;i++)
-					hidden[diffOn[i]] = true;
-				for (int i=0;i<diffOff.length;i++)
-					hidden[diffOff[i]] = false;
-
-				/* Increment config states of nodes that we have just changed */
-				for (int i=0;i<diffOn.length;i++)
-					stats.increment(getNodeCase(diffOn[i],hidden,observed));
-				for (int i=0;i<diffOff.length;i++)
-					stats.increment(getNodeCase(diffOff[i],hidden,observed));
-
-				/* Determine cases and store */
-				statsList.add(stats.clone(),factors[item][c]);
+				boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
+				Configuration stats = new Configuration();
+				
+				for (int h : items2DirectTerms[item])
+				{
+					hidden[h] = true;
+					activateAncestors(h, hidden);
+				}
+				determineCases(observed, hidden, stats);
+				statsList.add(stats,0);
+			} else
+			{
+				boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
+				
+				Configuration stats = new Configuration();
+				
+				/* Initialize stats */
+				determineCases(observed, hidden, stats);
+	
+				for (int c=0;c<diffOnTermsFreqs[item].length;c++)
+				{
+					int [] diffOn = diffOnTermsFreqs[item][c];
+					int [] diffOff = diffOffTermsFreqs[item][c];
+	
+					/* Decrement config stats of the nodes we are going to change */
+					for (int i=0;i<diffOn.length;i++)
+						stats.decrement(getNodeCase(diffOn[i],hidden,observed));
+					for (int i=0;i<diffOff.length;i++)
+						stats.decrement(getNodeCase(diffOff[i],hidden,observed));
+	
+					/* Change nodes states */
+					for (int i=0;i<diffOn.length;i++)
+						hidden[diffOn[i]] = true;
+					for (int i=0;i<diffOff.length;i++)
+						hidden[diffOff[i]] = false;
+	
+					/* Increment config states of nodes that we have just changed */
+					for (int i=0;i<diffOn.length;i++)
+						stats.increment(getNodeCase(diffOn[i],hidden,observed));
+					for (int i=0;i<diffOff.length;i++)
+						stats.increment(getNodeCase(diffOff[i],hidden,observed));
+	
+					/* Determine cases and store */
+					statsList.add(stats.clone(),factors[item][c]);
+				}
 			}
 		} else
 		{
+			int numTermsWithExplicitFrequencies = 0;
+			if (takeFrequenciesIntoAccount)
+			{
+				/* Determine the number of terms that have non-1.0 frequency. We restrict them
+				 * to the top 6 (the less probable) due to complexity issues and hope that this
+				 * a good enough approximation. */
+				for (int i=0;i<numTerms && i<6;i++)
+				{
+					if (items2TermFrequencies[item][item2TermFrequenciesOrder[item][i]] >= 1.0)
+						break;
+					numTermsWithExplicitFrequencies++;
+				}
+			}
+
+			/* We try each possible activity/inactivity combination of terms with explicit frequencies */
+			SubsetGenerator sg = new SubsetGenerator(numTermsWithExplicitFrequencies,numTermsWithExplicitFrequencies);//numTermsWithExplicitFrequencies);
+			SubsetGenerator.Subset s;
+			
 			while ((s = sg.next()) != null)
 			{
 				double factor = 0.0;
@@ -550,7 +566,7 @@ public class B4O
 					if (!taken[i])
 						factor += Math.log(1 - items2TermFrequencies[item][item2TermFrequenciesOrder[item][i]]);
 				}
-	
+
 				/* second, activate mandatory terms */
 				for (int i=numTermsWithExplicitFrequencies;i<numTerms;i++)
 				{
