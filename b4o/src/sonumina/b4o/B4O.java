@@ -27,6 +27,7 @@ public class B4O
 	   Options opt = new Options();
 	   opt.addOption("o", "ontology", true, "Path or URL to the ontology file. Default is \"" + ontologyPath + "\"");
 	   opt.addOption("a", "annotations", true, "Path or URL to files containing annotations. Default is \"" + annotationPath + "\"");
+	   opt.addOption("m", "maxTerms", true, "Defines the maximal number of terms a random query can have. Default is " + sonumina.b4o.calculation.B4O.maxTerms);
 	   opt.addOption("h", "help", false, "Shows this help");
 
 	   try
@@ -41,6 +42,9 @@ public class B4O
 			   f.printHelp(B4O.class.getName(), opt);
 			   System.exit(0);
 		   }
+		   
+		   if (cl.hasOption('m'))
+			   sonumina.b4o.calculation.B4O.maxTerms = Integer.parseInt(cl.getOptionValue('m'));
 		   
 		   ontologyPath = cl.getOptionValue('o',ontologyPath);
 		   annotationPath = cl.getOptionValue('a', annotationPath);

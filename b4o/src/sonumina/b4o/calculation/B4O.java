@@ -217,7 +217,7 @@ public class B4O
 	
 	/** Stores the score distribution */
 	private static Distributions scoreDistributions;
-	
+
 	/** Used to parse frequency information */
 	public static Pattern frequencyPattern = Pattern.compile("(\\d+)\\.?(\\d*)\\s*%");
 	public static Pattern frequencyFractionPattern = Pattern.compile("(\\d+)/(\\d+)");
@@ -236,13 +236,14 @@ public class B4O
 //	private final static String RESULT_NAME = "fnd.txt";
 //	private final static String [] evidenceCodes = null;
 //	private final static int SIZE_OF_SCORE_DISTRIBUTION = 250000;
+//	public static int maxTerms = -1;
 
 	private final static int MAX_SAMPLES = 5;
 	private final static boolean CONSIDER_FREQUENCIES_ONLY = true;
 	private final static String RESULT_NAME = "fnd-freq-only.txt";
 	private final static String [] evidenceCodes = null;//new String[]{"PCS","ICE"};
 	private final static int SIZE_OF_SCORE_DISTRIBUTION = 250000;
-	
+	public static int maxTerms = -1;						/* Defines the maximal number of terms a query can have */
 	
 	/** False positives can be explained via inheritance */
 	private static int VARIANT_INHERITANCE_POSITIVES = 1<<0;
