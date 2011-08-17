@@ -1200,7 +1200,7 @@ public class B4O
 
 		final BufferedWriter param = new BufferedWriter(new FileWriter(RESULT_NAME.split("\\.")[0]+ "_param.txt"));
 		param.write("alpha\tbeta\tconsider.freqs.only\tterms\tmax.terms\n");
-		param.write(String.format("%g\t%g\t%b\t%d\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY,slimGraph.getNumberOfVertices(),maxTerms));
+		param.write(String.format("%g\t%g\t%b\t%d\t%d\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY,slimGraph.getNumberOfVertices(),maxTerms));
 		param.flush();
 		
 		final BufferedWriter out = new BufferedWriter(new FileWriter(RESULT_NAME));
