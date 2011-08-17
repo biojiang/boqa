@@ -852,6 +852,32 @@ public class B4O
 				}
 			}
 			
+			
+			if (maxTerms != -1)
+			{
+				IntArray sparse = new IntArray(observations);
+				int [] mostSpecific = mostSpecificTerms(sparse.get());
+				if (mostSpecific.length > maxTerms)
+				{
+					int [] newTerms = new int[maxTerms];
+
+					/* Now randomly choose maxTerms and place them in new Terms */
+					for (int j=0;i<maxTerms;j++)
+					{
+						int r = rnd.nextInt(maxTerms-j);
+						newTerms[j] = mostSpecific[r];
+						mostSpecific[r] = mostSpecific[maxTerms-j-1]; /* Move last selectable term into the place of the chosen one */
+					}
+					for (int j=0;j<hidden.length;j++)
+						hidden[j] = false;
+					for (int t : newTerms)
+					{
+						hidden[t] = true;
+						activateAncestors(t, hidden);
+					}
+				}
+			}
+			
 			for (i=0;i<hidden.length;i++)
 				if (hidden[i]) numHidden++;
 	
@@ -1173,8 +1199,8 @@ public class B4O
 		/**************************************************************************************************************************/
 
 		final BufferedWriter param = new BufferedWriter(new FileWriter(RESULT_NAME.split("\\.")[0]+ "_param.txt"));
-		param.write("alpha\tbeta\tconsider.freqs.only\tterms\n");
-		param.write(String.format("%g\t%g\t%b\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY,slimGraph.getNumberOfVertices()));
+		param.write("alpha\tbeta\tconsider.freqs.only\tterms\tmax.terms\n");
+		param.write(String.format("%g\t%g\t%b\t%d\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY,slimGraph.getNumberOfVertices(),maxTerms));
 		param.flush();
 		
 		final BufferedWriter out = new BufferedWriter(new FileWriter(RESULT_NAME));
