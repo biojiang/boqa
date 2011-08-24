@@ -1253,9 +1253,9 @@ public class B4O
 							resultBuilder.append("\t");
 							resultBuilder.append(store.modelWithFrequencies.marginalsIdeal[j]);
 							resultBuilder.append("\t");
-							resultBuilder.append(store.resnick.scores[j]);
+							resultBuilder.append(store.resnik.scores[j]);
 							resultBuilder.append("\t");
-							resultBuilder.append(store.resnick.marginals[j]);
+							resultBuilder.append(store.resnik.marginals[j]);
 							resultBuilder.append("\t");
 							resultBuilder.append(itemHasFrequencies[item]?1:0);
 							resultBuilder.append("\n");
@@ -2327,7 +2327,7 @@ public class B4O
 		Observations obs;
 		Result modelWithoutFrequencies;
 		Result modelWithFrequencies;
-		Result resnick;
+		Result resnik;
 	}
 
 	/**
@@ -2363,7 +2363,7 @@ public class B4O
 		id.obs = obs;
 		id.modelWithoutFrequencies = modelWithoutFrequencies;
 		id.modelWithFrequencies = modelWithFrequencies;
-		id.resnick = resnick;
+		id.resnik = resnick;
 		
 		/******** The rest is for debugging purposes ********/
 		if (VERBOSE || provideGraph)
