@@ -2127,7 +2127,7 @@ public class B4O
 	 * 
 	 * @return
 	 */
-	private static Result resnickMaxScore(boolean [] observations, boolean pval, Random rnd)
+	private static Result resnikScore(boolean [] observations, boolean pval, Random rnd)
 	{
 		int [] observedTerms = getMostSpecificTermsSparse(observations);
 		int [] randomizedTerms = new int[observedTerms.length];
@@ -2357,7 +2357,7 @@ public class B4O
 		Result modelWithFrequencies = assignMarginals(obs, true);
 
 		/* Third, we apply the resnick sim measure */
-		Result resnick = resnickMaxScore(obs.observations, true, rnd);
+		Result resnick = resnikScore(obs.observations, true, rnd);
 		
 		ExperimentStore id = new ExperimentStore();
 		id.obs = obs;
