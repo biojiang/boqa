@@ -157,6 +157,8 @@ public class B4OCore
 	 * 
 	 * @param pattern
 	 * @return
+	 * 
+	 * @TODO: Optimize via proper index data structure.
 	 */
 	public static Iterable<Term> getTerms(final String pattern)
 	{
@@ -167,13 +169,14 @@ public class B4OCore
 				return new Iterator<Term>()
 				{
 					int i = 0;
+					String pat = pattern.toLowerCase();
 					
 					@Override
 					public boolean hasNext()
 					{
 						for (;i<slimGraph.getNumberOfVertices();i++)
 						{
-							if (pattern == null || pattern.length() == 0 || getTerm(i).getName().contains(pattern))
+							if (pattern == null || pattern.length() == 0 || getTerm(i).getName().toLowerCase().contains(pat))
 								return true;
 						}
 						return false;
