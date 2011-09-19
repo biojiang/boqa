@@ -190,6 +190,21 @@ public class B4OCore
 			}
 		};
 	}
+
+	/**
+	 * Returns the a single term of given index with respect to the given pattern.
+	 * 
+	 * @param pattern
+	 * @param which
+	 * @return
+	 */
+	public static Term getTerm(final String pattern, int which)
+	{
+		for (Term t : getTerms(pattern))
+			if (which-- == 0)
+				return t;
+		return null;
+	}
 	
 	/**
 	 * Returns the number of terms that match the given pattern.
