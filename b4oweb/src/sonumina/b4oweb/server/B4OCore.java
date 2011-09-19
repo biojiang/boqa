@@ -169,14 +169,15 @@ public class B4OCore
 				return new Iterator<Term>()
 				{
 					int i = 0;
-					String pat = pattern.toLowerCase();
+
+					final String pat = pattern!=null?pattern.toLowerCase():null;
 					
 					@Override
 					public boolean hasNext()
 					{
 						for (;i<slimGraph.getNumberOfVertices();i++)
 						{
-							if (pattern == null || pattern.length() == 0 || getTerm(i).getName().toLowerCase().contains(pat))
+							if (pat == null || pat.length() == 0 || getTerm(i).getName().toLowerCase().contains(pat))
 								return true;
 						}
 						return false;
