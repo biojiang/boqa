@@ -10,6 +10,7 @@ import org.eclipse.rwt.lifecycle.IEntryPoint;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSource;
 import org.eclipse.swt.dnd.DragSourceAdapter;
@@ -35,9 +36,14 @@ public class B4ORWT implements IEntryPoint
     private String termFilterString = null;
     
     private Table availableTermsTable;
+    
+    private TableColumn selectedTermsNameColumn;
+    private TableColumn selectedTermsRemoveColumn;
     private Table selectedTermsTable;
     
     private LinkedList<Integer> selectedTermsList = new LinkedList<Integer>();
+    private LinkedList<Button> selectedTermButtonList = new LinkedList<Button>();
+    private LinkedList<TableEditor> selectedTermTableEditorList = new LinkedList<TableEditor>();
 
     /**
      * Updates the content of the term table.
@@ -54,7 +60,47 @@ public class B4ORWT implements IEntryPoint
      */
     private void updateSelectedTermsTable()
     {
+    	selectedTermsTable.removeAll();
+    	for (Button b : selectedTermButtonList)
+    		b.dispose();
+    	for (TableEditor e : selectedTermTableEditorList)
+    		e.dispose();
+    	selectedTermButtonList.clear();
+    	selectedTermTableEditorList.clear();
+
+    	for (final Integer i : selectedTermsList)
+    	{
+    		TableItem item = new TableItem(selectedTermsTable,0);
+    		item.setText(0,B4OCore.getTerm(i).getName());
+    		
+    		TableEditor editor = new TableEditor(selectedTermsTable);
+    		Button button = new Button(selectedTermsTable,0);
+    		button.setText("X");
+    		button.addSelectionListener(new SelectionAdapter()
+    		{
+    			@Override
+    			public void widgetSelected(SelectionEvent e)
+    			{
+    				selectedTermsList.removeFirstOccurrence(i);
+    				updateSelectedTermsTable();
+    			}
+    		});
+    		
+    		button.pack();
+    		editor.minimumWidth = button.getSize().x;
+    		editor.minimumHeight = button.getSize().y;
+    		editor.horizontalAlignment = SWT.RIGHT;
+    		editor.setEditor(button, item, 1);
+    		
+    		selectedTermButtonList.add(button);
+    		selectedTermTableEditorList.add(editor);
+    	}
+    	
     	selectedTermsTable.setItemCount(selectedTermsList.size());
+    	
+    	selectedTermsNameColumn.pack();
+    	selectedTermsNameColumn.setWidth(selectedTermsNameColumn.getWidth() + 20);
+    	selectedTermsRemoveColumn.pack();
     	selectedTermsTable.redraw();
     }
     
@@ -126,8 +172,11 @@ public class B4ORWT implements IEntryPoint
 	    /* Selected Terms */
 	    Composite selectedTerms = new Composite(horizontalSash, 0);
 	    selectedTerms.setLayout(new GridLayout());
-	    selectedTermsTable = new Table(selectedTerms,SWT.VIRTUAL|SWT.BORDER);
-	    selectedTermsTable.addListener(SWT.SetData, new Listener()
+	    selectedTermsTable = new Table(selectedTerms,SWT.BORDER);
+	    selectedTermsNameColumn = new TableColumn(selectedTermsTable,0);
+	    selectedTermsRemoveColumn = new TableColumn(selectedTermsTable,0);
+	    
+/*	    selectedTermsTable.addListener(SWT.SetData, new Listener()
 	    {
 	    	@Override
 	    	public void handleEvent(Event event)
@@ -135,9 +184,9 @@ public class B4ORWT implements IEntryPoint
 				TableItem item = (TableItem)event.item;
 				int index = event.index;
 				int tid = selectedTermsList.get(index);
-				item.setText(B4OCore.getTerm(tid).getName());
+				item.setText(0,B4OCore.getTerm(tid).getName());
 	    	}
-	    });
+	    });*/
 	    selectedTermsTable.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL|GridData.GRAB_VERTICAL|GridData.FILL_BOTH));
 	    DropTarget selectedTermsTableDropTarget = new DropTarget(selectedTerms,DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_DEFAULT);
 	    selectedTermsTableDropTarget.setTransfer(new Transfer[]{TextTransfer.getInstance()});
@@ -147,6 +196,7 @@ public class B4ORWT implements IEntryPoint
 	    });
 	    /* Result */
 	    Browser browser = new Browser(verticalSash, SWT.BORDER);
+	    browser.setText("<b>Hallo</b>");
 
 	    shell.setMaximized(true);
 	    shell.layout();
