@@ -1,11 +1,28 @@
 package sonumina.b4orwt;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.LinkedList;
+
 import ontologizer.go.Term;
 
 import org.eclipse.rwt.lifecycle.IEntryPoint;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSource;
+import org.eclipse.swt.dnd.DragSourceAdapter;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.DragSourceListener;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -17,16 +34,28 @@ public class B4ORWT implements IEntryPoint
 {
     private String termFilterString = null;
     
-    private Table termTable;
+    private Table availableTermsTable;
+    private Table selectedTermsTable;
+    
+    private LinkedList<Integer> selectedTermsList = new LinkedList<Integer>();
 
     /**
      * Updates the content of the term table.
      */
-    private void updateTermTable()
+    private void updateAvailableTermsTable()
     {
-	    termTable.setItemCount(B4OCore.getNumberTerms(termFilterString));
-    	termTable.clearAll();
-    	termTable.redraw();
+	    availableTermsTable.setItemCount(B4OCore.getNumberTerms(termFilterString));
+    	availableTermsTable.clearAll();
+    	availableTermsTable.redraw();
+    }
+    
+    /**
+     * Updates the content of the selected terms table.
+     */
+    private void updateSelectedTermsTable()
+    {
+    	selectedTermsTable.setItemCount(selectedTermsList.size());
+    	selectedTermsTable.redraw();
     }
     
 	public int createUI()
@@ -35,10 +64,14 @@ public class B4ORWT implements IEntryPoint
 	    Shell shell = new Shell( display, 0 );
 	    shell.setLayout(new FillLayout());
 	    
-	    /* Term */
-	    Composite termComposite = new Composite(shell, 0);
-	    termComposite.setLayout(new GridLayout());
+	    SashForm verticalSash = new SashForm(shell, SWT.VERTICAL);
 	    
+	    SashForm horizontalSash = new SashForm(verticalSash, SWT.HORIZONTAL);
+		
+	    /* Available Terms */
+	    Composite termComposite = new Composite(horizontalSash, 0);
+	    termComposite.setLayout(new GridLayout());
+
 	    final Text termFilterText = new Text(termComposite,SWT.BORDER);
 	    termFilterText.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL|GridData.FILL_HORIZONTAL));
 	    termFilterText.addModifyListener(new ModifyListener()
@@ -47,12 +80,12 @@ public class B4ORWT implements IEntryPoint
 			public void modifyText(ModifyEvent event)
 			{
 				termFilterString = termFilterText.getText();
-				updateTermTable();
+				updateAvailableTermsTable();
 			}
 		});
 	    
-	    termTable = new Table(termComposite,SWT.VIRTUAL|SWT.BORDER);
-	    termTable.addListener( SWT.SetData, new Listener()
+	    availableTermsTable = new Table(termComposite,SWT.VIRTUAL|SWT.BORDER);
+	    availableTermsTable.addListener( SWT.SetData, new Listener()
 	    {
 	    	@Override
 			public void handleEvent(Event event)
@@ -61,16 +94,63 @@ public class B4ORWT implements IEntryPoint
 				int index = event.index;
 				Term t = B4OCore.getTerm(termFilterString, index);
 				item.setText(t.getName());
-				System.out.println(index);
 			}
 	    });
-	    termTable.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL|GridData.GRAB_VERTICAL|GridData.FILL_BOTH));
+	    availableTermsTable.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL|GridData.GRAB_VERTICAL|GridData.FILL_BOTH));
+	    availableTermsTable.addSelectionListener(new SelectionAdapter() {
+	    	@Override
+	    	public void widgetDefaultSelected(SelectionEvent e)
+	    	{
 
+	    		selectedTermsList.add(B4OCore.getIdOfTerm(B4OCore.getTerm(termFilterString, availableTermsTable.indexOf((TableItem)e.item))));
+	    		updateSelectedTermsTable();
+	    	}
+		});
+	    DragSource termTableDragSource = new DragSource(availableTermsTable,DND.DROP_COPY|DND.DROP_MOVE);
+	    termTableDragSource.addDragListener(new DragSourceAdapter() {
+			@Override
+			public void dragStart(DragSourceEvent event) {
+				
+				DragSource ds = (DragSource)event.widget;
+			    Table table = (Table) ds.getControl();
+			    TableItem[] selection = table.getSelection();
+				System.out.println(selection.length);
+			    if (selection.length > 0)
+			    {
+			    	event.data = selection[0].getText();
+			    }
+			}
+		});
 	    termComposite.pack();
-	    updateTermTable();
+	    
+	    /* Selected Terms */
+	    Composite selectedTerms = new Composite(horizontalSash, 0);
+	    selectedTerms.setLayout(new GridLayout());
+	    selectedTermsTable = new Table(selectedTerms,SWT.VIRTUAL|SWT.BORDER);
+	    selectedTermsTable.addListener(SWT.SetData, new Listener()
+	    {
+	    	@Override
+	    	public void handleEvent(Event event)
+	    	{
+				TableItem item = (TableItem)event.item;
+				int index = event.index;
+				int tid = selectedTermsList.get(index);
+				item.setText(B4OCore.getTerm(tid).getName());
+	    	}
+	    });
+	    selectedTermsTable.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL|GridData.GRAB_VERTICAL|GridData.FILL_BOTH));
+	    DropTarget selectedTermsTableDropTarget = new DropTarget(selectedTerms,DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_DEFAULT);
+	    selectedTermsTableDropTarget.setTransfer(new Transfer[]{TextTransfer.getInstance()});
+	    selectedTermsTableDropTarget.addDropListener(new DropTargetAdapter()
+	    {
+	    	
+	    });
+	    /* Result */
+	    Browser browser = new Browser(verticalSash, SWT.BORDER);
 
 	    shell.setMaximized(true);
 	    shell.layout();
+	    updateAvailableTermsTable();
 	    shell.open();
 	    while( !shell.isDisposed() ) {
 	      if( !display.readAndDispatch() )
