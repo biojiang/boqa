@@ -119,12 +119,19 @@ public class B4ORWT implements IEntryPoint
     
     private void calculate()
     {
+    	int rank;
     	List<ItemResultEntry> result = B4OCore.score(selectedTermsList);
     	StringBuilder str = new StringBuilder();
     	
+    	rank = 0;
     	for (ItemResultEntry e : result)
     	{
-    		str.append(e.getItemId() + "</br>");
+    		int id = e.getItemId();
+    		str.append(B4OCore.getItemName(id));
+    		str.append("</br>");
+    		
+    		if (rank > 20)
+    			break;
     	}
     	browser.setText(str.toString());
     }
@@ -224,8 +231,12 @@ public class B4ORWT implements IEntryPoint
 	    {
 	    	
 	    });
+
 	    /* Result */
-	    browser = new Browser(verticalSash, SWT.BORDER);
+	    Composite browserComposite = new Composite(verticalSash,0);
+	    browserComposite.setLayout(new GridLayout());
+	    browser = new Browser(browserComposite, SWT.BORDER);
+	    browser.setLayoutData(new GridData(GridData.FILL_BOTH));
 	    browser.setText("<b>Hallo</b>");
 
 	    shell.setMaximized(true);
