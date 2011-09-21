@@ -3,6 +3,7 @@ package sonumina.b4orwt;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.LinkedList;
+import java.util.List;
 
 import ontologizer.go.Term;
 
@@ -27,7 +28,16 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 
 import sonumina.b4oweb.server.*;
 
@@ -40,6 +50,7 @@ public class B4ORWT implements IEntryPoint
     private TableColumn selectedTermsNameColumn;
     private TableColumn selectedTermsRemoveColumn;
     private Table selectedTermsTable;
+    private Browser browser;
     
     private LinkedList<Integer> selectedTermsList = new LinkedList<Integer>();
     private LinkedList<Button> selectedTermButtonList = new LinkedList<Button>();
@@ -102,6 +113,20 @@ public class B4ORWT implements IEntryPoint
     	selectedTermsNameColumn.setWidth(selectedTermsNameColumn.getWidth() + 20);
     	selectedTermsRemoveColumn.pack();
     	selectedTermsTable.redraw();
+    	
+    	calculate();
+    }
+    
+    private void calculate()
+    {
+    	List<ItemResultEntry> result = B4OCore.score(selectedTermsList);
+    	StringBuilder str = new StringBuilder();
+    	
+    	for (ItemResultEntry e : result)
+    	{
+    		str.append(e.getItemId() + "</br>");
+    	}
+    	browser.setText(str.toString());
     }
     
 	public int createUI()
@@ -131,6 +156,9 @@ public class B4ORWT implements IEntryPoint
 		});
 	    
 	    availableTermsTable = new Table(termComposite,SWT.VIRTUAL|SWT.BORDER);
+	    availableTermsTable.setData( Table.ENABLE_RICH_TEXT, Boolean.TRUE ); /* RWT */
+	    availableTermsTable.setData( Table.ITEM_HEIGHT, new Integer(20)); /* RWT */
+
 	    availableTermsTable.addListener( SWT.SetData, new Listener()
 	    {
 	    	@Override
@@ -175,7 +203,9 @@ public class B4ORWT implements IEntryPoint
 	    selectedTermsTable = new Table(selectedTerms,SWT.BORDER);
 	    selectedTermsNameColumn = new TableColumn(selectedTermsTable,0);
 	    selectedTermsRemoveColumn = new TableColumn(selectedTermsTable,0);
-	    
+	    selectedTermsTable.setData( Table.ENABLE_RICH_TEXT, Boolean.TRUE ); /* RWT */
+	    selectedTermsTable.setData( Table.ITEM_HEIGHT, new Integer(20)); /* RWT */
+
 /*	    selectedTermsTable.addListener(SWT.SetData, new Listener()
 	    {
 	    	@Override
@@ -195,7 +225,7 @@ public class B4ORWT implements IEntryPoint
 	    	
 	    });
 	    /* Result */
-	    Browser browser = new Browser(verticalSash, SWT.BORDER);
+	    browser = new Browser(verticalSash, SWT.BORDER);
 	    browser.setText("<b>Hallo</b>");
 
 	    shell.setMaximized(true);
