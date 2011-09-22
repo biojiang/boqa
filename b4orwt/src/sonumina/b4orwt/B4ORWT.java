@@ -30,10 +30,12 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -51,7 +53,6 @@ public class B4ORWT implements IEntryPoint
     private TableColumn selectedTermsNameColumn;
     private TableColumn selectedTermsRemoveColumn;
     private Table selectedTermsTable;
-//    private Browser browser;
     private ScrolledComposite resultComposite;
     
     private LinkedList<Integer> selectedTermsList = new LinkedList<Integer>();
@@ -127,6 +128,7 @@ public class B4ORWT implements IEntryPoint
 
     	Composite comp = new Composite(resultComposite,0);
     	GridLayout gl = new GridLayout();
+    	gl.numColumns = 4;
     	gl.marginLeft = gl.marginRight = 0;
     	gl.marginTop = gl.marginBottom = 0;
     	comp.setLayout(gl);
@@ -138,20 +140,32 @@ public class B4ORWT implements IEntryPoint
     		int id = e.getItemId();
     		String name = B4OCore.getItemName(id);
     		
+    		Label pos = new Label(comp,0);
+    		pos.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+    		pos.setText((rank + 1) + ". ");
+    		pos.setAlignment(SWT.RIGHT);
+    		
     		Label l = new Label(comp,0);
     		l.setText(name);
-//    		str.append(B4OCore.getItemName(id));
-//    		str.append("</br>");
+    		
+    		ProgressBar pb = new ProgressBar(comp, SWT.HORIZONTAL);
+    		pb.setMaximum(100);
+    		pb.setSelection((int)(e.getScore() * 100));
+    		
+    		Label percentLabel = new Label(comp, 0);
+    		percentLabel.setAlignment(SWT.RIGHT);
+    		percentLabel.setText((int)(e.getScore() * 100) + "%");
     		
     		rank++;
-    		if (rank > 20)
+    		if (rank >= 30)
     			break;
     	}
     	
     	comp.pack();
+    	Control oldContent = resultComposite.getContent();
     	resultComposite.setContent(comp);
-    	
-//    	browser.setText(str.toString());
+    	if (oldContent != null)
+    		oldContent.dispose();
     }
     
 	public int createUI()
