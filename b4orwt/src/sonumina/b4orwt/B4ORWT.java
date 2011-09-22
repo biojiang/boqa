@@ -197,6 +197,13 @@ public class B4ORWT implements IEntryPoint
 				updateAvailableTermsTable();
 			}
 		});
+	    termFilterText.addSelectionListener(new SelectionAdapter() {
+	    	@Override
+	    	public void widgetDefaultSelected(SelectionEvent e)
+	    	{
+	    		addSelectedTermToSelectedTerms();
+	    	}
+		});
 	    termFilterText.addKeyListener(new KeyListener() {
 			
 			@Override
@@ -246,9 +253,7 @@ public class B4ORWT implements IEntryPoint
 	    	@Override
 	    	public void widgetDefaultSelected(SelectionEvent e)
 	    	{
-
-	    		selectedTermsList.add(B4OCore.getIdOfTerm(B4OCore.getTerm(termFilterString, availableTermsTable.indexOf((TableItem)e.item))));
-	    		updateSelectedTermsTable();
+	    		addSelectedTermToSelectedTerms();
 	    	}
 		});
 	    DragSource termTableDragSource = new DragSource(availableTermsTable,DND.DROP_COPY|DND.DROP_MOVE);
@@ -302,5 +307,16 @@ public class B4ORWT implements IEntryPoint
 	    }
 	    display.dispose();
 	    return 0;
+	}
+
+
+	/**
+	 * Adds the term selecetd in the available terms list to
+	 * the list of selected terms.
+	 */
+	private void addSelectedTermToSelectedTerms()
+	{
+		selectedTermsList.add(B4OCore.getIdOfTerm(B4OCore.getTerm(termFilterString, availableTermsTable.getSelectionIndex())));
+		updateSelectedTermsTable();
 	}
 }
