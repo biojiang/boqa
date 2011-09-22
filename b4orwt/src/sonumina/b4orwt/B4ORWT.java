@@ -1,7 +1,5 @@
 package sonumina.b4orwt;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,6 +9,7 @@ import org.eclipse.rwt.lifecycle.IEntryPoint;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSource;
@@ -25,6 +24,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -50,7 +51,8 @@ public class B4ORWT implements IEntryPoint
     private TableColumn selectedTermsNameColumn;
     private TableColumn selectedTermsRemoveColumn;
     private Table selectedTermsTable;
-    private Browser browser;
+//    private Browser browser;
+    private ScrolledComposite resultComposite;
     
     private LinkedList<Integer> selectedTermsList = new LinkedList<Integer>();
     private LinkedList<Button> selectedTermButtonList = new LinkedList<Button>();
@@ -122,18 +124,34 @@ public class B4ORWT implements IEntryPoint
     	int rank;
     	List<ItemResultEntry> result = B4OCore.score(selectedTermsList);
     	StringBuilder str = new StringBuilder();
+
+    	Composite comp = new Composite(resultComposite,0);
+    	GridLayout gl = new GridLayout();
+    	gl.marginLeft = gl.marginRight = 0;
+    	gl.marginTop = gl.marginBottom = 0;
+    	comp.setLayout(gl);
+    	comp.setLayoutData(new GridData(GridData.FILL_BOTH));
     	
     	rank = 0;
     	for (ItemResultEntry e : result)
     	{
     		int id = e.getItemId();
-    		str.append(B4OCore.getItemName(id));
-    		str.append("</br>");
+    		String name = B4OCore.getItemName(id);
     		
+    		Label l = new Label(comp,0);
+    		l.setText(name);
+//    		str.append(B4OCore.getItemName(id));
+//    		str.append("</br>");
+    		
+    		rank++;
     		if (rank > 20)
     			break;
     	}
-    	browser.setText(str.toString());
+    	
+    	comp.pack();
+    	resultComposite.setContent(comp);
+    	
+//    	browser.setText(str.toString());
     }
     
 	public int createUI()
@@ -213,17 +231,6 @@ public class B4ORWT implements IEntryPoint
 	    selectedTermsTable.setData( Table.ENABLE_RICH_TEXT, Boolean.TRUE ); /* RWT */
 	    selectedTermsTable.setData( Table.ITEM_HEIGHT, new Integer(20)); /* RWT */
 
-/*	    selectedTermsTable.addListener(SWT.SetData, new Listener()
-	    {
-	    	@Override
-	    	public void handleEvent(Event event)
-	    	{
-				TableItem item = (TableItem)event.item;
-				int index = event.index;
-				int tid = selectedTermsList.get(index);
-				item.setText(0,B4OCore.getTerm(tid).getName());
-	    	}
-	    });*/
 	    selectedTermsTable.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL|GridData.GRAB_VERTICAL|GridData.FILL_BOTH));
 	    DropTarget selectedTermsTableDropTarget = new DropTarget(selectedTerms,DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_DEFAULT);
 	    selectedTermsTableDropTarget.setTransfer(new Transfer[]{TextTransfer.getInstance()});
@@ -233,11 +240,11 @@ public class B4ORWT implements IEntryPoint
 	    });
 
 	    /* Result */
-	    Composite browserComposite = new Composite(verticalSash,0);
-	    browserComposite.setLayout(new GridLayout());
-	    browser = new Browser(browserComposite, SWT.BORDER);
-	    browser.setLayoutData(new GridData(GridData.FILL_BOTH));
-	    browser.setText("<b>Hallo</b>");
+	    Composite tempComp = new Composite(verticalSash, 0);
+	    tempComp.setLayout(new GridLayout());
+	    
+	    resultComposite = new ScrolledComposite(tempComp,SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+	    resultComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 	    shell.setMaximized(true);
 	    shell.layout();
