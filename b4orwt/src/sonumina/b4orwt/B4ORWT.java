@@ -20,10 +20,14 @@ import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -193,6 +197,34 @@ public class B4ORWT implements IEntryPoint
 				updateAvailableTermsTable();
 			}
 		});
+	    termFilterText.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e)
+			{
+				int idx;
+				
+				switch (e.keyCode)
+				{
+				case	SWT.ARROW_DOWN:
+						idx = availableTermsTable.getSelectionIndex();
+						availableTermsTable.setSelection(idx+1);
+						break;
+
+				case	SWT.ARROW_UP:
+						idx = availableTermsTable.getSelectionIndex();
+						availableTermsTable.setSelection(idx-1);
+						break;
+				}
+			}
+		});
+
 	    
 	    availableTermsTable = new Table(termComposite,SWT.VIRTUAL|SWT.BORDER);
 	    availableTermsTable.setData( Table.ENABLE_RICH_TEXT, Boolean.TRUE ); /* RWT */
