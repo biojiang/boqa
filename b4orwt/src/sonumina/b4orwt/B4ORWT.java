@@ -7,7 +7,6 @@ import ontologizer.go.Term;
 
 import org.eclipse.rwt.lifecycle.IEntryPoint;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.TableEditor;
@@ -15,7 +14,6 @@ import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSource;
 import org.eclipse.swt.dnd.DragSourceAdapter;
 import org.eclipse.swt.dnd.DragSourceEvent;
-import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.TextTransfer;
@@ -26,9 +24,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -68,9 +63,30 @@ public class B4ORWT implements IEntryPoint
      */
     private void updateAvailableTermsTable()
     {
+    	/* Represents the index of the previous selection in the within the new (filtered) list */
+    	int indexOfPreviousSelection = -1;
+    	TableItem [] ti = availableTermsTable.getSelection();
+    	if (ti != null && ti.length > 0)
+    	{
+    		String name = ti[0].getText();
+    		if (name != null)
+    		{
+    			for (Term t : B4OCore.getTerms(termFilterString))
+    			{
+    				indexOfPreviousSelection++;
+    				if (t.getName().equals(name))
+    					break;
+    			}
+    		}
+    	}
+
+    	/* Update table */
 	    availableTermsTable.setItemCount(B4OCore.getNumberTerms(termFilterString));
     	availableTermsTable.clearAll();
     	availableTermsTable.redraw();
+    	
+    	if (indexOfPreviousSelection != -1)
+    		availableTermsTable.setSelection(indexOfPreviousSelection);
     }
     
     /**
