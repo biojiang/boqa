@@ -9,7 +9,7 @@
  
   <context-param>
     <param-name>org.eclipse.rwt.entryPoints</param-name>
-    <param-value>sonumina.b4orwt</param-value>
+    <param-value>sonumina.b4orwt.B4ORWT</param-value>
   </context-param>
  
   <listener>
