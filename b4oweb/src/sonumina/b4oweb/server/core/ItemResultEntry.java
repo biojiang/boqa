@@ -1,4 +1,4 @@
-package sonumina.b4oweb.server;
+package sonumina.b4oweb.server.core;
 
 /**
  * Represents a single result entry for an item.

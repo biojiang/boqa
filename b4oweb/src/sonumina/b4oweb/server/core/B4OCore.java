@@ -1,4 +1,4 @@
-package sonumina.b4oweb.server;
+package sonumina.b4oweb.server.core;
 
 import java.io.IOException;
 import java.util.ArrayList;

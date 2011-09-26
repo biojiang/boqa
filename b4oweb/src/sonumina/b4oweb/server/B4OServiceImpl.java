@@ -7,6 +7,8 @@ import java.util.List;
 import ontologizer.go.Term;
 
 import sonumina.b4oweb.client.B4OService;
+import sonumina.b4oweb.server.core.B4OCore;
+import sonumina.b4oweb.server.core.ItemResultEntry;
 import sonumina.b4oweb.shared.SharedItemResultEntry;
 import sonumina.b4oweb.shared.SharedParents;
 import sonumina.b4oweb.shared.SharedTerm;
