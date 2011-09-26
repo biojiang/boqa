@@ -15,6 +15,6 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.rap.rwt_1.5.0.20110920-2112.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.rap.rwt_1.5.0.20110920-2112.jar" sourcepath="WebContent/WEB-INF/lib/org.eclipse.rap.rwt.source_1.5.0.20110920-2112.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
