@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-import sonumina.b4oweb.server.*;
+import sonumina.b4oweb.server.core.*;
 
 public class B4ORWT implements IEntryPoint
 {
