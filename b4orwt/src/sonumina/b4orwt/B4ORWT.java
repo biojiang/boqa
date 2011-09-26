@@ -1,3 +1,4 @@
+
 package sonumina.b4orwt;
 
 import java.util.LinkedList;
@@ -27,6 +28,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -140,15 +142,19 @@ public class B4ORWT implements IEntryPoint
     	calculate();
     }
     
+    /**
+     * Performs the calculation and updates the result list.
+     */
     private void calculate()
     {
+    	final int NUM_COLUMNS = 5;
     	int rank;
     	List<ItemResultEntry> result = B4OCore.score(selectedTermsList);
     	StringBuilder str = new StringBuilder();
 
-    	Composite comp = new Composite(resultComposite,0);
+    	final Composite comp = new Composite(resultComposite,0);
     	GridLayout gl = new GridLayout();
-    	gl.numColumns = 4;
+    	gl.numColumns = NUM_COLUMNS;
     	gl.marginLeft = gl.marginRight = 0;
     	gl.marginTop = gl.marginBottom = 0;
     	comp.setLayout(gl);
@@ -159,6 +165,10 @@ public class B4ORWT implements IEntryPoint
     	{
     		int id = e.getItemId();
     		String name = B4OCore.getItemName(id);
+    		
+    		final Button but = new Button(comp,0);
+    		but.setText("+");
+    		but.pack();
     		
     		Label pos = new Label(comp,0);
     		pos.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -175,7 +185,34 @@ public class B4ORWT implements IEntryPoint
     		Label percentLabel = new Label(comp, 0);
     		percentLabel.setAlignment(SWT.RIGHT);
     		percentLabel.setText((int)(e.getScore() * 100) + "%");
+
+    		/* The hidden composite */
+    		final Composite moreComposite = new Composite(comp,0);
+    		final GridData moreCompositeGridData = new GridData();
+    		moreCompositeGridData.exclude = true;
+    		moreCompositeGridData.grabExcessHorizontalSpace = true;
+    		moreCompositeGridData.horizontalSpan = 5;
+    		moreComposite.setLayoutData(moreCompositeGridData);
+    		moreComposite.setVisible(false);
+    		moreComposite.setLayout(new RowLayout(SWT.VERTICAL));
     		
+    		for (int terms : B4OCore.getTermsDirectlyAnnotatedTo(id))
+    		{
+    			Label termLabel = new Label(moreComposite,0);
+    			termLabel.setText(B4OCore.getTerm(terms).getName());
+    		}
+    		
+    		but.addSelectionListener(new SelectionAdapter()
+    		{
+    			@Override
+    			public void widgetSelected(SelectionEvent e) {
+    				moreCompositeGridData.exclude = !moreCompositeGridData.exclude;
+    				moreComposite.setVisible(!moreCompositeGridData.exclude);
+    				but.setText(moreCompositeGridData.exclude?"+":"-");
+    				comp.layout(true);
+    			}
+    		});
+
     		rank++;
     		if (rank >= 30)
     			break;
