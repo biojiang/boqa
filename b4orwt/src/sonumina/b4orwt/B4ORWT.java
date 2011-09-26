@@ -42,6 +42,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.widgets.Form;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import sonumina.b4oweb.server.core.*;
 
@@ -195,6 +197,12 @@ public class B4ORWT implements IEntryPoint
     		moreComposite.setLayoutData(moreCompositeGridData);
     		moreComposite.setVisible(false);
     		moreComposite.setLayout(new RowLayout(SWT.VERTICAL));
+
+    		FormToolkit toolkit = new FormToolkit(moreComposite.getDisplay());
+    		Form form = toolkit.createForm(moreComposite);
+    		form.setText("Sample form");
+    		form.getBody().setLayout(new GridLayout());
+    		toolkit.createButton(form.getBody(), "Checkbox", SWT.CHECK);
     		
     		for (int terms : B4OCore.getTermsDirectlyAnnotatedTo(id))
     		{
