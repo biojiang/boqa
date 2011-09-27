@@ -6,6 +6,7 @@ import java.util.List;
 
 import ontologizer.go.Term;
 
+import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.rwt.lifecycle.IEntryPoint;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -357,6 +358,9 @@ public class B4ORWT implements IEntryPoint
 	    
 	    resultComposite = new ScrolledComposite(tempComp,SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 	    resultComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+	    /* TEMP */
+	    new ColorRegistry();
 
 	    shell.setMaximized(true);
 	    shell.layout();
