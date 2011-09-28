@@ -25,21 +25,16 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
@@ -47,28 +42,11 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.widgets.Twistie;
 
 import sonumina.b4oweb.server.core.*;
-
-class ResultLayout extends Layout
-{
-	@Override
-	protected void layout(Composite composite, boolean flushCache)
-	{
-	}
-
-	@Override
-	protected Point computeSize(Composite composite, int wHint, int hHint,	boolean flushCache)
-	{
-		return null;
-	}
-	
-}
 
 public class B4ORWT implements IEntryPoint
 {
@@ -189,8 +167,9 @@ public class B4ORWT implements IEntryPoint
     		final Section s = toolkit.createSection(form.getBody(), Section.TWISTIE);
 
     		Composite hc = toolkit.createComposite(s);
-    		RowLayout rl = new RowLayout();
+    		ResultLayout rl = new ResultLayout();
     		rl.marginLeft = rl.marginRight = rl.marginTop = rl.marginBottom = 0;
+    		rl.center = true;
     		hc.setLayout(rl);
 
     		toolkit.createLabel(hc,(rank + 1) + ". " + name, SWT.LEFT).addMouseListener(new MouseAdapter()
@@ -206,8 +185,7 @@ public class B4ORWT implements IEntryPoint
     		pb.setMaximum(100);
     		pb.setSelection((int)(e.getScore() * 100));
     		toolkit.createLabel(hc,(int)(e.getScore() * 100) + "%", SWT.RIGHT);
-    		
-//    		s.setText((rank + 1) + ". " + name);
+
     		s.setTextClient(hc);
     		s.setExpanded(false);
     		
