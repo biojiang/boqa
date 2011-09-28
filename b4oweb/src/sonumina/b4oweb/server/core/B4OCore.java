@@ -59,7 +59,7 @@ public class B4OCore
 	{
 		logger.info("Starting " + B4OCore.class.getName());
 
-		OBOParser oboParser = new OBOParser(DEFINITIONS_PATH);
+		OBOParser oboParser = new OBOParser(DEFINITIONS_PATH,OBOParser.PARSE_DEFINITIONS);
 		try {
 			oboParser.doParse();
 		} catch (IOException e1) {
