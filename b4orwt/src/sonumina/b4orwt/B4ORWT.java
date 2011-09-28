@@ -1,6 +1,7 @@
 
 package sonumina.b4orwt;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,14 +28,17 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
@@ -48,6 +52,11 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import sonumina.b4oweb.server.core.*;
 
+/**
+ * Main entry point for the FABN application.
+ * 
+ * @author Sebastian Bauer
+ */
 public class B4ORWT implements IEntryPoint
 {
     private String termFilterString = null;
@@ -148,7 +157,8 @@ public class B4ORWT implements IEntryPoint
     /**
      * Performs the calculation and updates the result list.
      */
-    private void calculate()
+    @SuppressWarnings("serial")
+	private void calculate()
     {
     	int rank;
     	List<ItemResultEntry> result = B4OCore.score(selectedTermsList);
@@ -157,6 +167,9 @@ public class B4ORWT implements IEntryPoint
 		Form form = toolkit.createForm(resultComposite);
 		form.setText("Results");
 		form.getBody().setLayout(new GridLayout());
+		
+		int maxLabelWidth = 100;
+		ArrayList<Label> labels = new ArrayList<Label>(40);
 
     	rank = 0;
     	for (ItemResultEntry e : result)
@@ -164,34 +177,40 @@ public class B4ORWT implements IEntryPoint
     		int id = e.getItemId();
     		String name = B4OCore.getItemName(id);
 
+    		/* Create a new section */
     		final Section s = toolkit.createSection(form.getBody(), Section.TWISTIE);
-
-    		Composite hc = toolkit.createComposite(s);
+    		
+    		/* Text client for the section, which is displayed in the title */
+    		Composite tc = toolkit.createComposite(s);
     		ResultLayout rl = new ResultLayout();
     		rl.marginLeft = rl.marginRight = rl.marginTop = rl.marginBottom = 0;
     		rl.center = true;
-    		hc.setLayout(rl);
+    		tc.setLayout(rl);
 
-    		toolkit.createLabel(hc,(rank + 1) + ". " + name, SWT.LEFT).addMouseListener(new MouseAdapter()
+    		/* The item's label */
+    		Label l = toolkit.createLabel(tc,(rank + 1) + ". " + name, SWT.LEFT);
+    		l.addMouseListener(new MouseAdapter()
     		{
-				@Override
-				public void mouseUp(MouseEvent e)
-				{
-					s.setExpanded(!s.isExpanded());
-				}
+				public void mouseUp(MouseEvent e) {	s.setExpanded(!s.isExpanded());	}
     			
     		});
-    		ProgressBar pb = new ProgressBar(hc, SWT.HORIZONTAL);
+    		Point p = l.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+    		maxLabelWidth = Math.max(maxLabelWidth, p.x);
+    		labels.add(l);
+    		
+    		/* Percentage */
+    		ProgressBar pb = new ProgressBar(tc, SWT.HORIZONTAL);
     		pb.setMaximum(100);
     		pb.setSelection((int)(e.getScore() * 100));
-    		toolkit.createLabel(hc,(int)(e.getScore() * 100) + "%", SWT.RIGHT);
+    		toolkit.createLabel(tc,(int)(e.getScore() * 100) + "%", SWT.RIGHT);
 
-    		s.setTextClient(hc);
+    		s.setTextClient(tc);
     		s.setExpanded(false);
     		
     		Composite c = toolkit.createComposite(s);
     		c.setLayout(new GridLayout());
     		
+    		/* Now fill the body of the section */
     		for (int terms : B4OCore.getTermsDirectlyAnnotatedTo(id))
     			toolkit.createLabel(c,B4OCore.getTerm(terms).getName());
     		
@@ -201,7 +220,11 @@ public class B4ORWT implements IEntryPoint
     		if (rank >= 30)
     			break;
     	}
-    	
+
+    	/* Now assign the max width to each label */
+    	for (Label l : labels)
+    		l.setLayoutData(new RowData(maxLabelWidth,SWT.DEFAULT));
+
     	form.pack();
     	Control oldContent = resultComposite.getContent();
     	resultComposite.setContent(form);
