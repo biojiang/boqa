@@ -153,93 +153,51 @@ public class B4ORWT implements IEntryPoint
      */
     private void calculate()
     {
-    	final int NUM_COLUMNS = 5;
     	int rank;
     	List<ItemResultEntry> result = B4OCore.score(selectedTermsList);
-    	StringBuilder str = new StringBuilder();
 
-    	final Composite comp = new Composite(resultComposite,0);
-    	GridLayout gl = new GridLayout();
-    	gl.numColumns = NUM_COLUMNS;
-    	gl.marginLeft = gl.marginRight = 0;
-    	gl.marginTop = gl.marginBottom = 0;
-    	comp.setLayout(gl);
-    	comp.setLayoutData(new GridData(GridData.FILL_BOTH));
-    	
+		FormToolkit toolkit = new FormToolkit(resultComposite.getDisplay());
+		Form form = toolkit.createForm(resultComposite);
+		form.setText("Results");
+		form.getBody().setLayout(new GridLayout());
+
     	rank = 0;
     	for (ItemResultEntry e : result)
     	{
     		int id = e.getItemId();
     		String name = B4OCore.getItemName(id);
+
+    		Section s = toolkit.createSection(form.getBody(), Section.TWISTIE);
     		
-    		final Button but = new Button(comp,0);
-    		but.setText("+");
-    		but.pack();
-    		
-    		Label pos = new Label(comp,0);
-    		pos.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-    		pos.setText((rank + 1) + ". ");
-    		pos.setAlignment(SWT.RIGHT);
-    		
-    		Label l = new Label(comp,0);
-    		l.setText(name);
-    		
-    		ProgressBar pb = new ProgressBar(comp, SWT.HORIZONTAL);
+    		Composite hc = toolkit.createComposite(s);
+    		RowLayout rl = new RowLayout();
+    		rl.marginLeft = rl.marginRight = rl.marginTop = rl.marginBottom = 0;
+    		hc.setLayout(rl);
+    		ProgressBar pb = new ProgressBar(hc, SWT.HORIZONTAL);
     		pb.setMaximum(100);
     		pb.setSelection((int)(e.getScore() * 100));
+    		toolkit.createLabel(hc,(int)(e.getScore() * 100) + "%", SWT.RIGHT);
     		
-    		Label percentLabel = new Label(comp, 0);
-    		percentLabel.setAlignment(SWT.RIGHT);
-    		percentLabel.setText((int)(e.getScore() * 100) + "%");
-
-    		/* The hidden composite */
-    		final Composite moreComposite = new Composite(comp,0);
-    		final GridData moreCompositeGridData = new GridData();
-    		moreCompositeGridData.exclude = true;
-    		moreCompositeGridData.grabExcessHorizontalSpace = true;
-    		moreCompositeGridData.horizontalSpan = 5;
-    		moreComposite.setLayoutData(moreCompositeGridData);
-    		moreComposite.setVisible(false);
-    		moreComposite.setLayout(new RowLayout(SWT.VERTICAL));
-
-    		FormToolkit toolkit = new FormToolkit(moreComposite.getDisplay());
-    		Form form = toolkit.createForm(moreComposite);
-    		form.setText("Results");
-    		form.getBody().setLayout(new GridLayout());
-    		
-    		Twistie tw = new Twistie(form.getBody(),0);
-    		
-    		Section s = toolkit.createSection(form.getBody(), 0);
-    		s.setText("HJJ");
+    		s.setText((rank + 1) + ". " + name);
+    		s.setTextClient(hc);
     		s.setExpanded(false);
-    		Button but3 = toolkit.createButton(s, "Checkbox", SWT.CHECK);
-    		s.setClient(but3);
+    		
+    		Composite c = toolkit.createComposite(s);
+    		c.setLayout(new GridLayout());
     		
     		for (int terms : B4OCore.getTermsDirectlyAnnotatedTo(id))
-    		{
-    			Label termLabel = new Label(moreComposite,0);
-    			termLabel.setText(B4OCore.getTerm(terms).getName());
-    		}
+    			toolkit.createLabel(c,B4OCore.getTerm(terms).getName());
     		
-    		but.addSelectionListener(new SelectionAdapter()
-    		{
-    			@Override
-    			public void widgetSelected(SelectionEvent e) {
-    				moreCompositeGridData.exclude = !moreCompositeGridData.exclude;
-    				moreComposite.setVisible(!moreCompositeGridData.exclude);
-    				but.setText(moreCompositeGridData.exclude?"+":"-");
-    				comp.layout(true);
-    			}
-    		});
-
+    		s.setClient(c);
+ 
     		rank++;
     		if (rank >= 30)
     			break;
     	}
     	
-    	comp.pack();
+    	form.pack();
     	Control oldContent = resultComposite.getContent();
-    	resultComposite.setContent(comp);
+    	resultComposite.setContent(form);
     	if (oldContent != null)
     		oldContent.dispose();
     }
