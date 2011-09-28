@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 
 import sonumina.b4oweb.server.core.*;
@@ -67,10 +68,13 @@ public class B4ORWT implements IEntryPoint
     private TableColumn selectedTermsRemoveColumn;
     private Table selectedTermsTable;
     private ScrolledComposite resultComposite;
+    private ScrolledForm selelectedScrolledForm;
+    private FormToolkit selectedTermsFormToolkit;
     
     private LinkedList<Integer> selectedTermsList = new LinkedList<Integer>();
     private LinkedList<Button> selectedTermButtonList = new LinkedList<Button>();
     private LinkedList<TableEditor> selectedTermTableEditorList = new LinkedList<TableEditor>();
+    private LinkedList<Section> selectedTermSectionList = new LinkedList<Section>();
 
     /**
      * Updates the content of the term table.
@@ -113,8 +117,11 @@ public class B4ORWT implements IEntryPoint
     		b.dispose();
     	for (TableEditor e : selectedTermTableEditorList)
     		e.dispose();
+    	for (Section s: selectedTermSectionList)
+    		s.dispose();
     	selectedTermButtonList.clear();
     	selectedTermTableEditorList.clear();
+    	selectedTermSectionList.clear();
 
     	for (final Integer i : selectedTermsList)
     	{
@@ -142,9 +149,22 @@ public class B4ORWT implements IEntryPoint
     		
     		selectedTermButtonList.add(button);
     		selectedTermTableEditorList.add(editor);
+
+    		/* Form */
+    		String def = B4OCore.getTerm(i).getDefinition();
+    		Section s = selectedTermsFormToolkit.createSection(selelectedScrolledForm.getBody(), Section.TWISTIE|(def!=null?Section.DESCRIPTION:0));
+    		s.setTextClient(selectedTermsFormToolkit.createButton(s, "X", 0));
+    		s.setText(B4OCore.getTerm(i).getName());
+    		if (def != null) s.setDescription(def);
+    		
+    		Composite c = selectedTermsFormToolkit.createComposite(s, 0);
+    		c.setLayout(new GridLayout());
+    		s.setClient(c);
+
+    	    selectedTermsFormToolkit.createButton(c, "Consider", SWT.CHECK);
+    		
+    		selectedTermSectionList.add(s);
     	}
-    	
-    	selectedTermsTable.setItemCount(selectedTermsList.size());
     	
     	selectedTermsNameColumn.pack();
     	selectedTermsNameColumn.setWidth(selectedTermsNameColumn.getWidth() + 20);
@@ -265,13 +285,9 @@ public class B4ORWT implements IEntryPoint
 	    	}
 		});
 	    termFilterText.addKeyListener(new KeyListener() {
-			
 			@Override
-			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
+			public void keyReleased(KeyEvent e) { }
+
 			@Override
 			public void keyPressed(KeyEvent e)
 			{
@@ -349,6 +365,12 @@ public class B4ORWT implements IEntryPoint
 	    {
 	    	
 	    });
+
+	    selectedTermsFormToolkit = new FormToolkit(selectedTerms.getDisplay());
+	    selelectedScrolledForm = selectedTermsFormToolkit.createScrolledForm(selectedTerms);
+	    selelectedScrolledForm.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL|GridData.GRAB_VERTICAL|GridData.FILL_BOTH));
+	    selelectedScrolledForm.setText("Selected Terms");
+	    selelectedScrolledForm.getBody().setLayout(new GridLayout());
 
 	    /* Result */
 	    Composite tempComp = new Composite(verticalSash, 0);
