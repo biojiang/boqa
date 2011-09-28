@@ -43,8 +43,11 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.Twistie;
 
 import sonumina.b4oweb.server.core.*;
 
@@ -201,9 +204,16 @@ public class B4ORWT implements IEntryPoint
 
     		FormToolkit toolkit = new FormToolkit(moreComposite.getDisplay());
     		Form form = toolkit.createForm(moreComposite);
-    		form.setText("Sample form");
+    		form.setText("Results");
     		form.getBody().setLayout(new GridLayout());
-    		toolkit.createButton(form.getBody(), "Checkbox", SWT.CHECK);
+    		
+    		Twistie tw = new Twistie(form.getBody(),0);
+    		
+    		Section s = toolkit.createSection(form.getBody(), 0);
+    		s.setText("HJJ");
+    		s.setExpanded(false);
+    		Button but3 = toolkit.createButton(s, "Checkbox", SWT.CHECK);
+    		s.setClient(but3);
     		
     		for (int terms : B4OCore.getTermsDirectlyAnnotatedTo(id))
     		{
@@ -296,8 +306,8 @@ public class B4ORWT implements IEntryPoint
 
 	    
 	    availableTermsTable = new Table(termComposite,SWT.VIRTUAL|SWT.BORDER);
-	    availableTermsTable.setData( Table.ENABLE_RICH_TEXT, Boolean.TRUE ); /* RWT */
-	    availableTermsTable.setData( Table.ITEM_HEIGHT, new Integer(20)); /* RWT */
+//	    availableTermsTable.setData( Table.ENABLE_RICH_TEXT, Boolean.TRUE ); /* RWT */
+//	    availableTermsTable.setData( Table.ITEM_HEIGHT, new Integer(20)); /* RWT */
 
 	    availableTermsTable.addListener( SWT.SetData, new Listener()
 	    {
@@ -341,8 +351,8 @@ public class B4ORWT implements IEntryPoint
 	    selectedTermsTable = new Table(selectedTerms,SWT.BORDER);
 	    selectedTermsNameColumn = new TableColumn(selectedTermsTable,0);
 	    selectedTermsRemoveColumn = new TableColumn(selectedTermsTable,0);
-	    selectedTermsTable.setData( Table.ENABLE_RICH_TEXT, Boolean.TRUE ); /* RWT */
-	    selectedTermsTable.setData( Table.ITEM_HEIGHT, new Integer(20)); /* RWT */
+//	    selectedTermsTable.setData( Table.ENABLE_RICH_TEXT, Boolean.TRUE ); /* RWT */
+//	    selectedTermsTable.setData( Table.ITEM_HEIGHT, new Integer(20)); /* RWT */
 
 	    selectedTermsTable.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL|GridData.GRAB_VERTICAL|GridData.FILL_BOTH));
 	    DropTarget selectedTermsTableDropTarget = new DropTarget(selectedTerms,DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_DEFAULT);
@@ -358,9 +368,6 @@ public class B4ORWT implements IEntryPoint
 	    
 	    resultComposite = new ScrolledComposite(tempComp,SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 	    resultComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-	    /* TEMP */
-	    new ColorRegistry();
 
 	    shell.setMaximized(true);
 	    shell.layout();
