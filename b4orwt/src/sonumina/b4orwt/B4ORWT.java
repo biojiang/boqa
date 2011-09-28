@@ -6,7 +6,6 @@ import java.util.List;
 
 import ontologizer.go.Term;
 
-import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.rwt.lifecycle.IEntryPoint;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -24,8 +23,12 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -36,6 +39,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
@@ -50,6 +54,21 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.Twistie;
 
 import sonumina.b4oweb.server.core.*;
+
+class ResultLayout extends Layout
+{
+	@Override
+	protected void layout(Composite composite, boolean flushCache)
+	{
+	}
+
+	@Override
+	protected Point computeSize(Composite composite, int wHint, int hHint,	boolean flushCache)
+	{
+		return null;
+	}
+	
+}
 
 public class B4ORWT implements IEntryPoint
 {
@@ -167,18 +186,28 @@ public class B4ORWT implements IEntryPoint
     		int id = e.getItemId();
     		String name = B4OCore.getItemName(id);
 
-    		Section s = toolkit.createSection(form.getBody(), Section.TWISTIE);
-    		
+    		final Section s = toolkit.createSection(form.getBody(), Section.TWISTIE);
+
     		Composite hc = toolkit.createComposite(s);
     		RowLayout rl = new RowLayout();
     		rl.marginLeft = rl.marginRight = rl.marginTop = rl.marginBottom = 0;
     		hc.setLayout(rl);
+
+    		toolkit.createLabel(hc,(rank + 1) + ". " + name, SWT.LEFT).addMouseListener(new MouseAdapter()
+    		{
+				@Override
+				public void mouseUp(MouseEvent e)
+				{
+					s.setExpanded(!s.isExpanded());
+				}
+    			
+    		});
     		ProgressBar pb = new ProgressBar(hc, SWT.HORIZONTAL);
     		pb.setMaximum(100);
     		pb.setSelection((int)(e.getScore() * 100));
     		toolkit.createLabel(hc,(int)(e.getScore() * 100) + "%", SWT.RIGHT);
     		
-    		s.setText((rank + 1) + ". " + name);
+//    		s.setText((rank + 1) + ". " + name);
     		s.setTextClient(hc);
     		s.setExpanded(false);
     		
