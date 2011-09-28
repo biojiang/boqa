@@ -10,7 +10,7 @@ import org.eclipse.ui.forms.widgets.ToggleHyperlink;
  * 
  * @author Sebastian Bauer
  */
-public class DummyConfigurator implements Configurator
+public class B4ORWTConfigurator implements Configurator
 {
 	@Override
 	public void configure(Context context)

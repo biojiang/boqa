@@ -10,7 +10,7 @@
  
   <context-param>
    <param-name>org.eclipse.rwt.Configurator</param-name>
-   <param-value>sonumina.b4orwt.DummyConfigurator</param-value>
+   <param-value>sonumina.b4orwt.B4ORWTConfigurator</param-value>
   </context-param>
 
   <listener>
