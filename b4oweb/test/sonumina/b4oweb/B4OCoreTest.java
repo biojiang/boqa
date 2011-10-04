@@ -9,8 +9,8 @@ import java.util.List;
 import org.junit.Test;
 import org.mortbay.jetty.security.B64Code;
 
-import sonumina.b4oweb.server.B4OCore;
-import sonumina.b4oweb.server.ItemResultEntry;
+import sonumina.b4oweb.server.core.B4OCore;
+import sonumina.b4oweb.server.core.ItemResultEntry;
 
 public class B4OCoreTest
 {
@@ -18,7 +18,7 @@ public class B4OCoreTest
 	public void test()
 	{
 		int i;
-		List<ItemResultEntry> resultList = B4OCore.score(Arrays.asList(12,900));
+		List<ItemResultEntry> resultList = B4OCore.score(Arrays.asList(0,1));
 		for (i=0;i<resultList.size();i++)
 		{
 			int id = resultList.get(i).getItemId();
