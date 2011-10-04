@@ -59,6 +59,8 @@ import sonumina.b4oweb.server.core.*;
  */
 public class B4ORWT implements IEntryPoint
 {
+	private Display display;
+
 	/** String used to filter terms of the available table list */
     private String termFilterString = null;
     
@@ -168,81 +170,98 @@ public class B4ORWT implements IEntryPoint
     @SuppressWarnings("serial")
 	private void calculate()
     {
-    	int rank;
-    	List<ItemResultEntry> result = B4OCore.score(selectedTermsList);
+    	final ArrayList<Integer> clonedList = new ArrayList<Integer>(selectedTermsList.size());
+    	clonedList.addAll(selectedTermsList);
 
-		FormToolkit toolkit = new FormToolkit(resultComposite.getDisplay());
-		Form form = toolkit.createForm(resultComposite);
-		form.setText("Results");
-		form.getBody().setLayout(new GridLayout());
-		
-		int maxLabelWidth = 100;
-		ArrayList<Label> labels = new ArrayList<Label>(40);
-
-    	rank = 0;
-    	for (ItemResultEntry e : result)
+    	Thread t = new Thread(new Runnable()
     	{
-    		int id = e.getItemId();
-    		String name = B4OCore.getItemName(id);
-
-    		/* Create a new section */
-    		final Section s = toolkit.createSection(form.getBody(), Section.TWISTIE);
-    		
-    		/* Text client for the section, which is displayed in the title */
-    		Composite tc = toolkit.createComposite(s);
-    		ResultLayout rl = new ResultLayout();
-    		rl.marginLeft = rl.marginRight = rl.marginTop = rl.marginBottom = 0;
-    		rl.center = true;
-    		tc.setLayout(rl);
-
-    		/* The item's label */
-    		Label l = toolkit.createLabel(tc,(rank + 1) + ". " + name, SWT.LEFT);
-    		l.addMouseListener(new MouseAdapter()
+    		@Override
+    		public void run()
     		{
-				public void mouseUp(MouseEvent e) {	s.setExpanded(!s.isExpanded());	}
-    			
-    		});
-    		Point p = l.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-    		maxLabelWidth = Math.max(maxLabelWidth, p.x);
-    		labels.add(l);
-    		
-    		/* Percentage */
-    		ProgressBar pb = new ProgressBar(tc, SWT.HORIZONTAL);
-    		pb.setMaximum(100);
-    		pb.setSelection((int)(e.getScore() * 100));
-    		toolkit.createLabel(tc,(int)(e.getScore() * 100) + "%", SWT.RIGHT);
+    	    	final List<ItemResultEntry> result = B4OCore.score(clonedList);
 
-    		s.setTextClient(tc);
-    		s.setExpanded(false);
-    		
-    		Composite c = toolkit.createComposite(s);
-    		c.setLayout(new GridLayout());
-    		
-    		/* Now fill the body of the section */
-    		for (int terms : B4OCore.getTermsDirectlyAnnotatedTo(id))
-    			toolkit.createLabel(c,B4OCore.getTerm(terms).getName());
-    		
-    		s.setClient(c);
- 
-    		rank++;
-    		if (rank >= 30)
-    			break;
-    	}
+    	    	display.syncExec(new Runnable() {
+					@Override
+					public void run() {
+		    			FormToolkit toolkit = new FormToolkit(resultComposite.getDisplay());
+		    			Form form = toolkit.createForm(resultComposite);
+		    			form.setText("Results");
+		    			form.getBody().setLayout(new GridLayout());
+		    			
+		    			int maxLabelWidth = 100;
+		    			ArrayList<Label> labels = new ArrayList<Label>(40);
 
-    	/* Now assign the max width to each label */
-    	for (Label l : labels)
-    		l.setLayoutData(new RowData(maxLabelWidth,SWT.DEFAULT));
+		    			int rank = 0;
+		    	    	for (ItemResultEntry e : result)
+		    	    	{
+		    	    		int id = e.getItemId();
+		    	    		String name = B4OCore.getItemName(id);
 
-    	form.pack();
-    	Control oldContent = resultComposite.getContent();
-    	resultComposite.setContent(form);
-    	if (oldContent != null)
-    		oldContent.dispose();
+		    	    		/* Create a new section */
+		    	    		final Section s = toolkit.createSection(form.getBody(), Section.TWISTIE);
+		    	    		
+		    	    		/* Text client for the section, which is displayed in the title */
+		    	    		Composite tc = toolkit.createComposite(s);
+		    	    		ResultLayout rl = new ResultLayout();
+		    	    		rl.marginLeft = rl.marginRight = rl.marginTop = rl.marginBottom = 0;
+		    	    		rl.center = true;
+		    	    		tc.setLayout(rl);
+
+		    	    		/* The item's label */
+		    	    		Label l = toolkit.createLabel(tc,(rank + 1) + ". " + name, SWT.LEFT);
+		    	    		l.addMouseListener(new MouseAdapter()
+		    	    		{
+		    					public void mouseUp(MouseEvent e) {	s.setExpanded(!s.isExpanded());	}
+		    	    			
+		    	    		});
+		    	    		Point p = l.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		    	    		maxLabelWidth = Math.max(maxLabelWidth, p.x);
+		    	    		labels.add(l);
+		    	    		
+		    	    		/* Percentage */
+		    	    		ProgressBar pb = new ProgressBar(tc, SWT.HORIZONTAL);
+		    	    		pb.setMaximum(100);
+		    	    		pb.setSelection((int)(e.getScore() * 100));
+		    	    		toolkit.createLabel(tc,(int)(e.getScore() * 100) + "%", SWT.RIGHT);
+
+		    	    		s.setTextClient(tc);
+		    	    		s.setExpanded(false);
+		    	    		
+		    	    		Composite c = toolkit.createComposite(s);
+		    	    		c.setLayout(new GridLayout());
+		    	    		
+		    	    		/* Now fill the body of the section */
+		    	    		for (int terms : B4OCore.getTermsDirectlyAnnotatedTo(id))
+		    	    			toolkit.createLabel(c,B4OCore.getTerm(terms).getName());
+		    	    		
+		    	    		s.setClient(c);
+		    	 
+		    	    		rank++;
+		    	    		if (rank >= 30)
+		    	    			break;
+		    	    	}
+
+		    	    	/* Now assign the max width to each label */
+		    	    	for (Label l : labels)
+		    	    		l.setLayoutData(new RowData(maxLabelWidth,SWT.DEFAULT));
+
+		    	    	form.pack();
+		    	    	Control oldContent = resultComposite.getContent();
+		    	    	resultComposite.setContent(form);
+		    	    	if (oldContent != null)
+		    	    		oldContent.dispose();
+
+						
+					}
+				});
+    		}
+    	});
+    	t.start();
     }
     
 	public int createUI()
 	{       
-	    Display display = new Display();
+		display = new Display();
 	    Shell shell = new Shell( display, 0 );
 	    shell.setLayout(new FillLayout());
 	    
