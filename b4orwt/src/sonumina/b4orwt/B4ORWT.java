@@ -43,7 +43,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Form;
@@ -60,8 +59,10 @@ import sonumina.b4oweb.server.core.*;
  */
 public class B4ORWT implements IEntryPoint
 {
+	/** String used to filter terms of the available table list */
     private String termFilterString = null;
     
+    /** Table displaying all available terms */
     private Table availableTermsTable;
     
     private ScrolledComposite resultComposite;
@@ -116,6 +117,7 @@ public class B4ORWT implements IEntryPoint
     		/* Section */
     		String def = B4OCore.getTerm(i).getDefinition();
     		final Section s = selectedTermsFormToolkit.createSection(selelectedScrolledForm.getBody(), Section.TWISTIE|(def!=null?Section.DESCRIPTION:0));
+    		s.setLayoutData(new GridData(GridData.FILL_BOTH));
     		Composite tc = selectedTermsFormToolkit.createComposite(s);
     		ResultLayout rl = new ResultLayout();
     		rl.marginLeft = rl.marginRight = rl.marginTop = rl.marginBottom = 0;
@@ -155,6 +157,8 @@ public class B4ORWT implements IEntryPoint
     		selectedTermSectionList.add(s);
     	}
     	
+    	selelectedScrolledForm.reflow(true);
+
     	calculate();
     }
     
@@ -346,7 +350,7 @@ public class B4ORWT implements IEntryPoint
 
 	    selectedTermsFormToolkit = new FormToolkit(selectedTerms.getDisplay());
 	    selelectedScrolledForm = selectedTermsFormToolkit.createScrolledForm(selectedTerms);
-	    selelectedScrolledForm.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL|GridData.GRAB_VERTICAL|GridData.FILL_BOTH));
+	    selelectedScrolledForm.setLayoutData(new GridData(GridData.FILL_HORIZONTAL|GridData.FILL_VERTICAL|GridData.GRAB_HORIZONTAL));
 	    selelectedScrolledForm.setText("Selected Terms");
 	    selelectedScrolledForm.getBody().setLayout(new GridLayout());
 
