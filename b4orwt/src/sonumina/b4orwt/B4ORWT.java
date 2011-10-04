@@ -64,16 +64,11 @@ public class B4ORWT implements IEntryPoint
     
     private Table availableTermsTable;
     
-    private TableColumn selectedTermsNameColumn;
-    private TableColumn selectedTermsRemoveColumn;
-    private Table selectedTermsTable;
     private ScrolledComposite resultComposite;
     private ScrolledForm selelectedScrolledForm;
     private FormToolkit selectedTermsFormToolkit;
     
     private LinkedList<Integer> selectedTermsList = new LinkedList<Integer>();
-    private LinkedList<Button> selectedTermButtonList = new LinkedList<Button>();
-    private LinkedList<TableEditor> selectedTermTableEditorList = new LinkedList<TableEditor>();
     private LinkedList<Section> selectedTermSectionList = new LinkedList<Section>();
 
     /**
@@ -112,44 +107,12 @@ public class B4ORWT implements IEntryPoint
      */
     private void updateSelectedTermsTable()
     {
-    	selectedTermsTable.removeAll();
-    	for (Button b : selectedTermButtonList)
-    		b.dispose();
-    	for (TableEditor e : selectedTermTableEditorList)
-    		e.dispose();
     	for (Section s: selectedTermSectionList)
     		s.dispose();
-    	selectedTermButtonList.clear();
-    	selectedTermTableEditorList.clear();
     	selectedTermSectionList.clear();
 
     	for (final Integer i : selectedTermsList)
     	{
-    		TableItem item = new TableItem(selectedTermsTable,0);
-    		item.setText(0,B4OCore.getTerm(i).getName());
-    		
-    		TableEditor editor = new TableEditor(selectedTermsTable);
-    		Button button = new Button(selectedTermsTable,0);
-    		button.setText("X");
-    		button.addSelectionListener(new SelectionAdapter()
-    		{
-    			@Override
-    			public void widgetSelected(SelectionEvent e)
-    			{
-    				selectedTermsList.removeFirstOccurrence(i);
-    				updateSelectedTermsTable();
-    			}
-    		});
-    		
-    		button.pack();
-    		editor.minimumWidth = button.getSize().x;
-    		editor.minimumHeight = button.getSize().y;
-    		editor.horizontalAlignment = SWT.RIGHT;
-    		editor.setEditor(button, item, 1);
-    		
-    		selectedTermButtonList.add(button);
-    		selectedTermTableEditorList.add(editor);
-
     		/* Section */
     		String def = B4OCore.getTerm(i).getDefinition();
     		final Section s = selectedTermsFormToolkit.createSection(selelectedScrolledForm.getBody(), Section.TWISTIE|(def!=null?Section.DESCRIPTION:0));
@@ -191,11 +154,6 @@ public class B4ORWT implements IEntryPoint
 
     		selectedTermSectionList.add(s);
     	}
-    	
-    	selectedTermsNameColumn.pack();
-    	selectedTermsNameColumn.setWidth(selectedTermsNameColumn.getWidth() + 20);
-    	selectedTermsRemoveColumn.pack();
-    	selectedTermsTable.redraw();
     	
     	calculate();
     }
@@ -378,13 +336,7 @@ public class B4ORWT implements IEntryPoint
 	    /* Selected Terms */
 	    Composite selectedTerms = new Composite(horizontalSash, 0);
 	    selectedTerms.setLayout(new GridLayout());
-	    selectedTermsTable = new Table(selectedTerms,SWT.BORDER);
-	    selectedTermsNameColumn = new TableColumn(selectedTermsTable,0);
-	    selectedTermsRemoveColumn = new TableColumn(selectedTermsTable,0);
-//	    selectedTermsTable.setData( Table.ENABLE_RICH_TEXT, Boolean.TRUE ); /* RWT */
-//	    selectedTermsTable.setData( Table.ITEM_HEIGHT, new Integer(20)); /* RWT */
 
-	    selectedTermsTable.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL|GridData.GRAB_VERTICAL|GridData.FILL_BOTH));
 	    DropTarget selectedTermsTableDropTarget = new DropTarget(selectedTerms,DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_DEFAULT);
 	    selectedTermsTableDropTarget.setTransfer(new Transfer[]{TextTransfer.getInstance()});
 	    selectedTermsTableDropTarget.addDropListener(new DropTargetAdapter()
