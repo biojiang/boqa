@@ -1808,9 +1808,22 @@ public class B4O
 	 */
 	public static Result assignMarginals(Observations observations, boolean takeFrequenciesIntoAccount)
 	{
+		return assignMarginals(observations, takeFrequenciesIntoAccount, 1);
+	}
+	
+	/**
+	 * Provides the marginals for the observations.
+	 * 
+	 * @param observations
+	 * @param takeFrequenciesIntoAccount
+	 * @param numThreads defines the number of threads to be used for the calculation.
+	 * @return
+	 */
+	public static Result assignMarginals(final Observations observations, final boolean takeFrequenciesIntoAccount, int numThreads)
+	{
 		int i;
 		
-		Result res = new Result();
+		final Result res = new Result();
 		res.scores = new double[allItemList.size()];
 		res.marginals = new double[allItemList.size()];
 		res.marginalsIdeal = new double[allItemList.size()];
@@ -1821,55 +1834,67 @@ public class B4O
 		for (i=0;i<res.scores.length;i++)
 			res.scores[i] = Math.log(0);
 
-		double [][][] scores = new double[allItemList.size()][ALPHA_GRID.length][BETA_GRID.length];
-		double normalization = Math.log(0);
+		final double [][][] scores = new double[allItemList.size()][ALPHA_GRID.length][BETA_GRID.length];
+		final double [] idealScores = new double[allItemList.size()];
 
-		double [] idealScores = new double[allItemList.size()];
-		double idealNormalization = Math.log(0);
-
-		boolean exitNow = false;
+		ExecutorService es = Executors.newFixedThreadPool(numThreads);
 		
 		for (i=0;i<allItemList.size();i++)
 		{
-			WeightedConfigurationList stats = determineCasesForItem(i,observations.observations,takeFrequenciesIntoAccount);
+			final int item = i;
 			
-			for (int a=0;a<ALPHA_GRID.length;a++)
-			{
-				for (int b=0;b<BETA_GRID.length;b++)
-				{
-					scores[i][a][b] = stats.score(ALPHA_GRID[a], BETA_GRID[b]);
-					res.scores[i] = Util.logAdd(res.scores[i], scores[i][a][b]);
-				}
-			}
-			normalization = Util.logAdd(normalization, res.scores[i]);
+			/* Construct the runnable suitable for the calculation for a single item */
+			Runnable run = new Runnable() {
+				@Override
+				public void run() {
+					WeightedConfigurationList stats = determineCasesForItem(item,observations.observations,takeFrequenciesIntoAccount);
+					
+					for (int a=0;a<ALPHA_GRID.length;a++)
+					{
+						for (int b=0;b<BETA_GRID.length;b++)
+						{
+							scores[item][a][b] = stats.score(ALPHA_GRID[a], BETA_GRID[b]);
+							res.scores[item] = Util.logAdd(res.scores[item], scores[item][a][b]);
+						}
+					}
 
-			/* This is used only for benchmarks, where we know the true configuration */
-			if (observations.observationStats != null)
-			{
-				/* Calculate ideal scores */
-				double fpr = observations.observationStats.falsePositiveRate();
-				if (fpr == 0) fpr = 0.0000001;
-				else if (fpr == 1.0) fpr = 0.999999;
-				else if (Double.isNaN(fpr))
-				{
-					exitNow = true;
-					fpr = 0.5;
+					/* This is used only for benchmarks, where we know the true configuration */
+					if (observations.observationStats != null)
+					{
+						/* Calculate ideal scores */
+						double fpr = observations.observationStats.falsePositiveRate();
+						if (fpr == 0) fpr = 0.0000001;
+						else if (fpr == 1.0) fpr = 0.999999;
+						else if (Double.isNaN(fpr)) fpr = 0.5;
+			
+						double fnr = observations.observationStats.falseNegativeRate();
+						if (fnr == 0) fnr = 0.0000001;
+						else if (fnr == 1) fnr =0.999999;
+						else if (Double.isNaN(fnr)) fnr = 0.5;
+						
+						idealScores[item] = stats.score(fpr,fnr);
+					}
 				}
-	
-				double fnr = observations.observationStats.falseNegativeRate();
-				if (fnr == 0) fnr = 0.0000001;
-				else if (fnr == 1) fnr =0.999999;
-				else if (Double.isNaN(fnr))
-				{
-					exitNow = true;
-					fnr = 0.5;
-				}
-				
-				idealScores[i] = stats.score(fpr,fnr);
-				idealNormalization = Util.logAdd(idealNormalization, idealScores[i]);
-			}
+			};
+			es.execute(run);
 		}
 
+		es.shutdown();
+		try {
+			while (!es.awaitTermination(10, TimeUnit.SECONDS));
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		double normalization = Math.log(0);
+		double idealNormalization = Math.log(0);
+
+		for (i=0;i<allItemList.size();i++)
+		{
+			normalization = Util.logAdd(normalization, res.scores[i]);
+			idealNormalization = Util.logAdd(idealNormalization, idealScores[i]);
+		}
+		
 		for (i=0;i<allItemList.size();i++)
 		{
 			res.marginals[i] = Math.min(Math.exp(res.scores[i] - normalization),1);
@@ -1890,7 +1915,6 @@ public class B4O
 			for (i=0;i<allItemList.size();i++)
 				res.marginalsIdeal[i] = res.marginals[i];
 		}
-		                       
 		                       
 //		System.out.println(idealNormalization + "  " + normalization);
 //		if (exitNow)
