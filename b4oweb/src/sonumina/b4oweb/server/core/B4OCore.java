@@ -26,6 +26,8 @@ import sonumina.math.graph.SlimDirectedGraphView;
 public class B4OCore
 {
 	private static Logger logger = Logger.getLogger(B4OCore.class.getName());
+	
+	static int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
 	static final String DEFINITIONS_PATH = "/home/sba/workspace/b4oweb/human-phenotype-ontology.obo.gz";
 	static final String ASSOCIATIONS_PATH = "/home/sba/workspace/b4oweb/phenotype_annotation.omim.gz";
@@ -241,7 +243,7 @@ public class B4OCore
 	}
 
 	/**
-	 * Score.
+	 * Score according to the given server ids.
 	 * 
 	 * @param serverIds
 	 * @return
@@ -260,7 +262,7 @@ public class B4OCore
 		Observations o = new Observations();
 		o.observations = observations;
 
-		Result result = B4O.assignMarginals(o, true);
+		Result result = B4O.assignMarginals(o, true, numberOfThreads);
 		for (int i=0;i<result.size();i++)
 		{
 			ItemResultEntry newEntry = ItemResultEntry.create(i, result.getMarginal(i));
