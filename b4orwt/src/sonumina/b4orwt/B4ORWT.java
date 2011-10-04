@@ -150,19 +150,45 @@ public class B4ORWT implements IEntryPoint
     		selectedTermButtonList.add(button);
     		selectedTermTableEditorList.add(editor);
 
-    		/* Form */
+    		/* Section */
     		String def = B4OCore.getTerm(i).getDefinition();
-    		Section s = selectedTermsFormToolkit.createSection(selelectedScrolledForm.getBody(), Section.TWISTIE|(def!=null?Section.DESCRIPTION:0));
-    		s.setTextClient(selectedTermsFormToolkit.createButton(s, "X", 0));
-    		s.setText(B4OCore.getTerm(i).getName());
+    		final Section s = selectedTermsFormToolkit.createSection(selelectedScrolledForm.getBody(), Section.TWISTIE|(def!=null?Section.DESCRIPTION:0));
+    		Composite tc = selectedTermsFormToolkit.createComposite(s);
+    		ResultLayout rl = new ResultLayout();
+    		rl.marginLeft = rl.marginRight = rl.marginTop = rl.marginBottom = 0;
+    		rl.center = true;
+    		tc.setLayout(rl);
+
+    		/* Check mark */
+    	    Button check = selectedTermsFormToolkit.createButton(tc, "", SWT.CHECK);
+
+    		/* Label of the section */
+    		Label l = selectedTermsFormToolkit.createLabel(tc,B4OCore.getTerm(i).getName(), SWT.LEFT);
+    		l.addMouseListener(new MouseAdapter()
+    		{
+				public void mouseUp(MouseEvent e) {	s.setExpanded(!s.isExpanded());	}
+    			
+    		});
+
+    		/* Remove Button */
+    		Button rem = selectedTermsFormToolkit.createButton(tc, "X", 0);
+    		rem.addSelectionListener(new SelectionAdapter()
+    		{
+    			@Override
+    			public void widgetSelected(SelectionEvent e) {
+    				selectedTermsList.removeFirstOccurrence(i);
+    				updateSelectedTermsTable();
+    			}
+    		});
+    	
+    		
+    		s.setTextClient(tc);
     		if (def != null) s.setDescription(def);
     		
     		Composite c = selectedTermsFormToolkit.createComposite(s, 0);
     		c.setLayout(new GridLayout());
     		s.setClient(c);
 
-    	    selectedTermsFormToolkit.createButton(c, "Consider", SWT.CHECK);
-    		
     		selectedTermSectionList.add(s);
     	}
     	
