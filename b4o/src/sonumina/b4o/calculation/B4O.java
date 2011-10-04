@@ -158,8 +158,19 @@ public class B4O
 	 */
 	public static int [][] diffOffTerms;
 
+	/**
+	 * Similiar to diffOnTerms but each adjacent frequency-implied state
+	 */
 	public static int [][][] diffOnTermsFreqs;
+	
+	/**
+	 * Similiar to diffOffTerms but each adjacent frequency-implied state
+	 */
 	public static int [][][] diffOffTermsFreqs;
+	
+	/**
+	 * The factors of each combination.
+	 */
 	public static double [][] factors;
 
 	/** Links items to directly associated terms */
@@ -222,7 +233,7 @@ public class B4O
 	public static Pattern frequencyPattern = Pattern.compile("(\\d+)\\.?(\\d*)\\s*%");
 	public static Pattern frequencyFractionPattern = Pattern.compile("(\\d+)/(\\d+)");
 	
-	/* Settings */
+	/* Settings for generation of random data */
 //	private static String ontologyPath = "http://www.human-phenotype-ontology.org/human-phenotype-ontology.obo.gz";
 //	private static String annotationPath = "http://www.human-phenotype-ontology.org/phenotype_annotation.omim.gz";
 
@@ -264,7 +275,7 @@ public class B4O
 	private static final boolean DEBUG = false;
 	
 	/** Use threading */
-	private static final boolean THREADING = true;
+	private static final boolean THREADING_IN_SIMULATION = true;
 	
 	/** Use cached MaxIC terms. Speeds up Resnik */
 	private static final boolean PRECALCULATE_MAXICS = true;
@@ -1283,7 +1294,7 @@ public class B4O
 					}
 				};
 				
-				if (THREADING) es.execute(thread);
+				if (THREADING_IN_SIMULATION) es.execute(thread);
 				else thread.run();
 			}
 		}
