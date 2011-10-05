@@ -105,33 +105,67 @@ public class B4ORWT implements IEntryPoint
     
     /**
      * Updates the content of the term table.
+     * 
+     * Spawns a thread to do the actual work.
      */
     private void updateAvailableTermsTable()
     {
-    	/* Represents the index of the previous selection in the within the new (filtered) list */
-    	int indexOfPreviousSelection = -1;
     	TableItem [] ti = availableTermsTable.getSelection();
-    	if (ti != null && ti.length > 0)
+
+    	final String nameOfCuurentlySelectedTerm;
+    	
+    	if (ti != null && ti.length > 0) nameOfCuurentlySelectedTerm = ti[0].getText();
+    	else  nameOfCuurentlySelectedTerm = null;
+
+    	final String callbackId = getUniqueCallbackId(); 
+    	UICallBack.activate(callbackId);
+
+    	Thread t = new Thread(new Runnable()
     	{
-    		String name = ti[0].getText();
-    		if (name != null)
+    		@Override
+    		public void run()
     		{
+    	    	/* Represents the index of the previous selection in the within the new (filtered) list */
+    	    	int indexOfPreviousSelection = -1;
+
+    	    	int numberOfTerms = 0;
     			for (Term t : B4OCore.getTerms(termFilterString))
     			{
-    				indexOfPreviousSelection++;
-    				if (t.getName().equals(name))
-    					break;
+    				if (t.getName().equals(nameOfCuurentlySelectedTerm))
+    					indexOfPreviousSelection = numberOfTerms;
+    				numberOfTerms++;
     			}
-    		}
-    	}
 
-    	/* Update table */
-	    availableTermsTable.setItemCount(B4OCore.getNumberTerms(termFilterString));
-    	availableTermsTable.clearAll();
-    	availableTermsTable.redraw();
-    	
-    	if (indexOfPreviousSelection != -1)
-    		availableTermsTable.setSelection(indexOfPreviousSelection);
+    			final int prev = indexOfPreviousSelection;
+    			final int num = numberOfTerms;
+
+    			/* Update table */
+    			display.asyncExec(new Runnable()
+    			{
+    				@Override
+    				public void run()
+    				{
+    				    availableTermsTable.setItemCount(num);
+    			    	availableTermsTable.clearAll();
+    			    	availableTermsTable.redraw();
+    			    	
+    			    	if (prev != -1)
+    			    		availableTermsTable.setSelection(prev);
+    				}
+    			});
+    			
+    	    	/* Deactive UI Callback */
+    	    	display.asyncExec(new Runnable()
+    	    	{
+    	    		@Override
+    	    		public void run() {
+    	    			UICallBack.deactivate(callbackId);
+    	    		}
+    	    	});
+    		}
+    	});
+    	t.setDaemon(true);
+    	t.start();
     }
     
     /**
@@ -379,8 +413,6 @@ public class B4ORWT implements IEntryPoint
 
 	    /* Set tooltip provider for the table */
 	    final ICellToolTipAdapter tooltipAdapter = (ICellToolTipAdapter)availableTermsTable.getAdapter(ITableAdapter.class);
-	    
-	    System.out.println("Provider " + tooltipAdapter.getCellToolTipProvider());
 	    
 	    tooltipAdapter.setCellToolTipProvider(new ICellToolTipProvider()
 	    {
