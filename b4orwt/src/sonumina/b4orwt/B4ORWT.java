@@ -442,9 +442,12 @@ public class B4ORWT implements IEntryPoint
 				TableItem item = (TableItem)event.item;
 				int index = event.index;
 				Term t = B4OCore.getTerm(termFilterString, index);
-				item.setText(0,t.getName());
-				item.setText(1,t.getID().toString());
-				item.setData("#tooltip", t.getDefinition());
+				if (t != null)
+				{
+					item.setText(0,t.getName());
+					item.setText(1,t.getID().toString());
+					item.setData("#tooltip", t.getDefinition());
+				}
 			}
 	    });
 	    availableTermsTable.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL|GridData.GRAB_VERTICAL|GridData.FILL_BOTH));
