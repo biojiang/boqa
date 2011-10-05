@@ -8,6 +8,7 @@ import java.util.List;
 import ontologizer.go.Term;
 
 import org.eclipse.rwt.lifecycle.IEntryPoint;
+import org.eclipse.rwt.lifecycle.UICallBack;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -73,6 +74,10 @@ public class B4ORWT implements IEntryPoint
     
     private LinkedList<Integer> selectedTermsList = new LinkedList<Integer>();
     private LinkedList<Section> selectedTermSectionList = new LinkedList<Section>();
+
+    /** Used for UICallback */
+    private int calculationCallbackId = 0;
+    
 
     /**
      * Updates the content of the term table.
@@ -173,6 +178,9 @@ public class B4ORWT implements IEntryPoint
     	final ArrayList<Integer> clonedList = new ArrayList<Integer>(selectedTermsList.size());
     	clonedList.addAll(selectedTermsList);
 
+    	/* Activate UI Callback */
+    	final String callbackId = "callback" + calculationCallbackId; 
+    	UICallBack.activate(callbackId);
     	Thread t = new Thread(new Runnable()
     	{
     		@Override
@@ -180,7 +188,7 @@ public class B4ORWT implements IEntryPoint
     		{
     	    	final List<ItemResultEntry> result = B4OCore.score(clonedList);
 
-    	    	display.syncExec(new Runnable() {
+    	    	display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
 		    			FormToolkit toolkit = new FormToolkit(resultComposite.getDisplay());
@@ -251,11 +259,20 @@ public class B4ORWT implements IEntryPoint
 		    	    	if (oldContent != null)
 		    	    		oldContent.dispose();
 
-						
 					}
 				});
+
+    	    	/* Deactive UI Callback */
+    	    	display.asyncExec(new Runnable()
+    	    	{
+    	    		@Override
+    	    		public void run() {
+    	    			UICallBack.deactivate(callbackId);
+    	    		}
+    	    	});
     		}
     	});
+    	t.setDaemon(true);
     	t.start();
     }
     
