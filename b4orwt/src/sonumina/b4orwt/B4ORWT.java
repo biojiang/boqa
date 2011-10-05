@@ -35,6 +35,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -46,6 +47,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
@@ -71,14 +73,24 @@ public class B4ORWT implements IEntryPoint
     private ScrolledComposite resultComposite;
     private ScrolledForm selelectedScrolledForm;
     private FormToolkit selectedTermsFormToolkit;
-    
-    private LinkedList<Integer> selectedTermsList = new LinkedList<Integer>();
+
+    static private class SelectedTerm
+    {
+    	int id;
+    	boolean active;
+    	public SelectedTerm(int id, boolean active)
+    	{
+    		this.id = id;
+    		this.active = active;
+    	}
+    }
+
+    private LinkedList<SelectedTerm> selectedTermsList = new LinkedList<SelectedTerm>();
     private LinkedList<Section> selectedTermSectionList = new LinkedList<Section>();
 
-    /** Used for UICallback */
+    /** Used for UICallback which is used to update the UI from threads */
     private int calculationCallbackId = 0;
     
-
     /**
      * Updates the content of the term table.
      */
@@ -115,31 +127,36 @@ public class B4ORWT implements IEntryPoint
      */
     private void updateSelectedTermsTable()
     {
+    	selelectedScrolledForm.setRedraw(false);
+
     	for (Section s: selectedTermSectionList)
     		s.dispose();
     	selectedTermSectionList.clear();
 
-    	for (final Integer i : selectedTermsList)
+    	for (final SelectedTerm st : selectedTermsList)
     	{
+    		final int i = st.id;
+
     		/* Section */
     		String def = B4OCore.getTerm(i).getDefinition();
-    		final Section s = selectedTermsFormToolkit.createSection(selelectedScrolledForm.getBody(), Section.TWISTIE|(def!=null?Section.DESCRIPTION:0));
-    		s.setLayoutData(new GridData(GridData.FILL_BOTH));
+    		
+    		final Section s = selectedTermsFormToolkit.createSection(selelectedScrolledForm.getBody(), Section.TWISTIE|(def!=null?Section.DESCRIPTION:0)|Section.LEFT_TEXT_CLIENT_ALIGNMENT);
+    		s.setLayoutData(new GridData(GridData.FILL_HORIZONTAL|GridData.GRAB_HORIZONTAL));
     		Composite tc = selectedTermsFormToolkit.createComposite(s);
-    		ResultLayout rl = new ResultLayout();
+    		GridLayout rl = new GridLayout(3,false);
     		rl.marginLeft = rl.marginRight = rl.marginTop = rl.marginBottom = 0;
-    		rl.center = true;
     		tc.setLayout(rl);
 
     		/* Check mark */
     	    Button check = selectedTermsFormToolkit.createButton(tc, "", SWT.CHECK);
+    	    check.setLayoutData(new GridData(GridData.FILL_HORIZONTAL|GridData.GRAB_HORIZONTAL));
+    	    if (st.active) check.setSelection(st.active);
 
     		/* Label of the section */
     		Label l = selectedTermsFormToolkit.createLabel(tc,B4OCore.getTerm(i).getName(), SWT.LEFT);
     		l.addMouseListener(new MouseAdapter()
     		{
 				public void mouseUp(MouseEvent e) {	s.setExpanded(!s.isExpanded());	}
-    			
     		});
 
     		/* Remove Button */
@@ -152,8 +169,9 @@ public class B4ORWT implements IEntryPoint
     				updateSelectedTermsTable();
     			}
     		});
-    	
-    		
+    		GridData cld = new GridData(GridData.FILL_HORIZONTAL|GridData.GRAB_HORIZONTAL);
+    		rem.setLayoutData(cld);
+
     		s.setTextClient(tc);
     		if (def != null) s.setDescription(def);
     		
@@ -165,7 +183,8 @@ public class B4ORWT implements IEntryPoint
     	}
     	
     	selelectedScrolledForm.reflow(true);
-
+    	selelectedScrolledForm.setRedraw(true);
+    	
     	calculate();
     }
     
@@ -176,7 +195,9 @@ public class B4ORWT implements IEntryPoint
 	private void calculate()
     {
     	final ArrayList<Integer> clonedList = new ArrayList<Integer>(selectedTermsList.size());
-    	clonedList.addAll(selectedTermsList);
+    	for (SelectedTerm st : selectedTermsList)
+    		if (st.active)
+    			clonedList.add(st.id);
 
     	/* Activate UI Callback */
     	final String callbackId = "callback" + calculationCallbackId; 
@@ -416,7 +437,7 @@ public class B4ORWT implements IEntryPoint
 	 */
 	private void addSelectedTermToSelectedTerms()
 	{
-		selectedTermsList.add(B4OCore.getIdOfTerm(B4OCore.getTerm(termFilterString, availableTermsTable.getSelectionIndex())));
+		selectedTermsList.add(new SelectedTerm(B4OCore.getIdOfTerm(B4OCore.getTerm(termFilterString, availableTermsTable.getSelectionIndex())),true));
 		updateSelectedTermsTable();
 	}
 }
