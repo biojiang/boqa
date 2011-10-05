@@ -179,7 +179,7 @@ public class B4OCore
 					{
 						for (;i<slimGraph.getNumberOfVertices();i++)
 						{
-							if (pat == null || pat.length() == 0 || getTerm(i).getName().toLowerCase().contains(pat))
+							if (pat == null || pat.length() == 0 || getTerm(i).getName().toLowerCase().contains(pat) || getTerm(i).getIDAsString().contains(pat))
 								return true;
 						}
 						return false;
