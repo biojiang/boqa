@@ -151,6 +151,14 @@ public class B4ORWT implements IEntryPoint
     	    Button check = selectedTermsFormToolkit.createButton(tc, "", SWT.CHECK);
     	    check.setLayoutData(new GridData(GridData.FILL_HORIZONTAL|GridData.GRAB_HORIZONTAL));
     	    if (st.active) check.setSelection(st.active);
+    	    check.addSelectionListener(new SelectionAdapter()
+    	    {
+    	    	@Override
+    	    	public void widgetSelected(SelectionEvent e) {
+    	    		st.active = !st.active;
+    	    		calculate();
+    	    	}
+    	    });
 
     		/* Label of the section */
     		Label l = selectedTermsFormToolkit.createLabel(tc,B4OCore.getTerm(i).getName(), SWT.LEFT);
@@ -165,7 +173,7 @@ public class B4ORWT implements IEntryPoint
     		{
     			@Override
     			public void widgetSelected(SelectionEvent e) {
-    				selectedTermsList.removeFirstOccurrence(i);
+    				selectedTermsList.removeFirstOccurrence(st);
     				updateSelectedTermsTable();
     			}
     		});
