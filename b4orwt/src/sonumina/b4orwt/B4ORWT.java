@@ -21,6 +21,8 @@ import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -30,6 +32,9 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.internal.widgets.ICellToolTipAdapter;
+import org.eclipse.swt.internal.widgets.ICellToolTipProvider;
+import org.eclipse.swt.internal.widgets.ITableAdapter;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -40,6 +45,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
@@ -91,6 +97,11 @@ public class B4ORWT implements IEntryPoint
 
     /** Used for UICallback which is used to update the UI from threads */
     private int calculationCallbackId = 0;
+    
+    private String getUniqueCallbackId()
+    {
+    	return "callback" + calculationCallbackId++;
+    }
     
     /**
      * Updates the content of the term table.
@@ -209,7 +220,7 @@ public class B4ORWT implements IEntryPoint
     			clonedList.add(st.id);
 
     	/* Activate UI Callback */
-    	final String callbackId = "callback" + calculationCallbackId; 
+    	final String callbackId = getUniqueCallbackId(); 
     	UICallBack.activate(callbackId);
     	Thread t = new Thread(new Runnable()
     	{
@@ -364,6 +375,23 @@ public class B4ORWT implements IEntryPoint
 
 	    
 	    availableTermsTable = new Table(termComposite,SWT.VIRTUAL|SWT.BORDER);
+	    availableTermsTable.setData( ICellToolTipProvider.ENABLE_CELL_TOOLTIP, Boolean.TRUE );
+
+	    /* Set tooltip provider for the table */
+	    final ICellToolTipAdapter tooltipAdapter = (ICellToolTipAdapter)availableTermsTable.getAdapter(ITableAdapter.class);
+	    
+	    System.out.println("Provider " + tooltipAdapter.getCellToolTipProvider());
+	    
+	    tooltipAdapter.setCellToolTipProvider(new ICellToolTipProvider()
+	    {
+	    	@Override
+	    	public void getToolTipText(Item item, int columnIndex) {
+	    		String tooltip = (String)item.getData("#tooltip");
+	    		if (tooltip != null)
+	    			tooltipAdapter.setCellToolTipText(tooltip);
+	    	}
+	    });
+	    
 	    TableColumn nameColumn = new TableColumn(availableTermsTable, 0);
 	    nameColumn.setResizable(true);
 	    nameColumn.setWidth(320);
@@ -384,6 +412,7 @@ public class B4ORWT implements IEntryPoint
 				Term t = B4OCore.getTerm(termFilterString, index);
 				item.setText(0,t.getName());
 				item.setText(1,t.getID().toString());
+				item.setData("#tooltip", t.getDefinition());
 			}
 	    });
 	    availableTermsTable.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL|GridData.GRAB_VERTICAL|GridData.FILL_BOTH));
@@ -394,6 +423,7 @@ public class B4ORWT implements IEntryPoint
 	    		addSelectedTermToSelectedTerms();
 	    	}
 		});
+	    
 	    DragSource termTableDragSource = new DragSource(availableTermsTable,DND.DROP_COPY|DND.DROP_MOVE);
 	    termTableDragSource.addDragListener(new DragSourceAdapter() {
 			@Override
