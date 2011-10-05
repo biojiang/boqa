@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
@@ -363,6 +364,13 @@ public class B4ORWT implements IEntryPoint
 
 	    
 	    availableTermsTable = new Table(termComposite,SWT.VIRTUAL|SWT.BORDER);
+	    TableColumn nameColumn = new TableColumn(availableTermsTable, 0);
+	    nameColumn.setResizable(true);
+	    nameColumn.setWidth(320);
+	    TableColumn idColumn = new TableColumn(availableTermsTable, 1);
+	    idColumn.setResizable(true);
+	    idColumn.setWidth(100);
+
 //	    availableTermsTable.setData( Table.ENABLE_RICH_TEXT, Boolean.TRUE ); /* RWT */
 //	    availableTermsTable.setData( Table.ITEM_HEIGHT, new Integer(20)); /* RWT */
 
@@ -374,7 +382,8 @@ public class B4ORWT implements IEntryPoint
 				TableItem item = (TableItem)event.item;
 				int index = event.index;
 				Term t = B4OCore.getTerm(termFilterString, index);
-				item.setText(t.getName());
+				item.setText(0,t.getName());
+				item.setText(1,t.getID().toString());
 			}
 	    });
 	    availableTermsTable.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL|GridData.GRAB_VERTICAL|GridData.FILL_BOTH));
