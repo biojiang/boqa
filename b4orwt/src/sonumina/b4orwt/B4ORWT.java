@@ -245,7 +245,7 @@ public class B4ORWT implements IEntryPoint
 		    	    		s.setClient(c);
 		    	 
 		    	    		rank++;
-		    	    		if (rank >= 30)
+		    	    		if (rank >= 10 && e.getScore() < 0.001 || rank >= 30)
 		    	    			break;
 		    	    	}
 
