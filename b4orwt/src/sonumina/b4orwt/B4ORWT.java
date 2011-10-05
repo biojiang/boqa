@@ -427,9 +427,11 @@ public class B4ORWT implements IEntryPoint
 	    TableColumn nameColumn = new TableColumn(availableTermsTable, 0);
 	    nameColumn.setResizable(true);
 	    nameColumn.setWidth(320);
-	    TableColumn idColumn = new TableColumn(availableTermsTable, 1);
+	    TableColumn idColumn = new TableColumn(availableTermsTable, 0);
 	    idColumn.setResizable(true);
 	    idColumn.setWidth(100);
+	    TableColumn itemsColumn = new TableColumn(availableTermsTable, SWT.RIGHT);
+	    itemsColumn.setWidth(40);
 
 //	    availableTermsTable.setData( Table.ENABLE_RICH_TEXT, Boolean.TRUE ); /* RWT */
 //	    availableTermsTable.setData( Table.ITEM_HEIGHT, new Integer(20)); /* RWT */
@@ -446,6 +448,7 @@ public class B4ORWT implements IEntryPoint
 				{
 					item.setText(0,t.getName());
 					item.setText(1,t.getID().toString());
+					item.setText(2,Integer.toString(B4OCore.getNumberOfTermsAnnotatedToTerm(B4OCore.getIdOfTerm(t))));
 					item.setData("#tooltip", t.getDefinition());
 				}
 			}
