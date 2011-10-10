@@ -17,6 +17,7 @@ import ontologizer.go.OBOParserException;
 import ontologizer.go.Ontology;
 import ontologizer.go.Term;
 import ontologizer.go.TermContainer;
+import ontologizer.go.TermID;
 import sonumina.b4o.calculation.B4O;
 import sonumina.b4o.calculation.B4O.Result;
 import sonumina.b4o.calculation.Observations;
@@ -240,6 +241,29 @@ public class B4OCore
 	public static int getIdOfTerm(Term t)
 	{
 		return idx2Sorted[slimGraph.getVertexIndex(t)];
+	}
+
+	/**
+	 * Returns the server id of the given term.
+	 * 
+	 * @param t
+	 * @return
+	 */
+	public static int getIdOfTerm(TermID tid)
+	{
+		Term t = ontology.getTerm(tid);
+		return idx2Sorted[slimGraph.getVertexIndex(t)];
+	}
+
+	/**
+	 * Returns the term for the given term id.
+	 * 
+	 * @param tid
+	 * @return
+	 */
+	public static Term getTerm(TermID tid)
+	{
+		return ontology.getTerm(tid);
 	}
 
 	/**
