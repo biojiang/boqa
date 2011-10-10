@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ontologizer.go.Term;
+import ontologizer.go.TermID;
 
 import org.eclipse.rwt.lifecycle.IEntryPoint;
 import org.eclipse.rwt.lifecycle.UICallBack;
@@ -60,6 +61,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 
+import sonumina.b4orwt.TermDetails.ITermDetailsProvider;
 import sonumina.b4oweb.server.core.*;
 
 /**
@@ -76,6 +78,8 @@ public class B4ORWT implements IEntryPoint
     
     /** Table displaying all available terms */
     private Table availableTermsTable;
+    
+    private TermDetails selectedTermDetails;
     
     private ScrolledComposite resultComposite;
     private ScrolledForm selelectedScrolledForm;
@@ -461,6 +465,14 @@ public class B4ORWT implements IEntryPoint
 	    		addSelectedTermToSelectedTerms();
 	    	}
 		});
+	    availableTermsTable.addMouseListener(new MouseAdapter() {
+	    	@Override
+	    	public void mouseDown(MouseEvent e) {
+				int index = availableTermsTable.getSelectionIndex();
+				Term t = B4OCore.getTerm(termFilterString, index);
+				selectedTermDetails.setTermID(t.getID());
+	    	}
+		});
 	    
 	    DragSource termTableDragSource = new DragSource(availableTermsTable,DND.DROP_COPY|DND.DROP_MOVE);
 	    termTableDragSource.addDragListener(new DragSourceAdapter() {
@@ -470,13 +482,30 @@ public class B4ORWT implements IEntryPoint
 				DragSource ds = (DragSource)event.widget;
 			    Table table = (Table) ds.getControl();
 			    TableItem[] selection = table.getSelection();
-				System.out.println(selection.length);
+				System.out.println("Drag: " + selection.length);
 			    if (selection.length > 0)
 			    {
 			    	event.data = selection[0].getText();
 			    }
 			}
 		});
+	    
+	    selectedTermDetails = new TermDetails(termComposite, 0);
+	    selectedTermDetails.setTermDetailsProvider(new ITermDetailsProvider() {
+			
+			public String getName(TermID term)
+			{
+				return B4OCore.getTerm(term).getName();
+			}
+			
+			public String getDescription(TermID term)
+			{
+				return B4OCore.getTerm(term).getDefinition();
+			}
+		});
+	    selectedTermDetails.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+	    
 	    termComposite.pack();
 	    
 	    /* Selected Terms */

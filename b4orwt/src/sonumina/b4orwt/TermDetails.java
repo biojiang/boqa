@@ -22,6 +22,7 @@ public class TermDetails extends Composite
 
 	private Browser browser;
 	private ITermDetailsProvider termDetailsProvider;
+	private TermID currentTermID;
 
 	public TermDetails(Composite parent, int style)
 	{
@@ -47,7 +48,7 @@ public class TermDetails extends Composite
 	 * 
 	 * @param term
 	 */
-	public void setTerm(TermID term)
+	public void setTermID(TermID term)
 	{
 		StringBuilder str = new StringBuilder();
 		
@@ -56,15 +57,19 @@ public class TermDetails extends Composite
 			String name = termDetailsProvider.getName(term);
 			if (name != null)
 			{
-				str.append("<h1>");
+				str.append("<h3>");
 				str.append(name);
-				str.append("</h1>");
+				str.append("</h3>");
 			}
 			
 			String desc = termDetailsProvider.getDescription(term);
 			if (desc != null)
+			{
 				str.append(termDetailsProvider.getDescription(term));
+			}
 		}
 		browser.setText(str.toString());
+		
+		currentTermID = term;
 	}
 }
