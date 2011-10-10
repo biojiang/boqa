@@ -1,5 +1,6 @@
 package sonumina.b4orwt;
 
+import ontologizer.go.DescriptionParser;
 import ontologizer.go.TermID;
 
 import org.eclipse.swt.browser.Browser;
@@ -50,7 +51,7 @@ public class TermDetails extends Composite
 	 */
 	public void setTermID(TermID term)
 	{
-		StringBuilder str = new StringBuilder();
+		final StringBuilder str = new StringBuilder();
 		
 		if (termDetailsProvider != null)
 		{
@@ -65,7 +66,15 @@ public class TermDetails extends Composite
 			String desc = termDetailsProvider.getDescription(term);
 			if (desc != null)
 			{
-				str.append(termDetailsProvider.getDescription(term));
+				DescriptionParser.parse(termDetailsProvider.getDescription(term), new DescriptionParser.IDescriptionPartCallback() {
+					@Override
+					public boolean part(String txt, String ref)
+					{
+						str.append(txt);
+						return true;
+					}
+				});
+				
 			}
 		}
 		browser.setText(str.toString());
