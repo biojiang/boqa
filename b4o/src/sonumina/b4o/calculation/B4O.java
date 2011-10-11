@@ -1229,11 +1229,12 @@ public class B4O
 			
 			for (int a=0;a<evidenceCodes.length;a++)
 				evidenceBuilder.append("," + evidenceCodes[a]);
+			evidenceString = evidenceBuilder.toString();
 		}
 
 		final BufferedWriter param = new BufferedWriter(new FileWriter(RESULT_NAME.split("\\.")[0]+ "_param.txt"));
 		param.write("alpha\tbeta\tconsider.freqs.only\titems\tterms\tmax.terms\tevidences\n");
-		param.write(String.format("%g\t%g\t%b\t%d\t%d\t%s\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY,allItemList.size(),slimGraph.getNumberOfVertices(),maxTerms,evidenceString));
+		param.write(String.format("%g\t%g\t%b\t%d\t%d\t%d\t%s\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY,allItemList.size(),slimGraph.getNumberOfVertices(),maxTerms,evidenceString));
 		param.flush();
 		
 		final BufferedWriter out = new BufferedWriter(new FileWriter(RESULT_NAME));
