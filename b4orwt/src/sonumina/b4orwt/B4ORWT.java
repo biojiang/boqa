@@ -11,6 +11,8 @@ import ontologizer.go.TermID;
 import org.eclipse.rwt.lifecycle.IEntryPoint;
 import org.eclipse.rwt.lifecycle.UICallBack;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.TableEditor;
@@ -79,7 +81,10 @@ public class B4ORWT implements IEntryPoint
     /** Table displaying all available terms */
     private Table availableTermsTable;
     
+    /** GUI element displaying the term details */
     private TermDetails selectedTermDetails;
+    
+    private TermGraph selectedTermsGraph;
     
     private ScrolledComposite resultComposite;
     private ScrolledForm selelectedScrolledForm;
@@ -509,7 +514,21 @@ public class B4ORWT implements IEntryPoint
 	    termComposite.pack();
 	    
 	    /* Selected Terms */
-	    Composite selectedTerms = new Composite(horizontalSash, 0);
+	    CTabFolder tabFolder = new CTabFolder(horizontalSash, 0);
+
+	    CTabItem selectedTermsItem = new CTabItem(tabFolder, 0);
+	    selectedTermsItem.setText("Textual");
+
+	    CTabItem selectedTermsGraphicalItem = new CTabItem(tabFolder, 0);
+	    selectedTermsGraphicalItem.setText("Graphical");
+
+	    /* Graphical */
+	    selectedTermsGraph = new TermGraph(tabFolder, 0);
+	    selectedTermsGraphicalItem.setControl(selectedTermsGraph);
+
+	    /* Textual */
+	    Composite selectedTerms = new Composite(tabFolder, 0);
+	    selectedTermsItem.setControl(selectedTerms);
 	    selectedTerms.setLayout(new GridLayout());
 
 	    DropTarget selectedTermsTableDropTarget = new DropTarget(selectedTerms,DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_DEFAULT);
