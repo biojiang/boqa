@@ -2,6 +2,7 @@
 package sonumina.b4orwt;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -65,6 +66,8 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import sonumina.b4orwt.TermDetails.ITermDetailsProvider;
 import sonumina.b4oweb.server.core.*;
+import sonumina.math.graph.DirectedGraph;
+import sonumina.math.graph.Edge;
 
 /**
  * Main entry point for the FABN application.
@@ -84,7 +87,8 @@ public class B4ORWT implements IEntryPoint
     /** GUI element displaying the term details */
     private TermDetails selectedTermDetails;
     
-    private TermGraph selectedTermsGraph;
+    /** The graph of the selected terms */
+    private TermGraph<Integer> selectedTermsGraph;
     
     private ScrolledComposite resultComposite;
     private ScrolledForm selelectedScrolledForm;
@@ -183,6 +187,7 @@ public class B4ORWT implements IEntryPoint
     private void updateSelectedTermsTable()
     {
     	selelectedScrolledForm.setRedraw(false);
+    	HashSet<Integer> selectedTermIds = new HashSet<Integer>();
 
     	for (Section s: selectedTermSectionList)
     		s.dispose();
@@ -191,6 +196,8 @@ public class B4ORWT implements IEntryPoint
     	for (final SelectedTerm st : selectedTermsList)
     	{
     		final int i = st.id;
+    		
+    		selectedTermIds.add(i);
 
     		/* Section */
     		String def = B4OCore.getTerm(i).getDefinition();
@@ -247,6 +254,27 @@ public class B4ORWT implements IEntryPoint
     	
     	selelectedScrolledForm.reflow(true);
     	selelectedScrolledForm.setRedraw(true);
+    	
+    	/* Now the graph */
+    	final DirectedGraph<Integer> graph = new DirectedGraph<Integer>();
+		B4OCore.visitAncestors(selectedTermIds,new B4OCore.IAncestorVisitor()
+		{
+			@Override
+			public void visit(int t)
+			{
+				graph.addVertex(t);
+			}
+		});
+		
+		for (Integer v : graph)
+		{
+			int [] parents = B4OCore.getParents(v);
+			for (int p : parents)
+			graph.addEdge(new Edge<Integer>(v,p));
+		}
+		
+		selectedTermsGraph.setGraph(graph);
+
     	
     	calculate();
     }
@@ -497,7 +525,6 @@ public class B4ORWT implements IEntryPoint
 	    
 	    selectedTermDetails = new TermDetails(termComposite, 0);
 	    selectedTermDetails.setTermDetailsProvider(new ITermDetailsProvider() {
-			
 			public String getName(TermID term)
 			{
 				return B4OCore.getTerm(term).getName();
@@ -523,7 +550,14 @@ public class B4ORWT implements IEntryPoint
 	    selectedTermsGraphicalItem.setText("Graphical");
 
 	    /* Graphical */
-	    selectedTermsGraph = new TermGraph(tabFolder, 0);
+	    selectedTermsGraph = new TermGraph<Integer>(tabFolder, 0);
+	    selectedTermsGraph.setLabelProvider(new TermGraph.ILabelProvider<Integer>() {
+			@Override
+			public String getLabel(Integer t)
+			{
+				return B4OCore.getTerm(t).getName();
+			}
+		});
 	    selectedTermsGraphicalItem.setControl(selectedTermsGraph);
 
 	    /* Textual */
