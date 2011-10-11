@@ -234,8 +234,6 @@ public class B4O
 	public static Pattern frequencyFractionPattern = Pattern.compile("(\\d+)/(\\d+)");
 	
 	/* Settings for generation of random data */
-//	private static String ontologyPath = "http://www.human-phenotype-ontology.org/human-phenotype-ontology.obo.gz";
-//	private static String annotationPath = "http://www.human-phenotype-ontology.org/phenotype_annotation.omim.gz";
 
 	private final static double ALPHA = 0.001; // 0.01
 	private final static double BETA = 0.10;   // 0.1
