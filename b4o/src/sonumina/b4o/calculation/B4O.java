@@ -234,21 +234,20 @@ public class B4O
 	public static Pattern frequencyFractionPattern = Pattern.compile("(\\d+)/(\\d+)");
 	
 	/* Settings for generation of random data */
-
 	private final static double ALPHA = 0.001; // 0.01
 	private final static double BETA = 0.10;   // 0.1
 	private final static double ALPHA_GRID[] = new double[]{1e-10,0.0005,0.001,0.005,0.01,0.05,0.1};
 	private final static double BETA_GRID[] = new double[] {1e-10,0.005,0.01,0.05,0.1,0.2};
 	
 //	private final static int MAX_SAMPLES = 1;
-//	private final static boolean CONSIDER_FREQUENCIES_ONLY = false;
+//	private static boolean CONSIDER_FREQUENCIES_ONLY = false;
 //	private final static String RESULT_NAME = "fnd.txt";
 //	private final static String [] evidenceCodes = null;
 //	private final static int SIZE_OF_SCORE_DISTRIBUTION = 250000;
 //	public static int maxTerms = -1;
 
 	private final static int MAX_SAMPLES = 5;
-	private final static boolean CONSIDER_FREQUENCIES_ONLY = true;
+	private static boolean CONSIDER_FREQUENCIES_ONLY = true;
 	private final static String RESULT_NAME = "fnd-freq-only.txt";
 	private final static String [] evidenceCodes = null;//new String[]{"PCS","ICE"};
 	private final static int SIZE_OF_SCORE_DISTRIBUTION = 250000;
@@ -295,6 +294,18 @@ public class B4O
 
 	/** Some more verbose output */
 	private static final boolean VERBOSE = false;
+
+	/* Some configuration stuff */
+	
+	/**
+	 * Sets, whether only frequencies should be considered.
+	 * 
+	 * @param frequencies
+	 */
+	public static void setConsiderFrequenciesOnly(boolean frequencies)
+	{
+		CONSIDER_FREQUENCIES_ONLY = frequencies;
+	}
 
 	/**
 	 * Returns whether false negatives are propagated in a
