@@ -1219,10 +1219,21 @@ public class B4O
 							firstItemWithFrequencies + " which is " + (firstItemWithFrequencies!=-1?allItemList.get(firstItemWithFrequencies):""));
 		
 		/**************************************************************************************************************************/
+		
+		String evidenceString = "All";
+		if (evidenceCodes != null && evidenceCodes.length > 0)
+		{
+			StringBuilder evidenceBuilder = new StringBuilder();
+			evidenceBuilder.append("\"");
+			evidenceBuilder.append(evidenceCodes[0]);
+			
+			for (int a=0;a<evidenceCodes.length;a++)
+				evidenceBuilder.append("," + evidenceCodes[a]);
+		}
 
 		final BufferedWriter param = new BufferedWriter(new FileWriter(RESULT_NAME.split("\\.")[0]+ "_param.txt"));
-		param.write("alpha\tbeta\tconsider.freqs.only\tterms\tmax.terms\n");
-		param.write(String.format("%g\t%g\t%b\t%d\t%d\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY,slimGraph.getNumberOfVertices(),maxTerms));
+		param.write("alpha\tbeta\tconsider.freqs.only\titems\tterms\tmax.terms\tevidences\n");
+		param.write(String.format("%g\t%g\t%b\t%d\t%d\t%s\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY,allItemList.size(),slimGraph.getNumberOfVertices(),maxTerms,evidenceString));
 		param.flush();
 		
 		final BufferedWriter out = new BufferedWriter(new FileWriter(RESULT_NAME));
