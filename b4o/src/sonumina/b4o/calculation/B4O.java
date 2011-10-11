@@ -728,12 +728,12 @@ public class B4O
 	}
 
 	/**
-	 * Generates observation according to the model parameter.
+	 * Generates observation according to the model parameter for the given item.
 	 * 
 	 * @param item
 	 * @return
 	 */
-	public static Observations generateObservations(int itemNr, Random rnd)
+	public static Observations generateObservations(int item, Random rnd)
 	{
 		int retry = 0;
 
@@ -758,26 +758,26 @@ public class B4O
 	
 			if (CONSIDER_ONLY_DIRECT_ASSOCIATIONS)
 			{
-				System.out.println("Item " + itemNr + " has " + items2DirectTerms[itemNr].length + " annotations");
-				for (i=0;i<items2DirectTerms[itemNr].length;i++)
+				System.out.println("Item " + item + " has " + items2DirectTerms[item].length + " annotations");
+				for (i=0;i<items2DirectTerms[item].length;i++)
 				{
 					boolean state = true;
 				
 					if (respectFrequencies())
 					{
-						state = rnd.nextDouble() < items2TermFrequencies[itemNr][i];
+						state = rnd.nextDouble() < items2TermFrequencies[item][i];
 						
 						if (VERBOSE)
-							System.out.println(items2DirectTerms[itemNr][i] + "(" + items2TermFrequencies[itemNr][i] + ")="+state);
+							System.out.println(items2DirectTerms[item][i] + "(" + items2TermFrequencies[item][i] + ")="+state);
 					}
 					
 					if (state)
 					{
-						hidden[items2DirectTerms[itemNr][i]] = state;
-						observations[items2DirectTerms[itemNr][i]] = state;
+						hidden[items2DirectTerms[item][i]] = state;
+						observations[items2DirectTerms[item][i]] = state;
 						
-						activateAncestors(items2DirectTerms[itemNr][i], hidden);
-						activateAncestors(items2DirectTerms[itemNr][i], observations);
+						activateAncestors(items2DirectTerms[item][i], hidden);
+						activateAncestors(items2DirectTerms[item][i], observations);
 						
 						numPositive++;
 					} else
@@ -788,10 +788,10 @@ public class B4O
 				
 			} else
 			{
-				for (i=0;i<items2Terms[itemNr].length;i++)
+				for (i=0;i<items2Terms[item].length;i++)
 				{
-					hidden[items2Terms[itemNr][i]] = true;
-					observations[items2Terms[itemNr][i]] = true;
+					hidden[items2Terms[item][i]] = true;
+					observations[items2Terms[item][i]] = true;
 					numPositive++;
 				}
 			}
@@ -928,7 +928,7 @@ public class B4O
 			System.out.println("Number of modelled false negatives " + stats.getCases(Configuration.NodeCase.FALSE_NEGATIVE) + " (beta=" +  stats.falseNegativeRate() + "%)");
 		
 			o = new Observations();
-			o.item = itemNr;
+			o.item = item;
 			o.observations = observations;
 			o.observationStats = stats;
 		} while (!ALLOW_EMPTY_OBSERVATIONS && retry++ < 50);
