@@ -1218,7 +1218,6 @@ public class B4O
 		final BufferedWriter summary = new BufferedWriter(new FileWriter(RESULT_NAME.split("\\.")[0]+ "_summary.txt"));
 
 		ExecutorService es = Executors.newFixedThreadPool(numProcessors);
-//		ExecutorService es = Executors.newFixedThreadPool(1);
 
 		Random rnd = new Random(9);
 
