@@ -96,6 +96,30 @@ evaluate.def<-function(d,v)
 evaluate<-cmpfun(evaluate.def)
 
 
+
+c<-data.frame(a=c(1,1,1,2,2),b=c(1,1,2,2,2))
+
+#
+# 
+#
+rank2.def<-function(c)
+{
+	t<-c(rowSums(c[-nrow(c),]==c[-1,])!=ncol(c),T)
+	rank<-numeric(nrow(c))
+	r<-1
+	for (i in 1:length(t))
+	{
+		if (t[i] == T)
+		{
+			diff<- i - r + 1
+			val <- r + (diff - 1) / 2
+			rank[r:i]<-val
+			print(paste(r,i,val))
+			r <- i + 1;
+		}
+	}
+}
+
 v<-matrix(c("marg","Marg. Prob.", T,
 		    "marg.ideal", "Marg. Prob. (Ideal)", T,
 		    "marg.freq","Marg. Prob. (Freq)", T,
@@ -118,8 +142,30 @@ if (file.exists("fnd.txt"))
 	}
 	message("Data read")
 	d<-d[order(d$run),]
+
+    # As below
 	resnick.avg.rank<-unlist(tapply(d$resnick.avg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
 	d<-cbind(d,resnick.avg.rank)
+
+	marg.ideal.rank<-unlist(tapply(d$marg.ideal,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
+	d<-cbind(d,marg.ideal.rank)
+
+	marg.rank<-unlist(tapply(d$marg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
+	d<-cbind(d,marg.rank)
+
+
+#	resnick.avg.p.rank<-unlist(tapply(d$resnick.avg.p, d$run,function(x) {r<-rank(x);return (max(r) - r + 1)})) 
+	f<-data.frame(p=d$resnick.avg.p,s=d$resnick.avg)
+	resnick.avg.p.order<-unsplit(lapply(split(f,d$run),function (x)
+	{
+		o<-order(x$p,-x$s)						# determine the order
+		xs<-x[o,]								# sort
+		r<-numeric(1:length(o))
+		r[o]<-ave(1:length(o),xs$p,xs$s)		# for each rank, the mean of the factor group, filled at the correct order
+		return (r)
+	}),d$run)
+	d<-cbind(d,resnick.avg.p.rank)
+
 	message("Data prepared")
 	
 	# all vs all
@@ -138,17 +184,30 @@ if (file.exists("fnd.txt"))
 	d<-read.table("fnd-freq-only.txt",h=F,stringsAsFactors=F)
 	colnames(d)<-c("run","label","score","marg","marg.ideal", "score.freq","marg.freq", "marg.freq.ideal", "resnick.avg", "resnick.avg.p","freq")
 	d<-d[order(d$run),]
+
+    # As above
 	resnick.avg.rank<-unlist(tapply(d$resnick.avg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
 	d<-cbind(d,resnick.avg.rank)
+
+	marg.ideal.rank<-unlist(tapply(d$marg.ideal,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
+	d<-cbind(d,marg.ideal.rank)
+
+	marg.rank<-unlist(tapply(d$marg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
+	d<-cbind(d,marg.rank)
+
+	resnick.avg.p.rank <- unlist(tapply(d$resnick.avg.p,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)})) 
+	d<-cbind(d,resnick.avg.p.rank)
+
 	res.list<-evaluate(d,v)
 	res.list.freq.vs.freq<-res.list
 	save(res.list.freq.vs.freq,file="b4o_res.list.freq.vs.freq.RObj")
 }
 
+# ssss
 
 col<-c("red","blue","cyan","green","gray","orange","magenta", "black")
 
-#pdf("b4o-precall.pdf")
+pdf("b4o-precall.pdf")
 
 plot(ylim=c(0,1),res.list[[1]]$recall.lines,res.list[[1]]$prec.lines,type="l",col=col[1],xlab="Recall",ylab="Precision")
 lines(res.list[[2]]$recall.lines,res.list[[2]]$prec.lines,type="l",col=col[2])
@@ -161,4 +220,4 @@ lines(res.list[[8]]$recall.lines,res.list[[8]]$prec.lines,type="l",col=col[8])
 
 legend(x="topright",as.character(lapply(res.list,function(x) x$name)),col=col,lty=1)
 
-#dev.off()
+dev.off()
