@@ -460,11 +460,11 @@ public class B4O
 	static long timeDuration;
 	
 	/**
-	 * 
+	 * Determines the case of the given items and the given observations.
 	 * 
 	 * @param item
 	 * @param observed
-	 * @param takeFrequenciesIntoAccount
+	 * @param takeFrequenciesIntoAccount select, if frequencies should be taken into account.
 	 * @return
 	 */
 	private static WeightedConfigurationList determineCasesForItem(int item, boolean [] observed, boolean takeFrequenciesIntoAccount)
@@ -505,6 +505,8 @@ public class B4O
 				/* Initialize stats */
 				determineCases(observed, hidden, stats);
 	
+				/* Loop over all tracked configurations that may appear due to the
+				 * given item being active */
 				for (int c=0;c<diffOnTermsFreqs[item].length;c++)
 				{
 					int [] diffOn = diffOnTermsFreqs[item][c];
