@@ -1,6 +1,7 @@
 package sonumina.b4orwt;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -66,8 +67,9 @@ public class TermGraph<T> extends Canvas
 							nodeInfos.get(vertex).left = left + horizPad;
 							nodeInfos.get(vertex).top = top + vertPad;
 						};
-					});
+					}, 6, 10);
 
+					/* Draw nodes */
 					for (T v : graph)
 					{
 						Node n = nodeInfos.get(v); 
@@ -76,6 +78,27 @@ public class TermGraph<T> extends Canvas
 						
 						event.gc.drawRoundRectangle(x, y, n.width, n.height, 3, 3);
 						event.gc.drawText(labelProvider.getLabel(v),x + horizPad,y + vertPad);
+					}
+
+					/* Draw edges */
+					for (T v : graph)
+					{
+						Node n1 = nodeInfos.get(v);
+						
+						int x1 = n1.left + n1.width / 2;
+						int y1 = n1.top + n1.height;
+
+						Iterator<T> iter = graph.getChildNodes(v);
+						while (iter.hasNext())
+						{
+							T c = iter.next();
+							Node n2 = nodeInfos.get(c);
+							
+							int x2 = n2.left + n2.width / 2;
+							int y2 = n2.top;
+							
+							event.gc.drawLine(x1, y1, x2, y2);
+						}
 					}
 				}
 			}
