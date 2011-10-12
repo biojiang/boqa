@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
 import sonumina.math.graph.DirectedGraph;
+import sonumina.math.graph.DirectedGraphDotLayout;
 import sonumina.math.graph.DirectedGraphLayout;
 
 public class TermGraph<T> extends Canvas
@@ -44,7 +45,7 @@ public class TermGraph<T> extends Canvas
 				{
 					final HashMap<T,Node> nodeInfos = new HashMap<T,Node>(); 
 
-					DirectedGraphLayout.layout(graph, new DirectedGraphLayout.IGetDimension<T>() {
+					DirectedGraphDotLayout.layout(graph, new DirectedGraphLayout.IGetDimension<T>() {
 						public void get(T vertex, DirectedGraphLayout.Dimension d)
 						{
 							Node n = new Node();
