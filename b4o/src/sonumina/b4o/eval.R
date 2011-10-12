@@ -181,8 +181,18 @@ if (file.exists("fnd.txt"))
 } else
 {
 	# only freq vs freq
-	d<-read.table("fnd-freq-only.txt",h=F,stringsAsFactors=F)
-	colnames(d)<-c("run","label","score","marg","marg.ideal", "score.freq","marg.freq", "marg.freq.ideal", "resnick.avg", "resnick.avg.p","freq")
+	if ((!file.exists("d-freq-only.RObj")) || (file.info("d-freq-only.RObj")$mtime < file.info("fnd-freq-only.txt")$mtime))
+	{
+		d<-read.table("fnd-freq-only.txt",h=F,stringsAsFactors=F)
+		colnames(d)<-c("run","label","score","marg","marg.ideal", "score.freq","marg.freq", "marg.freq.ideal", "resnick.avg", "resnick.avg.p","freq")
+		save(d,file="d-freq-only.RObj");
+	} else
+	{
+		load("d-freq-only.RObj")
+	}
+	
+	
+	message("Data read")
 	d<-d[order(d$run),]
 
     # As above
