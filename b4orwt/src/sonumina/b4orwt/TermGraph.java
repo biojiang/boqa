@@ -21,9 +21,13 @@ public class TermGraph<T> extends Canvas
 	private DirectedGraph<T> graph;
 	private ILabelProvider<T> labelProvider;
 	
+	private int horizPad = 5;
+	private int vertPad = 5;
+	
 	private static class Node
 	{
 		public int left, top;
+		public int width, height;
 	}
 
 	public TermGraph(Composite parent, int style)
@@ -46,8 +50,11 @@ public class TermGraph<T> extends Canvas
 							nodeInfos.put(vertex,n);
 							
 							Point p = event.gc.textExtent(labelProvider.getLabel(vertex));
-							d.width = p.x;
-							d.height = p.y;
+							d.width = p.x + 2 * horizPad;
+							d.height = p.y + 2 * vertPad;
+							
+							n.width = d.width;
+							n.height = d.height;
 						};
 					}, new DirectedGraphLayout.IPosition<T>() {
 						public void setSize(int width, int height)
@@ -56,13 +63,20 @@ public class TermGraph<T> extends Canvas
 						
 						public void set(T vertex, int left, int top)
 						{
-							nodeInfos.get(vertex).left = left;
-							nodeInfos.get(vertex).top = top;
+							nodeInfos.get(vertex).left = left + horizPad;
+							nodeInfos.get(vertex).top = top + vertPad;
 						};
 					});
 
 					for (T v : graph)
-						event.gc.drawText(labelProvider.getLabel(v),nodeInfos.get(v).left,nodeInfos.get(v).top);
+					{
+						Node n = nodeInfos.get(v); 
+						int x = n.left;
+						int y = n.top;
+						
+						event.gc.drawRoundRectangle(x, y, n.width, n.height, 3, 3);
+						event.gc.drawText(labelProvider.getLabel(v),x + horizPad,y + vertPad);
+					}
 				}
 			}
 		});
