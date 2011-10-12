@@ -270,7 +270,7 @@ public class B4ORWT implements IEntryPoint
 		{
 			int [] parents = B4OCore.getParents(v);
 			for (int p : parents)
-			graph.addEdge(new Edge<Integer>(v,p));
+			graph.addEdge(new Edge<Integer>(p,v));
 		}
 		
 		selectedTermsGraph.setGraph(graph);
