@@ -3,6 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="internal"/>
 	<classpathentry kind="src" path="external"/>
+	<classpathentry kind="src" path="src.grappa"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.rap.rwt_1.5.0.20110920-2112.jar" sourcepath="lib/org.eclipse.rap.rwt.source_1.5.0.20110920-2112.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.rap.jface_1.5.0.20110920-2112.jar" sourcepath="lib/org.eclipse.rap.jface.source_1.5.0.20110920-2112.jar"/>
