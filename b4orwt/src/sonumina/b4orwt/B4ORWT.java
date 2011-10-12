@@ -54,6 +54,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -541,12 +543,12 @@ public class B4ORWT implements IEntryPoint
 	    termComposite.pack();
 	    
 	    /* Selected Terms */
-	    CTabFolder tabFolder = new CTabFolder(horizontalSash, 0);
+	    TabFolder tabFolder = new TabFolder(horizontalSash, 0);
 
-	    CTabItem selectedTermsItem = new CTabItem(tabFolder, 0);
+	    TabItem selectedTermsItem = new TabItem(tabFolder, 0);
 	    selectedTermsItem.setText("Textual");
 
-	    CTabItem selectedTermsGraphicalItem = new CTabItem(tabFolder, 0);
+	    TabItem selectedTermsGraphicalItem = new TabItem(tabFolder, 0);
 	    selectedTermsGraphicalItem.setText("Graphical");
 
 	    /* Graphical */
