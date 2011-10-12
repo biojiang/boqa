@@ -543,11 +543,13 @@ public class B4ORWT implements IEntryPoint
 	    termComposite.pack();
 	    
 	    /* Selected Terms */
-	    TabFolder tabFolder = new TabFolder(horizontalSash, 0);
-
+	    Composite tabComposite = new Composite(horizontalSash,0); /* Dummy composite for the margins */
+	    tabComposite.setLayout(new GridLayout());
+	    
+	    TabFolder tabFolder = new TabFolder(tabComposite, 0);
+	    tabFolder.setLayoutData(new GridData(GridData.FILL_BOTH));
 	    TabItem selectedTermsItem = new TabItem(tabFolder, 0);
 	    selectedTermsItem.setText("Textual");
-
 	    TabItem selectedTermsGraphicalItem = new TabItem(tabFolder, 0);
 	    selectedTermsGraphicalItem.setText("Graphical");
 
