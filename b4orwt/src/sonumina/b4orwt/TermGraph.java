@@ -50,18 +50,6 @@ public class TermGraph<T> extends Canvas
 			{
 				if (graph != null && labelProvider != null)
 				{
-					/* Draw nodes */
-					for (T v : graph)
-					{
-						Node n = nodeInfos.get(v); 
-						int x = n.left;
-						int y = n.top;
-						
-						event.gc.setFont(getFont());
-						event.gc.drawRoundRectangle(x, y, n.width, n.height, 3, 3);
-						event.gc.drawText(labelProvider.getLabel(v),x + horizPad,y + vertPad);
-					}
-
 					/* Draw edges */
 					for (T v : graph)
 					{
@@ -101,18 +89,30 @@ public class TermGraph<T> extends Canvas
 	public void setGraph(DirectedGraph<T> graph)
 	{
 		this.graph = graph;
+		final TermGraph<T> THIS = this;
 
+		/* TODO: Reuse already present nodes */
+		for (Node n : nodeInfos.values())
+			n.but.dispose();
 		nodeInfos.clear();
 
 		DirectedGraphDotLayout.layout(graph, new DirectedGraphLayout.IGetDimension<T>() {
 			public void get(T vertex, DirectedGraphLayout.Dimension d)
 			{
+				String label;
+
 				Node n = new Node();
 				nodeInfos.put(vertex,n);
 
-				Point p = Graphics.stringExtent( getFont(),  labelProvider.getLabel(vertex));
-				d.width = p.x + 2 * horizPad;
-				d.height = p.y + 2 * vertPad;
+				label = labelProvider.getLabel(vertex);
+
+				Button b = new Button(THIS,0);
+				b.setText(label);
+				b.pack();
+				n.but = b;
+
+				d.width = b.getSize().x;
+				d.height = b.getSize().y;
 				
 				n.width = d.width;
 				n.height = d.height;
@@ -124,8 +124,11 @@ public class TermGraph<T> extends Canvas
 			
 			public void set(T vertex, int left, int top)
 			{
-				nodeInfos.get(vertex).left = left + horizPad;
-				nodeInfos.get(vertex).top = top + vertPad;
+				Node n = nodeInfos.get(vertex);
+				
+				n.left = left;
+				n.top = top;
+				n.but.setLocation(left, top);
 			};
 		}, 6, 10);
 
