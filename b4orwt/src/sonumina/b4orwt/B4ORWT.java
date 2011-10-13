@@ -169,7 +169,7 @@ public class B4ORWT implements IEntryPoint
     				}
     			});
     			
-    	    	/* Deactive UI Callback */
+    	    	/* Deactivate UI Callback */
     	    	display.asyncExec(new Runnable()
     	    	{
     	    		@Override
@@ -560,6 +560,17 @@ public class B4ORWT implements IEntryPoint
 			public String getLabel(Integer t) { return B4OCore.getTerm(t).getName(); }
 			@Override
 			public String getTooltip(Integer t) { return B4OCore.getTerm(t).getDefinition(); }
+		});
+	    selectedTermsGraph.addSelectionListener(new SelectionAdapter() {
+	    	@Override
+	    	public void widgetSelected(SelectionEvent e) {
+	    		if (e.data != null && e.data instanceof Integer)
+	    		{
+	    			int index = (Integer)e.data;
+					Term t = B4OCore.getTerm(index);
+	    			selectedTermDetails.setTermID(t.getID());
+	    		}
+	    	}
 		});
 	    selectedTermsGraphicalItem.setControl(selectedTermsGraph);
 
