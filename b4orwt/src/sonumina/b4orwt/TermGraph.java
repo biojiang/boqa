@@ -22,7 +22,10 @@ public class TermGraph<T> extends Canvas
 		public String getLabel(T t); 
 	}
 
-	private static class Node
+	/**
+	 * Container for storing data of the node.
+	 */
+	private static class NodeData
 	{
 		public int left, top;
 		public int width, height;
@@ -32,12 +35,8 @@ public class TermGraph<T> extends Canvas
 
 	private DirectedGraph<T> graph;
 	private ILabelProvider<T> labelProvider;
-
-	private int horizPad = 5;
-	private int vertPad = 5;
-
-	private HashMap<T,Node> nodeInfos = new HashMap<T,Node>(); 
-
+	
+	private HashMap<T,NodeData> graphLayout = new HashMap<T,NodeData>(); 
 
 	public TermGraph(Composite parent, int style)
 	{
@@ -53,7 +52,7 @@ public class TermGraph<T> extends Canvas
 					/* Draw edges */
 					for (T v : graph)
 					{
-						Node n1 = nodeInfos.get(v);
+						NodeData n1 = graphLayout.get(v);
 						
 						int x1 = n1.left + n1.width / 2;
 						int y1 = n1.top + n1.height;
@@ -62,7 +61,7 @@ public class TermGraph<T> extends Canvas
 						while (iter.hasNext())
 						{
 							T c = iter.next();
-							Node n2 = nodeInfos.get(c);
+							NodeData n2 = graphLayout.get(c);
 							
 							int x2 = n2.left + n2.width / 2;
 							int y2 = n2.top;
@@ -92,17 +91,17 @@ public class TermGraph<T> extends Canvas
 		final TermGraph<T> THIS = this;
 
 		/* TODO: Reuse already present nodes */
-		for (Node n : nodeInfos.values())
+		for (NodeData n : graphLayout.values())
 			n.but.dispose();
-		nodeInfos.clear();
+		graphLayout.clear();
 
 		DirectedGraphDotLayout.layout(graph, new DirectedGraphLayout.IGetDimension<T>() {
 			public void get(T vertex, DirectedGraphLayout.Dimension d)
 			{
 				String label;
 
-				Node n = new Node();
-				nodeInfos.put(vertex,n);
+				NodeData n = new NodeData();
+				graphLayout.put(vertex,n);
 
 				label = labelProvider.getLabel(vertex);
 
@@ -124,7 +123,7 @@ public class TermGraph<T> extends Canvas
 			
 			public void set(T vertex, int left, int top)
 			{
-				Node n = nodeInfos.get(vertex);
+				NodeData n = graphLayout.get(vertex);
 				
 				n.left = left;
 				n.top = top;
