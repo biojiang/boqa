@@ -2,17 +2,21 @@ package sonumina.b4orwt;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 
-import org.eclipse.rwt.graphics.Graphics;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 
 import sonumina.math.graph.DirectedGraph;
 import sonumina.math.graph.DirectedGraphDotLayout;
@@ -25,7 +29,7 @@ public class TermGraph<T> extends Canvas
 		public String getLabel(T t); 
 		public String getTooltip(T t);
 	}
-
+	
 	/**
 	 * Container for storing data of the node.
 	 */
@@ -37,6 +41,11 @@ public class TermGraph<T> extends Canvas
 		public Button but;
 	}
 
+	private static final String VERTEX_KEY = "#vertex";
+
+	/** Allows access to ourself */
+	private TermGraph<T> we = this;
+	
 	private DirectedGraph<T> graph;
 	private ILabelProvider<T> labelProvider;
 	
@@ -53,6 +62,28 @@ public class TermGraph<T> extends Canvas
 	
 	/** The vertical offset to center the visuals */
 	private int offsetTop;
+
+	private LinkedList<SelectionListener> selectionListListener = new LinkedList<SelectionListener>();
+	
+	private SelectionListener buttonSelectionListener = new SelectionAdapter()
+	{
+		public void widgetSelected(org.eclipse.swt.events.SelectionEvent e)
+		{
+			T vertex = (T)e.widget.getData(VERTEX_KEY);
+			if (vertex != null)
+			{
+				Event ev = new Event();
+				ev.type = SWT.Selection;
+				ev.widget = we;
+				ev.data = vertex;
+				
+				SelectionEvent sev = new SelectionEvent(ev);
+				
+				for (SelectionListener listener : selectionListListener)
+					listener.widgetSelected(sev);
+			}
+		};
+	};
 
 	public TermGraph(Composite parent, int style)
 	{
@@ -99,6 +130,11 @@ public class TermGraph<T> extends Canvas
 		});
 	}
 
+	/**
+	 * Sets the label provider.
+	 * 
+	 * @param labelProvider
+	 */
 	public void setLabelProvider(ILabelProvider<T> labelProvider)
 	{
 		this.labelProvider = labelProvider;
@@ -131,7 +167,6 @@ public class TermGraph<T> extends Canvas
 	public void setGraph(DirectedGraph<T> graph)
 	{
 		this.graph = graph;
-		final TermGraph<T> THIS = this;
 
 		/* TODO: Reuse already present nodes */
 		for (NodeData n : graphLayout.values())
@@ -151,9 +186,11 @@ public class TermGraph<T> extends Canvas
 					n = new NodeData();
 					graphLayout.put(vertex,n);
 	
-					Button b = new Button(THIS,SWT.WRAP|SWT.CENTER);
+					Button b = new Button(we,SWT.WRAP|SWT.CENTER);
 					b.setText(labelProvider.getLabel(vertex));
+					b.setData(VERTEX_KEY, vertex);
 					b.setToolTipText(labelProvider.getTooltip(vertex));
+					b.addSelectionListener(buttonSelectionListener);
 					Point def = b.computeSize(SWT.DEFAULT, SWT.DEFAULT,true);
 					if (def.x > 160)
 						b.setSize(b.computeSize(160,SWT.DEFAULT,true));
@@ -170,7 +207,6 @@ public class TermGraph<T> extends Canvas
 		}, new DirectedGraphLayout.IPosition<T>() {
 			public void setSize(int width, int height)
 			{
-				System.out.println(width + " " + height);
 			}
 			
 			public void set(T vertex, int left, int top)
@@ -189,6 +225,11 @@ public class TermGraph<T> extends Canvas
 
 		updateButtonLocations();
 		redraw();
+	}
+
+	public void addSelectionListener(SelectionListener listener)
+	{
+		selectionListListener.add(listener);
 	}
 
 }
