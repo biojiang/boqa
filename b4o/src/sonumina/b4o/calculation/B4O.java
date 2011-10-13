@@ -1841,7 +1841,7 @@ public class B4O
 	 * @param numThreads defines the number of threads to be used for the calculation.
 	 * @return
 	 */
-	public static Result assignMarginals(final Observations observations, final boolean takeFrequenciesIntoAccount, int numThreads)
+	public static Result assignMarginals(final Observations observations, final boolean takeFrequenciesIntoAccount, final int numThreads)
 	{
 		int i;
 		
@@ -1859,7 +1859,11 @@ public class B4O
 		final double [][][] scores = new double[allItemList.size()][ALPHA_GRID.length][BETA_GRID.length];
 		final double [] idealScores = new double[allItemList.size()];
 
-		ExecutorService es = Executors.newFixedThreadPool(numThreads);
+		final ExecutorService es;
+		if (numThreads > 1)
+			es = Executors.newFixedThreadPool(numThreads);
+		else
+			es = null;
 		
 		for (i=0;i<allItemList.size();i++)
 		{
@@ -1898,14 +1902,19 @@ public class B4O
 					}
 				}
 			};
-			es.execute(run);
+
+			if (es != null) es.execute(run);
+			else run.run();
 		}
 
-		es.shutdown();
-		try {
-			while (!es.awaitTermination(10, TimeUnit.SECONDS));
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		if (es != null)
+		{
+			es.shutdown();
+			try {
+				while (!es.awaitTermination(10, TimeUnit.SECONDS));
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		double normalization = Math.log(0);
