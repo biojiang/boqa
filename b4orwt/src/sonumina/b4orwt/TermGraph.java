@@ -23,6 +23,7 @@ public class TermGraph<T> extends Canvas
 	public static interface ILabelProvider<T>
 	{
 		public String getLabel(T t); 
+		public String getTooltip(T t);
 	}
 
 	/**
@@ -150,10 +151,9 @@ public class TermGraph<T> extends Canvas
 					n = new NodeData();
 					graphLayout.put(vertex,n);
 	
-					String label = labelProvider.getLabel(vertex);
-	
 					Button b = new Button(THIS,SWT.WRAP|SWT.CENTER);
-					b.setText(label);
+					b.setText(labelProvider.getLabel(vertex));
+					b.setToolTipText(labelProvider.getTooltip(vertex));
 					Point def = b.computeSize(SWT.DEFAULT, SWT.DEFAULT,true);
 					if (def.x > 160)
 						b.setSize(b.computeSize(160,SWT.DEFAULT,true));

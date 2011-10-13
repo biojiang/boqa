@@ -557,10 +557,9 @@ public class B4ORWT implements IEntryPoint
 	    selectedTermsGraph = new TermGraph<Integer>(tabFolder, 0);
 	    selectedTermsGraph.setLabelProvider(new TermGraph.ILabelProvider<Integer>() {
 			@Override
-			public String getLabel(Integer t)
-			{
-				return B4OCore.getTerm(t).getName();
-			}
+			public String getLabel(Integer t) { return B4OCore.getTerm(t).getName(); }
+			@Override
+			public String getTooltip(Integer t) { return B4OCore.getTerm(t).getDefinition(); }
 		});
 	    selectedTermsGraphicalItem.setControl(selectedTermsGraph);
 
