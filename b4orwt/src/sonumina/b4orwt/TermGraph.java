@@ -3,9 +3,11 @@ package sonumina.b4orwt;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.eclipse.rwt.graphics.Graphics;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
@@ -19,18 +21,23 @@ public class TermGraph<T> extends Canvas
 	{
 		public String getLabel(T t); 
 	}
-	
-	private DirectedGraph<T> graph;
-	private ILabelProvider<T> labelProvider;
-	
-	private int horizPad = 5;
-	private int vertPad = 5;
-	
+
 	private static class Node
 	{
 		public int left, top;
 		public int width, height;
+		
+		public Button but;
 	}
+
+	private DirectedGraph<T> graph;
+	private ILabelProvider<T> labelProvider;
+
+	private int horizPad = 5;
+	private int vertPad = 5;
+
+	private HashMap<T,Node> nodeInfos = new HashMap<T,Node>(); 
+
 
 	public TermGraph(Composite parent, int style)
 	{
@@ -43,33 +50,6 @@ public class TermGraph<T> extends Canvas
 			{
 				if (graph != null && labelProvider != null)
 				{
-					final HashMap<T,Node> nodeInfos = new HashMap<T,Node>(); 
-
-					DirectedGraphDotLayout.layout(graph, new DirectedGraphLayout.IGetDimension<T>() {
-						public void get(T vertex, DirectedGraphLayout.Dimension d)
-						{
-							Node n = new Node();
-							nodeInfos.put(vertex,n);
-							
-							Point p = event.gc.textExtent(labelProvider.getLabel(vertex));
-							d.width = p.x + 2 * horizPad;
-							d.height = p.y + 2 * vertPad;
-							
-							n.width = d.width;
-							n.height = d.height;
-						};
-					}, new DirectedGraphLayout.IPosition<T>() {
-						public void setSize(int width, int height)
-						{
-						}
-						
-						public void set(T vertex, int left, int top)
-						{
-							nodeInfos.get(vertex).left = left + horizPad;
-							nodeInfos.get(vertex).top = top + vertPad;
-						};
-					}, 6, 10);
-
 					/* Draw nodes */
 					for (T v : graph)
 					{
@@ -77,6 +57,7 @@ public class TermGraph<T> extends Canvas
 						int x = n.left;
 						int y = n.top;
 						
+						event.gc.setFont(getFont());
 						event.gc.drawRoundRectangle(x, y, n.width, n.height, 3, 3);
 						event.gc.drawText(labelProvider.getLabel(v),x + horizPad,y + vertPad);
 					}
@@ -106,6 +87,12 @@ public class TermGraph<T> extends Canvas
 		});
 	}
 
+	@Override
+	public void layout()
+	{
+		super.layout();
+	}
+
 	public void setLabelProvider(ILabelProvider<T> labelProvider)
 	{
 		this.labelProvider = labelProvider;
@@ -114,6 +101,35 @@ public class TermGraph<T> extends Canvas
 	public void setGraph(DirectedGraph<T> graph)
 	{
 		this.graph = graph;
+
+		nodeInfos.clear();
+
+		DirectedGraphDotLayout.layout(graph, new DirectedGraphLayout.IGetDimension<T>() {
+			public void get(T vertex, DirectedGraphLayout.Dimension d)
+			{
+				Node n = new Node();
+				nodeInfos.put(vertex,n);
+
+				Point p = Graphics.stringExtent( getFont(),  labelProvider.getLabel(vertex));
+				d.width = p.x + 2 * horizPad;
+				d.height = p.y + 2 * vertPad;
+				
+				n.width = d.width;
+				n.height = d.height;
+			};
+		}, new DirectedGraphLayout.IPosition<T>() {
+			public void setSize(int width, int height)
+			{
+			}
+			
+			public void set(T vertex, int left, int top)
+			{
+				nodeInfos.get(vertex).left = left + horizPad;
+				nodeInfos.get(vertex).top = top + vertPad;
+			};
+		}, 6, 10);
+
+
 		redraw();
 	}
 
