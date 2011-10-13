@@ -39,6 +39,9 @@ public class TermGraph<T> extends Canvas
 	
 	private HashMap<T,NodeData> graphLayout = new HashMap<T,NodeData>(); 
 
+	private int marginLeft = 4;
+	private int marginTop = 4;
+	
 	public TermGraph(Composite parent, int style)
 	{
 		super(parent, style);
@@ -129,6 +132,9 @@ public class TermGraph<T> extends Canvas
 			public void set(T vertex, int left, int top)
 			{
 				NodeData n = graphLayout.get(vertex);
+				
+				left += marginLeft;
+				top += marginTop;
 				
 				n.left = left;
 				n.top = top;
