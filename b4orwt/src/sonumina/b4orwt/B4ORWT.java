@@ -2,9 +2,12 @@
 package sonumina.b4orwt;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import ontologizer.go.Term;
 import ontologizer.go.TermID;
@@ -222,7 +225,7 @@ public class B4ORWT implements IEntryPoint
     		Label l = selectedTermsFormToolkit.createLabel(tc,B4OCore.getTerm(i).getName(), SWT.LEFT);
     		l.addMouseListener(new MouseAdapter()
     		{
-				public void mouseUp(MouseEvent e) {	s.setExpanded(!s.isExpanded());	}
+				public void mouseUp(MouseEvent e) {	s.setExpanded(!s.isExpanded()); }
     		});
 
     		/* Remove Button */
@@ -252,8 +255,21 @@ public class B4ORWT implements IEntryPoint
     	selelectedScrolledForm.setRedraw(true);
     	
     	/* Now the graph */
-    	final DirectedGraph<Integer> graph = new DirectedGraph<Integer>();
-		B4OCore.visitAncestors(selectedTermIds,new B4OCore.IAncestorVisitor()
+    	DirectedGraph<Integer> graph = new DirectedGraph<Integer>();
+		addInducedSubGraphToGraph(selectedTermIds, graph);
+		selectedTermsGraph.setGraph(graph);
+    	calculate();
+    }
+
+    /**
+     * Add the sub graph induced by the given term ids to the graph.
+     * 
+     * @param termIds
+     * @param graph
+     */
+	private void addInducedSubGraphToGraph(Collection<Integer> termIds, final DirectedGraph<Integer> graph)
+	{
+		B4OCore.visitAncestors(termIds,new B4OCore.IAncestorVisitor()
 		{
 			@Override
 			public void visit(int t)
@@ -268,19 +284,31 @@ public class B4ORWT implements IEntryPoint
 			for (int p : parents)
 			graph.addEdge(new Edge<Integer>(p,v));
 		}
-		
-		selectedTermsGraph.setGraph(graph);
+	}
 
-    	
-    	calculate();
-    }
-    
+    /**
+     * Add the sub graph induced by the given term ids to the graph.
+     * 
+     * @param termIds
+     * @param graph
+     */
+	private void addInducedSubGraphToGraph(int [] termIds, final DirectedGraph<Integer> graph)
+	{
+		ArrayList<Integer> list = new ArrayList<Integer>(termIds.length);
+		for (int tid : termIds)
+			list.add(tid);
+		addInducedSubGraphToGraph(list, graph);
+	}
+	
     /**
      * Performs the calculation and updates the result list.
      */
     @SuppressWarnings("serial")
 	private void calculate()
     {
+    	/* Only used for debugging */
+    	final boolean MULTITHREADING = true;
+
     	final ArrayList<Integer> clonedList = new ArrayList<Integer>(selectedTermsList.size());
     	for (SelectedTerm st : selectedTermsList)
     		if (st.active)
@@ -289,18 +317,19 @@ public class B4ORWT implements IEntryPoint
     	/* Activate UI Callback */
     	final String callbackId = getUniqueCallbackId(); 
     	UICallBack.activate(callbackId);
-    	Thread t = new Thread(new Runnable()
+
+    	Runnable threadRunnable = new Runnable()
     	{
     		@Override
     		public void run()
     		{
-    	    	final List<ItemResultEntry> result = B4OCore.score(clonedList);
+    	    	final List<ItemResultEntry> result = B4OCore.score(clonedList, MULTITHREADING);
 
     	    	display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
 		    			FormToolkit toolkit = new FormToolkit(resultComposite.getDisplay());
-		    			Form form = toolkit.createForm(resultComposite);
+		    			final Form form = toolkit.createForm(resultComposite);
 		    			form.setText("Results");
 		    			form.getBody().setLayout(new GridLayout());
 		    			
@@ -327,7 +356,7 @@ public class B4ORWT implements IEntryPoint
 		    	    		Label l = toolkit.createLabel(tc,(rank + 1) + ". " + name, SWT.LEFT);
 		    	    		l.addMouseListener(new MouseAdapter()
 		    	    		{
-		    					public void mouseUp(MouseEvent e) {	s.setExpanded(!s.isExpanded());	}
+		    					public void mouseUp(MouseEvent e) {	s.setExpanded(!s.isExpanded());form.pack();}
 		    	    			
 		    	    		});
 		    	    		Point p = l.computeSize(SWT.DEFAULT, SWT.DEFAULT);
@@ -345,10 +374,20 @@ public class B4ORWT implements IEntryPoint
 		    	    		
 		    	    		Composite c = toolkit.createComposite(s);
 		    	    		c.setLayout(new GridLayout());
-		    	    		
-		    	    		/* Now fill the body of the section */
-		    	    		for (int terms : B4OCore.getTermsDirectlyAnnotatedTo(id))
-		    	    			toolkit.createLabel(c,B4OCore.getTerm(terms).getName());
+
+		    	    		TermGraph<Integer> tg = new TermGraph<Integer>(c,0);
+		    	    	    tg.setLabelProvider(new TermGraph.ILabelProvider<Integer>() {
+		    	    			@Override
+		    	    			public String getLabel(Integer t) { return B4OCore.getTerm(t).getName(); }
+		    	    			@Override
+		    	    			public String getTooltip(Integer t) { return B4OCore.getTerm(t).getDefinition(); }
+		    	    		});
+		    	        	DirectedGraph<Integer> graph = new DirectedGraph<Integer>();
+		    	    		addInducedSubGraphToGraph(clonedList, graph);
+		    	    		addInducedSubGraphToGraph(B4OCore.getTermsDirectlyAnnotatedTo(id), graph);
+
+		    	    		tg.setLayoutData(new GridData(GridData.FILL_HORIZONTAL|GridData.GRAB_HORIZONTAL|GridData.FILL_VERTICAL|GridData.GRAB_VERTICAL));
+		    	    		tg.setGraph(graph);
 		    	    		
 		    	    		s.setClient(c);
 		    	 
@@ -379,9 +418,14 @@ public class B4ORWT implements IEntryPoint
     	    		}
     	    	});
     		}
-    	});
-    	t.setDaemon(true);
-    	t.start();
+    	};
+    	
+    	if (MULTITHREADING)
+    	{
+    		Thread t = new Thread(threadRunnable);
+    		t.setDaemon(true);
+    		t.start();
+    	} else threadRunnable.run();
     }
     
 	public int createUI()
@@ -592,6 +636,7 @@ public class B4ORWT implements IEntryPoint
 	    
 	    resultComposite = new ScrolledComposite(tempComp,SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 	    resultComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+	    resultComposite.setLayout(new FillLayout());
 
 	    shell.setMaximized(true);
 	    shell.layout();
