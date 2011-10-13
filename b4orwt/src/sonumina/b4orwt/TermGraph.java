@@ -227,6 +227,18 @@ public class TermGraph<T> extends Canvas
 		redraw();
 	}
 
+//	@Override
+//	public Point computeSize(int wHint, int hHint, boolean changed)
+//	{
+//		int width = 200;
+//		int height = 200;
+//		if (wHint == SWT.DEFAULT)
+//			width = usedWidth;
+//		if (hHint == SWT.DEFAULT)
+//			height = usedHeight;
+//		return new Point(width,height);
+//	}
+
 	public void addSelectionListener(SelectionListener listener)
 	{
 		selectionListListener.add(listener);
