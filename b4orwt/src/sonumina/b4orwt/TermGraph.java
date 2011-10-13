@@ -102,27 +102,30 @@ public class TermGraph<T> extends Canvas
 		DirectedGraphDotLayout.layout(graph, new DirectedGraphLayout.IGetDimension<T>() {
 			public void get(T vertex, DirectedGraphLayout.Dimension d)
 			{
-				String label;
-
-				NodeData n = new NodeData();
-				graphLayout.put(vertex,n);
-
-				label = labelProvider.getLabel(vertex);
-
-				Button b = new Button(THIS,SWT.WRAP|SWT.CENTER);
-				b.setText(label);
-				Point def = b.computeSize(SWT.DEFAULT, SWT.DEFAULT,true);
-				if (def.x > 160)
-					b.setSize(b.computeSize(160,SWT.DEFAULT,true));
-				else
-					b.setSize(def);
-
-				d.width = b.getSize().x;
-				d.height = b.getSize().y;
+				NodeData n;
 				
-				n.width = d.width;
-				n.height = d.height;
-				n.but = b;
+				n = graphLayout.get(vertex);
+				if (n == null)
+				{
+					n = new NodeData();
+					graphLayout.put(vertex,n);
+	
+					String label = labelProvider.getLabel(vertex);
+	
+					Button b = new Button(THIS,SWT.WRAP|SWT.CENTER);
+					b.setText(label);
+					Point def = b.computeSize(SWT.DEFAULT, SWT.DEFAULT,true);
+					if (def.x > 160)
+						b.setSize(b.computeSize(160,SWT.DEFAULT,true));
+					else
+						b.setSize(def);
+	
+					n.width = b.getSize().x;
+					n.height = b.getSize().y;
+					n.but = b;
+				}
+				d.width = n.width;
+				d.height = n.height;
 			};
 		}, new DirectedGraphLayout.IPosition<T>() {
 			public void setSize(int width, int height)
