@@ -271,11 +271,7 @@ public class B4ORWT implements IEntryPoint
 	{
 		B4OCore.visitAncestors(termIds,new B4OCore.IAncestorVisitor()
 		{
-			@Override
-			public void visit(int t)
-			{
-				graph.addVertex(t);
-			}
+			public void visit(int t) { 	graph.addVertex(t); }
 		});
 		
 		for (Integer v : graph)
@@ -294,10 +290,22 @@ public class B4ORWT implements IEntryPoint
      */
 	private void addInducedSubGraphToGraph(int [] termIds, final DirectedGraph<Integer> graph)
 	{
-		ArrayList<Integer> list = new ArrayList<Integer>(termIds.length);
-		for (int tid : termIds)
-			list.add(tid);
+		ArrayList<Integer> list = toIntegerArray(termIds);
 		addInducedSubGraphToGraph(list, graph);
+	}
+
+	/**
+	 * Primitive to convert an array of ints to an ArrayList of Integers.
+	 *  
+	 * @param array
+	 * @return
+	 */
+	private static ArrayList<Integer> toIntegerArray(int[] array)
+	{
+		ArrayList<Integer> list = new ArrayList<Integer>(array.length);
+		for (int e : array)
+			list.add(e);
+		return list;
 	}
 	
     /**
@@ -375,6 +383,19 @@ public class B4ORWT implements IEntryPoint
 		    	    		Composite c = toolkit.createComposite(s);
 		    	    		c.setLayout(new GridLayout());
 
+		    	    		/* Find out which nodes to display */
+		    	    	    final HashSet<Integer> queryTerms = new HashSet<Integer>();
+		    	    	    final HashSet<Integer> itemTerms = new HashSet<Integer>();
+		    	        	DirectedGraph<Integer> graph = new DirectedGraph<Integer>();
+		    	    		addInducedSubGraphToGraph(clonedList, graph);
+		    	    		for (Integer tid : graph) /* Keep query terms */
+		    	    			queryTerms.add(tid);
+		    	    		addInducedSubGraphToGraph(B4OCore.getTermsDirectlyAnnotatedTo(id), graph);
+		    	    		B4OCore.visitAncestors(toIntegerArray(B4OCore.getTermsDirectlyAnnotatedTo(id)),new B4OCore.IAncestorVisitor()
+		    	    		{
+		    	    			public void visit(int t) { 	itemTerms.add(t); }
+		    	    		});
+
 		    	    		TermGraph<Integer> tg = new TermGraph<Integer>(c,0);
 		    	    	    tg.setLabelProvider(new TermGraph.ILabelProvider<Integer>() {
 		    	    			@Override
@@ -382,10 +403,6 @@ public class B4ORWT implements IEntryPoint
 		    	    			@Override
 		    	    			public String getTooltip(Integer t) { return B4OCore.getTerm(t).getDefinition(); }
 		    	    		});
-		    	        	DirectedGraph<Integer> graph = new DirectedGraph<Integer>();
-		    	    		addInducedSubGraphToGraph(clonedList, graph);
-		    	    		addInducedSubGraphToGraph(B4OCore.getTermsDirectlyAnnotatedTo(id), graph);
-
 		    	    		tg.setLayoutData(new GridData(GridData.FILL_HORIZONTAL|GridData.GRAB_HORIZONTAL|GridData.FILL_VERTICAL|GridData.GRAB_VERTICAL));
 		    	    		tg.setGraph(graph);
 		    	    		
