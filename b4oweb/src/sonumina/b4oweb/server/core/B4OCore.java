@@ -274,6 +274,18 @@ public class B4OCore
 	 */
 	public static List<ItemResultEntry> score(List<Integer> serverIds)
 	{
+		return score(serverIds, true);
+	}
+
+	/**
+	 * Score according to the given server ids.
+	 * 
+	 * @param serverIds
+	 * @param multithreading
+	 * @return
+	 */
+	public static List<ItemResultEntry> score(List<Integer> serverIds, boolean multiThreading)
+	{
 		boolean [] observations = new boolean[slimGraph.getNumberOfVertices()];
 		for (int id : serverIds)
 		{
@@ -286,7 +298,7 @@ public class B4OCore
 		Observations o = new Observations();
 		o.observations = observations;
 
-		Result result = B4O.assignMarginals(o, true, numberOfThreads);
+		Result result = B4O.assignMarginals(o, true, multiThreading?numberOfThreads:1);
 		for (int i=0;i<result.size();i++)
 		{
 			ItemResultEntry newEntry = ItemResultEntry.create(i, result.getMarginal(i));
