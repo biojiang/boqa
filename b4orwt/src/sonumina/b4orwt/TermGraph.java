@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.eclipse.rwt.graphics.Graphics;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
@@ -105,16 +106,16 @@ public class TermGraph<T> extends Canvas
 
 				label = labelProvider.getLabel(vertex);
 
-				Button b = new Button(THIS,0);
+				Button b = new Button(THIS,SWT.WRAP);
 				b.setText(label);
-				b.pack();
-				n.but = b;
+				b.setSize(b.computeSize(160,SWT.DEFAULT|SWT.CENTER));
 
 				d.width = b.getSize().x;
 				d.height = b.getSize().y;
 				
 				n.width = d.width;
 				n.height = d.height;
+				n.but = b;
 			};
 		}, new DirectedGraphLayout.IPosition<T>() {
 			public void setSize(int width, int height)
