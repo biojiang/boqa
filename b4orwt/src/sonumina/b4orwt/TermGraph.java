@@ -106,9 +106,13 @@ public class TermGraph<T> extends Canvas
 
 				label = labelProvider.getLabel(vertex);
 
-				Button b = new Button(THIS,SWT.WRAP);
+				Button b = new Button(THIS,SWT.WRAP|SWT.CENTER);
 				b.setText(label);
-				b.setSize(b.computeSize(160,SWT.DEFAULT|SWT.CENTER));
+				Point def = b.computeSize(SWT.DEFAULT, SWT.DEFAULT,true);
+				if (def.x > 160)
+					b.setSize(b.computeSize(160,SWT.DEFAULT,true));
+				else
+					b.setSize(def);
 
 				d.width = b.getSize().x;
 				d.height = b.getSize().y;
