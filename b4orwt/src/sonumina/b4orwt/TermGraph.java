@@ -23,6 +23,7 @@ import sonumina.math.graph.DirectedGraph;
 import sonumina.math.graph.DirectedGraphDotLayout;
 import sonumina.math.graph.DirectedGraphLayout;
 
+@SuppressWarnings("serial")
 public class TermGraph<T> extends Canvas
 {
 	public static interface ILabelProvider<T>
@@ -76,6 +77,7 @@ public class TermGraph<T> extends Canvas
 	{
 		public void widgetSelected(org.eclipse.swt.events.SelectionEvent e)
 		{
+			@SuppressWarnings("unchecked")
 			T vertex = (T)e.widget.getData(VERTEX_KEY);
 			if (vertex != null)
 			{
