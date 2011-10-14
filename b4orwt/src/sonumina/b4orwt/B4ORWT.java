@@ -1,13 +1,10 @@
-
 package sonumina.b4orwt;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import ontologizer.go.Term;
 import ontologizer.go.TermID;
@@ -402,6 +399,16 @@ public class B4ORWT implements IEntryPoint
 		    	    			public String getLabel(Integer t) { return B4OCore.getTerm(t).getName(); }
 		    	    			@Override
 		    	    			public String getTooltip(Integer t) { return B4OCore.getTerm(t).getDefinition(); }
+								@Override
+								public String getVariant(Integer t)
+								{
+									if (queryTerms.contains(t))
+									{
+										if (itemTerms.contains(t)) return "match";
+										return "queryOnly";
+									}
+									return null;
+								}
 		    	    		});
 		    	    		tg.setLayoutData(new GridData(GridData.FILL_HORIZONTAL|GridData.GRAB_HORIZONTAL|GridData.FILL_VERTICAL|GridData.GRAB_VERTICAL));
 		    	    		tg.setGraph(graph);
@@ -450,7 +457,7 @@ public class B4ORWT implements IEntryPoint
 		display = new Display();
 	    Shell shell = new Shell( display, 0 );
 	    shell.setLayout(new FillLayout());
-	    
+
 	    SashForm verticalSash = new SashForm(shell, SWT.VERTICAL);
 	    
 	    SashForm horizontalSash = new SashForm(verticalSash, SWT.HORIZONTAL);
@@ -609,12 +616,17 @@ public class B4ORWT implements IEntryPoint
 	    selectedTermsGraphicalItem.setText("Graphical");
 
 	    /* Graphical */
-	    selectedTermsGraph = new TermGraph<Integer>(tabFolder, 0);
+	    Composite dummyComposite = new Composite(tabFolder, 0);
+	    dummyComposite.setLayout(new FillLayout());
+
+	    selectedTermsGraph = new TermGraph<Integer>(dummyComposite, 0);
 	    selectedTermsGraph.setLabelProvider(new TermGraph.ILabelProvider<Integer>() {
 			@Override
 			public String getLabel(Integer t) { return B4OCore.getTerm(t).getName(); }
 			@Override
 			public String getTooltip(Integer t) { return B4OCore.getTerm(t).getDefinition(); }
+			@Override
+			public String getVariant(Integer t) { return null; }
 		});
 	    selectedTermsGraph.addSelectionListener(new SelectionAdapter() {
 	    	@Override
@@ -627,7 +639,7 @@ public class B4ORWT implements IEntryPoint
 	    		}
 	    	}
 		});
-	    selectedTermsGraphicalItem.setControl(selectedTermsGraph);
+	    selectedTermsGraphicalItem.setControl(dummyComposite);
 
 	    /* Textual */
 	    Composite selectedTerms = new Composite(tabFolder, 0);

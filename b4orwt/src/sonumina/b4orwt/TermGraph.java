@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.eclipse.rwt.lifecycle.WidgetUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -28,6 +29,7 @@ public class TermGraph<T> extends Canvas
 	{
 		public String getLabel(T t); 
 		public String getTooltip(T t);
+		public String getVariant(T t);
 	}
 	
 	/**
@@ -189,6 +191,9 @@ public class TermGraph<T> extends Canvas
 					Button b = new Button(we,SWT.WRAP|SWT.CENTER);
 					b.setText(labelProvider.getLabel(vertex));
 					b.setData(VERTEX_KEY, vertex);
+					String variant = labelProvider.getVariant(vertex);
+					if (variant != null)
+						b.setData(WidgetUtil.CUSTOM_VARIANT, variant);
 					b.setToolTipText(labelProvider.getTooltip(vertex));
 					b.addSelectionListener(buttonSelectionListener);
 					Point def = b.computeSize(SWT.DEFAULT, SWT.DEFAULT,true);
@@ -226,18 +231,6 @@ public class TermGraph<T> extends Canvas
 		updateButtonLocations();
 		redraw();
 	}
-
-//	@Override
-//	public Point computeSize(int wHint, int hHint, boolean changed)
-//	{
-//		int width = 200;
-//		int height = 200;
-//		if (wHint == SWT.DEFAULT)
-//			width = usedWidth;
-//		if (hHint == SWT.DEFAULT)
-//			height = usedHeight;
-//		return new Point(width,height);
-//	}
 
 	public void addSelectionListener(SelectionListener listener)
 	{
