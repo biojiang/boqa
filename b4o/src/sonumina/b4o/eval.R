@@ -156,12 +156,13 @@ if (file.exists("fnd.txt"))
 
 #	resnick.avg.p.rank<-unlist(tapply(d$resnick.avg.p, d$run,function(x) {r<-rank(x);return (max(r) - r + 1)})) 
 	f<-data.frame(p=d$resnick.avg.p,s=d$resnick.avg)
-	resnick.avg.p.order<-unsplit(lapply(split(f,d$run),function (x)
+	resnick.avg.p.rank<-unsplit(lapply(split(f,d$run),function (x)
 	{
 		o<-order(x$p,-x$s)						# determine the order
-		xs<-x[o,]								# sort
-		r<-numeric(1:length(o))
-		r[o]<-ave(1:length(o),xs$p,xs$s)		# for each rank, the mean of the factor group, filled at the correct order
+#		xs<-x[o,]								# sort
+		r[o]<-1:length(o)
+#		r<-1:length(o)
+#		r[o]<-ave(1:length(o),xs$p,xs$s)		# for each rank, the mean of the factor group, filled at the correct order
 		return (r)
 	}),d$run)
 	d<-cbind(d,resnick.avg.p.rank)
@@ -190,7 +191,7 @@ if (file.exists("fnd.txt"))
 	{
 		load("d-freq-only.RObj")
 	}
-	
+d<-d[d$run==1,]
 	
 	message("Data read")
 	d<-d[order(d$run),]
@@ -205,7 +206,15 @@ if (file.exists("fnd.txt"))
 	marg.rank<-unlist(tapply(d$marg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
 	d<-cbind(d,marg.rank)
 
-	resnick.avg.p.rank <- unlist(tapply(d$resnick.avg.p,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)})) 
+	resnick.avg.p.rank <- unlist(tapply(d$resnick.avg.p,d$run,function(x) {r<-rank(-x);return (max(r) - r + 1)})) 
+	d<-cbind(d,resnick.avg.p.rank)
+
+	resnick.avg.p.rank<-unsplit(lapply(split(f,d$run),function (x)
+	{
+		o<-order(x$p,-x$s)
+		r[o]<-1:length(o)
+		return (r)
+	}),d$run)
 	d<-cbind(d,resnick.avg.p.rank)
 
 	res.list<-evaluate(d,v)
