@@ -1,0 +1,49 @@
+Button.match {
+  border: 1px solid #A4A4A4;
+  border-radius: 3px;
+  padding: 2px 5px;
+  background-image: gradient(
+    linear, left top, left bottom,
+    from( #ffffff ),
+    color-stop( 48%, #d0f0d0 ),
+    color-stop( 52%, #c8e0c8 ),
+    to( #ffffff )
+  );
+  animation: hoverOut 500ms ease-out;
+  cursor: pointer;
+}
+
+Button.match:hover {
+  background-image: gradient(
+    linear, left top, left bottom,
+    from( #ffffff ),
+    color-stop( 48%, #d0f0d0 ),
+    color-stop( 52%, #c8e0c8 ),
+    to( #ccffcc )
+  );
+}
+
+Button.queryOnly {
+  border: 1px solid #A4A4A4;
+  border-radius: 3px;
+  padding: 2px 5px;
+  background-image: gradient(
+    linear, left top, left bottom,
+    from( #ffffff ),
+    color-stop( 48%, #f0d0d0 ),
+    color-stop( 52%, #e0c8c8 ),
+    to( #ffffff )
+  );
+  animation: hoverOut 500ms ease-out;
+  cursor: pointer;
+}
+
+Button.queryOnly:hover {
+  background-image: gradient(
+    linear, left top, left bottom,
+    from( #ffffff ),
+    color-stop( 48%, #f0d0d0 ),
+    color-stop( 52%, #e0c8c8 ),
+    to( #ffcccc )
+  );
+}
