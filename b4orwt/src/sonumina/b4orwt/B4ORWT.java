@@ -54,6 +54,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.events.ExpansionEvent;
+import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
@@ -349,6 +351,11 @@ public class B4ORWT implements IEntryPoint
 
 		    	    		/* Create a new section */
 		    	    		final Section s = toolkit.createSection(form.getBody(), Section.TWISTIE);
+		    	    		s.addExpansionListener(new IExpansionListener() {
+								public void expansionStateChanging(ExpansionEvent e) { }
+								
+								public void expansionStateChanged(ExpansionEvent e) { form.pack(); }
+							});
 		    	    		
 		    	    		/* Text client for the section, which is displayed in the title */
 		    	    		Composite tc = toolkit.createComposite(s);
@@ -361,7 +368,7 @@ public class B4ORWT implements IEntryPoint
 		    	    		Label l = toolkit.createLabel(tc,(rank + 1) + ". " + name, SWT.LEFT);
 		    	    		l.addMouseListener(new MouseAdapter()
 		    	    		{
-		    					public void mouseUp(MouseEvent e) {	s.setExpanded(!s.isExpanded());form.pack();}
+		    					public void mouseUp(MouseEvent e) {	s.setExpanded(!s.isExpanded()); form.pack();}
 		    	    			
 		    	    		});
 		    	    		Point p = l.computeSize(SWT.DEFAULT, SWT.DEFAULT);
