@@ -27,8 +27,13 @@ public class TermGraph<T> extends Canvas
 {
 	public static interface ILabelProvider<T>
 	{
+		/** Return the label of the vertex */
 		public String getLabel(T t); 
+		
+		/** Return the tooltip of the vertex */
 		public String getTooltip(T t);
+		
+		/** Return the variant that should be used for vertex */
 		public String getVariant(T t);
 	}
 	
