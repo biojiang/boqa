@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/b4o/src/sonumina/b4o/B4O.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="sonumina.b4o.B4O"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-o ${workspace_loc}/b4o/data/human-phenotype-ontology.obo -a ${workspace_loc}/b4o/data/phenotype_annotation.omim.orphanet -m 6"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="b4o"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx1G"/>
+</launchConfiguration>
