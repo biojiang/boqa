@@ -206,16 +206,27 @@ d<-d[d$run==1,]
 	marg.rank<-unlist(tapply(d$marg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
 	d<-cbind(d,marg.rank)
 
+	marg.freq.rank<-unlist(tapply(d$marg.freq,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
+	d<-cbind(d,marg.freq.rank)
+
+	marg.freq.ideal.rank<-unlist(tapply(d$marg.freq.ideal,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
+	d<-cbind(d,marg.freq.ideal.rank)
+
 	resnick.avg.p.rank <- unlist(tapply(d$resnick.avg.p,d$run,function(x) {r<-rank(-x);return (max(r) - r + 1)})) 
 	d<-cbind(d,resnick.avg.p.rank)
 
+	f<-data.frame(p=d$resnick.avg.p,s=d$resnick.avg)
 	resnick.avg.p.rank<-unsplit(lapply(split(f,d$run),function (x)
 	{
 		o<-order(x$p,-x$s)
+		r<-1:length(o)
 		r[o]<-1:length(o)
 		return (r)
 	}),d$run)
 	d<-cbind(d,resnick.avg.p.rank)
+
+	# Calculate avg ranks
+	d.label.idx<-which(d$label==1)
 
 	res.list<-evaluate(d,v)
 	res.list.freq.vs.freq<-res.list
