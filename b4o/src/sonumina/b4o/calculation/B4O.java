@@ -237,7 +237,7 @@ public class B4O
 	private final static double ALPHA = 0.001; // 0.01
 	private final static double BETA = 0.10;   // 0.1
 	private final static double ALPHA_GRID[] = new double[]{1e-10,0.0005,0.001,0.005,0.01,0.05,0.1};
-	private final static double BETA_GRID[] = new double[] {1e-10,0.005,0.01,0.05,0.1,0.2};
+	private final static double BETA_GRID[] = new double[] {1e-10,0.005,0.01,0.05,0.1,0.2,0.4,0.8,0.9};
 	
 //	private final static int MAX_SAMPLES = 1;
 //	private static boolean CONSIDER_FREQUENCIES_ONLY = false;
@@ -1233,8 +1233,8 @@ public class B4O
 		}
 
 		final BufferedWriter param = new BufferedWriter(new FileWriter(RESULT_NAME.split("\\.")[0]+ "_param.txt"));
-		param.write("alpha\tbeta\tconsider.freqs.only\titems\tterms\tmax.terms\tevidences\n");
-		param.write(String.format("%g\t%g\t%b\t%d\t%d\t%d\t%s\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY,allItemList.size(),slimGraph.getNumberOfVertices(),maxTerms,evidenceString));
+		param.write("alpha\tbeta\tconsider.freqs.only\titems\tterms\tmax.terms\tmax.samples\tevidences\n");
+		param.write(String.format("%g\t%g\t%b\t%d\t%d\t%d\t%d\t%s\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY,allItemList.size(),slimGraph.getNumberOfVertices(),maxTerms,MAX_SAMPLES,evidenceString));
 		param.flush();
 		
 		final BufferedWriter out = new BufferedWriter(new FileWriter(RESULT_NAME));
