@@ -352,7 +352,7 @@ public class B4ORWT implements IEntryPoint
 		    	    		/* Find out which nodes to display in the graph display */
 		    	    	    final HashSet<Integer> queryTerms = new HashSet<Integer>();
 		    	    	    final HashSet<Integer> itemTerms = new HashSet<Integer>();
-		    	        	DirectedGraph<Integer> graph = new DirectedGraph<Integer>();
+		    	        	final DirectedGraph<Integer> graph = new DirectedGraph<Integer>();
 		    	    		addInducedSubGraphToGraph(clonedList, graph);
 		    	    		for (Integer tid : graph) /* Keep query terms */
 		    	    			queryTerms.add(tid);
@@ -364,11 +364,6 @@ public class B4ORWT implements IEntryPoint
 
 		    	    		/* Create a new section */
 		    	    		final Section s = toolkit.createSection(form.getBody(), Section.TWISTIE);
-		    	    		s.addExpansionListener(new IExpansionListener() {
-								public void expansionStateChanging(ExpansionEvent e) { }
-								
-								public void expansionStateChanged(ExpansionEvent e) { form.pack(); }
-							});
 		    	    		
 		    	    		/* Text client for the section, which is displayed in the title */
 		    	    		Composite tc = toolkit.createComposite(s);
@@ -379,11 +374,6 @@ public class B4ORWT implements IEntryPoint
 
 		    	    		/* The item's label */
 		    	    		Label l = toolkit.createLabel(tc,(rank + 1) + ". " + name, SWT.LEFT);
-		    	    		l.addMouseListener(new MouseAdapter()
-		    	    		{
-		    					public void mouseUp(MouseEvent e) {	s.setExpanded(!s.isExpanded()); form.pack();}
-		    	    			
-		    	    		});
 		    	    		Point p = l.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		    	    		maxLabelWidth = Math.max(maxLabelWidth, p.x);
 		    	    		labels.add(l);
@@ -397,13 +387,45 @@ public class B4ORWT implements IEntryPoint
 		    	    		s.setTextClient(tc);
 		    	    		s.setExpanded(false);
 		    	    		
-		    	    		Composite c = toolkit.createComposite(s);
+		    	    		final Composite c = toolkit.createComposite(s);
 		    	    		c.setLayout(new GridLayout());
 
-		    	    		createTermGraph(c, queryTerms, itemTerms, graph);
-		    	    		
 		    	    		s.setClient(c);
-		    	 
+
+		    	    		/* Create a runnable that initialize the term graph for the given
+		    	    		 * section if not already done. We use this construct to avoid code
+		    	    		 * duplication as this is needed twice.
+		    	    		 */
+		    	    		final Runnable initializeTermGraphRunnable = new Runnable() {
+								@Override
+								public void run() {
+									if (s.getData("#initialized") == null)
+									{
+					    	    		createTermGraph(c, queryTerms, itemTerms, graph);
+										s.setData("#initialized",Boolean.TRUE);
+									}
+								}
+							};
+
+							/* Add the expansion listener */
+		    	    		s.addExpansionListener(new IExpansionListener() {
+								public void expansionStateChanging(ExpansionEvent e) { initializeTermGraphRunnable.run(); }
+								
+								public void expansionStateChanged(ExpansionEvent e) { form.pack(); }
+							});
+
+		    	    		/* And the mouse listener */
+		    	    		l.addMouseListener(new MouseAdapter()
+		    	    		{
+		    					public void mouseUp(MouseEvent e)
+		    					{
+		    						initializeTermGraphRunnable.run();
+		    						s.setExpanded(!s.isExpanded());
+		    						form.pack();
+		    					}
+		    	    			
+		    	    		});
+
 		    	    		rank++;
 		    	    		if (rank >= 10 && e.getScore() < 0.001 || rank >= 30)
 		    	    			break;
