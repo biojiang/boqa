@@ -349,6 +349,19 @@ public class B4ORWT implements IEntryPoint
 		    	    		int id = e.getItemId();
 		    	    		String name = B4OCore.getItemName(id);
 
+		    	    		/* Find out which nodes to display in the graph display */
+		    	    	    final HashSet<Integer> queryTerms = new HashSet<Integer>();
+		    	    	    final HashSet<Integer> itemTerms = new HashSet<Integer>();
+		    	        	DirectedGraph<Integer> graph = new DirectedGraph<Integer>();
+		    	    		addInducedSubGraphToGraph(clonedList, graph);
+		    	    		for (Integer tid : graph) /* Keep query terms */
+		    	    			queryTerms.add(tid);
+		    	    		addInducedSubGraphToGraph(B4OCore.getTermsDirectlyAnnotatedTo(id), graph);
+		    	    		B4OCore.visitAncestors(toIntegerArray(B4OCore.getTermsDirectlyAnnotatedTo(id)),new B4OCore.IAncestorVisitor()
+		    	    		{
+		    	    			public void visit(int t) { 	itemTerms.add(t); }
+		    	    		});
+
 		    	    		/* Create a new section */
 		    	    		final Section s = toolkit.createSection(form.getBody(), Section.TWISTIE);
 		    	    		s.addExpansionListener(new IExpansionListener() {
@@ -387,38 +400,7 @@ public class B4ORWT implements IEntryPoint
 		    	    		Composite c = toolkit.createComposite(s);
 		    	    		c.setLayout(new GridLayout());
 
-		    	    		/* Find out which nodes to display */
-		    	    	    final HashSet<Integer> queryTerms = new HashSet<Integer>();
-		    	    	    final HashSet<Integer> itemTerms = new HashSet<Integer>();
-		    	        	DirectedGraph<Integer> graph = new DirectedGraph<Integer>();
-		    	    		addInducedSubGraphToGraph(clonedList, graph);
-		    	    		for (Integer tid : graph) /* Keep query terms */
-		    	    			queryTerms.add(tid);
-		    	    		addInducedSubGraphToGraph(B4OCore.getTermsDirectlyAnnotatedTo(id), graph);
-		    	    		B4OCore.visitAncestors(toIntegerArray(B4OCore.getTermsDirectlyAnnotatedTo(id)),new B4OCore.IAncestorVisitor()
-		    	    		{
-		    	    			public void visit(int t) { 	itemTerms.add(t); }
-		    	    		});
-
-		    	    		TermGraph<Integer> tg = new TermGraph<Integer>(c,0);
-		    	    	    tg.setLabelProvider(new TermGraph.ILabelProvider<Integer>() {
-		    	    			@Override
-		    	    			public String getLabel(Integer t) { return B4OCore.getTerm(t).getName(); }
-		    	    			@Override
-		    	    			public String getTooltip(Integer t) { return B4OCore.getTerm(t).getDefinition(); }
-								@Override
-								public String getVariant(Integer t)
-								{
-									if (queryTerms.contains(t))
-									{
-										if (itemTerms.contains(t)) return "match";
-										return "queryOnly";
-									}
-									return null;
-								}
-		    	    		});
-		    	    		tg.setLayoutData(new GridData(GridData.FILL_HORIZONTAL|GridData.GRAB_HORIZONTAL|GridData.FILL_VERTICAL|GridData.GRAB_VERTICAL));
-		    	    		tg.setGraph(graph);
+		    	    		createTermGraph(c, queryTerms, itemTerms, graph);
 		    	    		
 		    	    		s.setClient(c);
 		    	 
@@ -695,5 +677,37 @@ public class B4ORWT implements IEntryPoint
 	{
 		selectedTermsList.add(new SelectedTerm(B4OCore.getIdOfTerm(B4OCore.getTerm(termFilterString, availableTermsTable.getSelectionIndex())),true));
 		updateSelectedTermsTable();
+	}
+
+	/**
+	 * Creates a term graph in which the membership of a term to certain sets
+	 * (only query, only item, both) is characterized.
+	 * 
+	 * @param queryTerms
+	 * @param itemTerms
+	 * @param graph
+	 * @param parent
+	 */
+	private void createTermGraph(Composite parent, final HashSet<Integer> queryTerms, final HashSet<Integer> itemTerms, DirectedGraph<Integer> graph)
+	{
+		TermGraph<Integer> tg = new TermGraph<Integer>(parent,0);
+		tg.setLabelProvider(new TermGraph.ILabelProvider<Integer>() {
+			@Override
+			public String getLabel(Integer t) { return B4OCore.getTerm(t).getName(); }
+			@Override
+			public String getTooltip(Integer t) { return B4OCore.getTerm(t).getDefinition(); }
+			@Override
+			public String getVariant(Integer t)
+			{
+				if (queryTerms.contains(t))
+				{
+					if (itemTerms.contains(t)) return "match";
+					return "queryOnly";
+				}
+				return null;
+			}
+		});
+		tg.setLayoutData(new GridData(GridData.FILL_HORIZONTAL|GridData.GRAB_HORIZONTAL|GridData.FILL_VERTICAL|GridData.GRAB_VERTICAL));
+		tg.setGraph(graph);
 	}
 }
