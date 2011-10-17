@@ -187,9 +187,11 @@ if (file.exists("fnd.txt"))
 		d<-read.table("fnd-freq-only.txt",h=F,stringsAsFactors=F)
 		colnames(d)<-c("run","label","score","marg","marg.ideal", "score.freq","marg.freq", "marg.freq.ideal", "resnick.avg", "resnick.avg.p","freq")
 		save(d,file="d-freq-only.RObj");
+		message("Data loaded and stored");
 	} else
 	{
 		load("d-freq-only.RObj")
+		message("Data loaded form storage")
 	}
 d<-d[d$run==1,]
 	
