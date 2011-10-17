@@ -31,7 +31,6 @@ import ontologizer.go.Term;
 import ontologizer.go.TermID;
 import ontologizer.set.PopulationSet;
 import ontologizer.types.ByteString;
-import sonumina.b4o.calculation.Configuration.NodeCase;
 import sonumina.math.graph.SlimDirectedGraphView;
 
 /**
