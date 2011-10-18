@@ -2,6 +2,7 @@ package sonumina.b4orwt;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -84,7 +85,10 @@ public class B4ORWT implements IEntryPoint
     
     /** Contains visible terms */
     private ArrayList<Term> availableVisibleTermsList;
-    
+
+    /** Maps a term to its actual position in the term list */
+    private HashMap<Term,Integer> availableVisiblePos2SortedIndex;
+
     /** GUI element displaying the term details */
     private TermDetails selectedTermDetails;
     
@@ -153,6 +157,10 @@ public class B4ORWT implements IEntryPoint
     				visibleTerms.add(t);
     			}
 
+    	    	final HashMap<Term,Integer> term2SortedIdx = new HashMap<Term,Integer>();
+    	    	for (int i=0;i<numberOfTerms;i++)
+    	    		term2SortedIdx.put(visibleTerms.get(i), i);
+    			
     			final int prev = indexOfPreviousSelection;
 
     			/* Update table */
@@ -161,7 +169,10 @@ public class B4ORWT implements IEntryPoint
     				@Override
     				public void run()
     				{
+    					/* Finally, update data */
     					availableVisibleTermsList = visibleTerms;
+    			    	availableVisiblePos2SortedIndex = term2SortedIdx;
+
     				    availableTermsTable.setItemCount(visibleTerms.size());
     			    	availableTermsTable.clearAll();
     			    	availableTermsTable.redraw();
@@ -450,7 +461,7 @@ public class B4ORWT implements IEntryPoint
 					}
 				});
 
-    	    	/* Deactive UI Callback */
+    	    	/* Deactivate UI Callback */
     	    	display.asyncExec(new Runnable()
     	    	{
     	    		@Override
@@ -661,7 +672,7 @@ public class B4ORWT implements IEntryPoint
 	    		{
 	    			int index = (Integer)e.data;
 					Term t = B4OCore.getTerm(index);
-	    			selectedTermDetails.setTermID(t.getID());
+	    			setSelectionOfAvailableTermListToTerm(t);
 	    		}
 	    	}
 		});
@@ -746,5 +757,22 @@ public class B4ORWT implements IEntryPoint
 		});
 		tg.setLayoutData(new GridData(GridData.FILL_HORIZONTAL|GridData.GRAB_HORIZONTAL|GridData.FILL_VERTICAL|GridData.GRAB_VERTICAL));
 		tg.setGraph(graph);
+	}
+
+	/**
+	 * Sets the selection of the available term list to the given term.
+	 * Also updates the browser. 
+	 * 
+	 * @param t
+	 */
+	private void setSelectionOfAvailableTermListToTerm(Term t)
+	{
+		selectedTermDetails.setTermID(t.getID());
+		if (availableVisiblePos2SortedIndex != null)
+		{
+			Integer sortedIndex = availableVisiblePos2SortedIndex.get(t);
+			if (sortedIndex != null)
+				availableTermsTable.setSelection(sortedIndex);
+		}
 	}
 }
