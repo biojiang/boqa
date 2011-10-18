@@ -520,7 +520,7 @@ public class B4ORWT implements IEntryPoint
 	    Composite termComposite = new Composite(horizontalSash, 0);
 	    termComposite.setLayout(new GridLayout());
 
-	    final Text termFilterText = new Text(termComposite,SWT.BORDER);
+	    final Text termFilterText = new Text(termComposite,SWT.BORDER|SWT.SEARCH|SWT.ICON_CANCEL);
 	    termFilterText.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL|GridData.FILL_HORIZONTAL));
 	    termFilterText.addModifyListener(new ModifyListener()
 	    {
