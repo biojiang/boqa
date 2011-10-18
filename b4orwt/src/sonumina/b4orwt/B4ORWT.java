@@ -363,7 +363,7 @@ public class B4ORWT implements IEntryPoint
 		    	    		});
 
 		    	    		/* Create a new section */
-		    	    		final Section s = toolkit.createSection(form.getBody(), Section.TWISTIE);
+		    	    		final Section s = toolkit.createSection(form.getBody(), Section.TWISTIE|Section.LEFT_TEXT_CLIENT_ALIGNMENT);
 		    	    		
 		    	    		/* Text client for the section, which is displayed in the title */
 		    	    		Composite tc = toolkit.createComposite(s);
