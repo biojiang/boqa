@@ -8,7 +8,7 @@
 	<classpathentry kind="lib" path="lib/org.eclipse.core.commands_3.6.0.I20110111-0800.jar" sourcepath="lib/org.eclipse.core.commands.source_3.6.0.I20110111-0800.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.equinox.common_3.6.0.v20110523.jar" sourcepath="lib/org.eclipse.equinox.common.source_3.6.0.v20110523.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.rap.jface_1.5.0.20111014-0115.jar" sourcepath="lib/org.eclipse.rap.jface.source_1.5.0.20111014-0115.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.rap.rwt_1.5.0.20111014-0115.jar" sourcepath="lib/org.eclipse.rap.rwt.source_1.5.0.20111014-0115.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.rap.ui.forms_1.5.0.20111014-0115.jar" sourcepath="lib/org.eclipse.rap.ui.forms.source_1.5.0.20111014-0115.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.rap.rwt_1.5.0.20111018-0113.jar" sourcepath="lib/org.eclipse.rap.rwt.source_1.5.0.20111018-0113.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
