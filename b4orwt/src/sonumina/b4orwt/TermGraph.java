@@ -65,6 +65,9 @@ public class TermGraph<T> extends Canvas
 	private int usedWidth;
 	private int usedHeight;
 	
+	/** Identifies whether the locations of buttons have been set at least once */
+	private boolean buttonLocationsSet = false;
+	
 	/** The offset used to center the visuals */
 	private int offsetLeft;
 	
@@ -157,13 +160,15 @@ public class TermGraph<T> extends Canvas
 		int newOffsetLeft = Math.max((getClientArea().width - usedWidth)/2,0);
 		int newOffsetTop = Math.max((getClientArea().height - usedHeight)/2,0);
 
-		if (newOffsetLeft != offsetLeft || newOffsetTop != offsetTop)
+		if (!buttonLocationsSet || newOffsetLeft != offsetLeft || newOffsetTop != offsetTop)
 		{
 			offsetLeft = newOffsetLeft;
 			offsetTop = newOffsetTop;
 
 			for (NodeData nd : graphLayout.values())
 				nd.but.setLocation(offsetLeft + nd.left, offsetTop + nd.top);
+
+			buttonLocationsSet = true;
 		}
 	}
 
@@ -231,7 +236,9 @@ public class TermGraph<T> extends Canvas
 				if (n.left + n.width > usedWidth)
 					usedWidth = n.left + n.width; 
 				if (n.top + n.height > usedHeight)
-					usedHeight = n.top + n.height; 
+					usedHeight = n.top + n.height;
+
+				buttonLocationsSet = false;
 			};
 		}, 6, 10);
 
