@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import ontologizer.go.DescriptionParser;
 import ontologizer.go.Term;
 import ontologizer.go.TermID;
 
@@ -104,6 +105,7 @@ public class B4ORWT implements IEntryPoint
     {
     	int id;
     	boolean active;
+
     	public SelectedTerm(int id, boolean active)
     	{
     		this.id = id;
@@ -111,6 +113,21 @@ public class B4ORWT implements IEntryPoint
     	}
     }
 
+    /**
+     * A simple label provider for terms. 
+     * 
+     * @author Sebastian Bauer
+     */
+    class TermLabelProvider implements TermGraph.ILabelProvider<Integer>
+    {
+			@Override
+			public String getLabel(Integer t) { return B4OCore.getTerm(t).getName(); }
+			@Override
+			public String getTooltip(Integer t) { return B4OCore.getTerm(t).getDefinition()!=null?DescriptionParser.parse(B4OCore.getTerm(t).getDefinition()):null; }
+			@Override
+			public String getVariant(Integer t) { return null; }
+    };
+    
     /**
      * Common listener that can be used in a term graph widget. It updates the
      * state of the available term list according to the pressed term button within
@@ -609,7 +626,8 @@ public class B4ORWT implements IEntryPoint
 					item.setText(0,t.getName());
 					item.setText(1,t.getID().toString());
 					item.setText(2,Integer.toString(B4OCore.getNumberOfTermsAnnotatedToTerm(B4OCore.getIdOfTerm(t))));
-					item.setData("#tooltip", t.getDefinition());
+					if (t.getDefinition() != null)
+						item.setData("#tooltip", DescriptionParser.parse(t.getDefinition()));
 				}
 			}
 	    });
@@ -679,14 +697,7 @@ public class B4ORWT implements IEntryPoint
 	    dummyComposite.setLayout(new FillLayout());
 
 	    selectedTermsGraph = new TermGraph<Integer>(dummyComposite, 0);
-	    selectedTermsGraph.setLabelProvider(new TermGraph.ILabelProvider<Integer>() {
-			@Override
-			public String getLabel(Integer t) { return B4OCore.getTerm(t).getName(); }
-			@Override
-			public String getTooltip(Integer t) { return B4OCore.getTerm(t).getDefinition(); }
-			@Override
-			public String getVariant(Integer t) { return null; }
-		});
+	    selectedTermsGraph.setLabelProvider(new TermLabelProvider());
 	    selectedTermsGraph.addSelectionListener(termButtonSelectionListener);
 	    selectedTermsGraphicalItem.setControl(dummyComposite);
 
@@ -752,12 +763,8 @@ public class B4ORWT implements IEntryPoint
 	private TermGraph<Integer> createTermGraph(Composite parent, final HashSet<Integer> queryTerms, final HashSet<Integer> itemTerms, DirectedGraph<Integer> graph)
 	{
 		TermGraph<Integer> tg = new TermGraph<Integer>(parent,0);
-		tg.setLabelProvider(new TermGraph.ILabelProvider<Integer>() {
-			@Override
-			public String getLabel(Integer t) { return B4OCore.getTerm(t).getName(); }
-			@Override
-			public String getTooltip(Integer t) { return B4OCore.getTerm(t).getDefinition(); }
-			@Override
+		tg.setLabelProvider(new TermLabelProvider()
+		{
 			public String getVariant(Integer t)
 			{
 				if (queryTerms.contains(t))
