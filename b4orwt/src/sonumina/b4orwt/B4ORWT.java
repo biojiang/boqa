@@ -31,6 +31,7 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.internal.widgets.ICellToolTipAdapter;
 import org.eclipse.swt.internal.widgets.ICellToolTipProvider;
@@ -110,12 +111,32 @@ public class B4ORWT implements IEntryPoint
     	}
     }
 
+    /**
+     * Common listener that can be used in a term graph widget. It updates the
+     * state of the available term list according to the pressed term button within
+     * the graph.
+     */
+    private SelectionListener termButtonSelectionListener = new SelectionAdapter() {
+    	    	@Override
+    	    	public void widgetSelected(SelectionEvent e) {
+    	    		if (e.data != null && e.data instanceof Integer)
+    	    		{
+    	    			setSelectionOfAvailableTermListToTerm((Integer)e.data);
+    	    		}
+    	    	}
+    		};
+    
     private LinkedList<SelectedTerm> selectedTermsList = new LinkedList<SelectedTerm>();
     private LinkedList<Section> selectedTermSectionList = new LinkedList<Section>();
 
     /** Used for UICallback which is used to update the UI from threads */
     private int calculationCallbackId = 0;
     
+    /**
+     * Returns a unique id that can be used for UICallback.
+     * 
+     * @return
+     */
     private String getUniqueCallbackId()
     {
     	return "callback" + calculationCallbackId++;
@@ -418,7 +439,8 @@ public class B4ORWT implements IEntryPoint
 								public void run() {
 									if (s.getData("#initialized") == null)
 									{
-					    	    		createTermGraph(c, queryTerms, itemTerms, graph);
+					    	    		TermGraph<Integer> tg = createTermGraph(c, queryTerms, itemTerms, graph);
+					    	    		tg.addSelectionListener(termButtonSelectionListener);
 										s.setData("#initialized",Boolean.TRUE);
 									}
 								}
@@ -665,17 +687,7 @@ public class B4ORWT implements IEntryPoint
 			@Override
 			public String getVariant(Integer t) { return null; }
 		});
-	    selectedTermsGraph.addSelectionListener(new SelectionAdapter() {
-	    	@Override
-	    	public void widgetSelected(SelectionEvent e) {
-	    		if (e.data != null && e.data instanceof Integer)
-	    		{
-	    			int index = (Integer)e.data;
-					Term t = B4OCore.getTerm(index);
-	    			setSelectionOfAvailableTermListToTerm(t);
-	    		}
-	    	}
-		});
+	    selectedTermsGraph.addSelectionListener(termButtonSelectionListener);
 	    selectedTermsGraphicalItem.setControl(dummyComposite);
 
 	    /* Textual */
@@ -735,8 +747,9 @@ public class B4ORWT implements IEntryPoint
 	 * @param itemTerms
 	 * @param graph
 	 * @param parent
+	 * @return the constructed term graph
 	 */
-	private void createTermGraph(Composite parent, final HashSet<Integer> queryTerms, final HashSet<Integer> itemTerms, DirectedGraph<Integer> graph)
+	private TermGraph<Integer> createTermGraph(Composite parent, final HashSet<Integer> queryTerms, final HashSet<Integer> itemTerms, DirectedGraph<Integer> graph)
 	{
 		TermGraph<Integer> tg = new TermGraph<Integer>(parent,0);
 		tg.setLabelProvider(new TermGraph.ILabelProvider<Integer>() {
@@ -757,16 +770,19 @@ public class B4ORWT implements IEntryPoint
 		});
 		tg.setLayoutData(new GridData(GridData.FILL_HORIZONTAL|GridData.GRAB_HORIZONTAL|GridData.FILL_VERTICAL|GridData.GRAB_VERTICAL));
 		tg.setGraph(graph);
+		return tg;
 	}
 
 	/**
 	 * Sets the selection of the available term list to the given term.
 	 * Also updates the browser. 
 	 * 
-	 * @param t
+	 * @param index the index as understood by B4OCore
 	 */
-	private void setSelectionOfAvailableTermListToTerm(Term t)
+	private void setSelectionOfAvailableTermListToTerm(int index)
 	{
+		Term t = B4OCore.getTerm(index);
+
 		selectedTermDetails.setTermID(t.getID());
 		if (availableVisiblePos2SortedIndex != null)
 		{
