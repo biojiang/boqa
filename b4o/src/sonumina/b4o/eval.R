@@ -193,7 +193,6 @@ if (file.exists("fnd.txt"))
 		load("d-freq-only.RObj")
 		message("Data loaded form storage")
 	}
-d<-d[d$run==1,]
 	
 	message("Data read")
 	d<-d[order(d$run),]
