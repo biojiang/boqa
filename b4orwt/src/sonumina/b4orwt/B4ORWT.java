@@ -82,6 +82,9 @@ public class B4ORWT implements IEntryPoint
     /** Table displaying all available terms */
     private Table availableTermsTable;
     
+    /** Contains visible terms */
+    private ArrayList<Term> availableVisibleTermsList;
+    
     /** GUI element displaying the term details */
     private TermDetails selectedTermDetails;
     
@@ -123,10 +126,10 @@ public class B4ORWT implements IEntryPoint
     {
     	TableItem [] ti = availableTermsTable.getSelection();
 
-    	final String nameOfCuurentlySelectedTerm;
+    	final String nameOfCurrentlySelectedTerm;
     	
-    	if (ti != null && ti.length > 0) nameOfCuurentlySelectedTerm = ti[0].getText();
-    	else  nameOfCuurentlySelectedTerm = null;
+    	if (ti != null && ti.length > 0) nameOfCurrentlySelectedTerm = ti[0].getText();
+    	else  nameOfCurrentlySelectedTerm = null;
 
     	final String callbackId = getUniqueCallbackId(); 
     	UICallBack.activate(callbackId);
@@ -139,16 +142,18 @@ public class B4ORWT implements IEntryPoint
     	    	/* Represents the index of the previous selection in the within the new (filtered) list */
     	    	int indexOfPreviousSelection = -1;
 
+    	    	final ArrayList<Term> visibleTerms = new ArrayList<Term>();
+
     	    	int numberOfTerms = 0;
     			for (Term t : B4OCore.getTerms(termFilterString))
     			{
-    				if (t.getName().equals(nameOfCuurentlySelectedTerm))
+    				if (t.getName().equals(nameOfCurrentlySelectedTerm))
     					indexOfPreviousSelection = numberOfTerms;
     				numberOfTerms++;
+    				visibleTerms.add(t);
     			}
 
     			final int prev = indexOfPreviousSelection;
-    			final int num = numberOfTerms;
 
     			/* Update table */
     			display.asyncExec(new Runnable()
@@ -156,7 +161,8 @@ public class B4ORWT implements IEntryPoint
     				@Override
     				public void run()
     				{
-    				    availableTermsTable.setItemCount(num);
+    					availableVisibleTermsList = visibleTerms;
+    				    availableTermsTable.setItemCount(visibleTerms.size());
     			    	availableTermsTable.clearAll();
     			    	availableTermsTable.redraw();
     			    	
@@ -463,6 +469,10 @@ public class B4ORWT implements IEntryPoint
     	} else threadRunnable.run();
     }
     
+    /**
+     * Main entry for an RWT application. We do what the name suggests
+     * and create the UI.
+     */
 	public int createUI()
 	{       
 		display = new Display();
@@ -555,7 +565,12 @@ public class B4ORWT implements IEntryPoint
 			{
 				TableItem item = (TableItem)event.item;
 				int index = event.index;
-				Term t = B4OCore.getTerm(termFilterString, index);
+				Term t;
+				
+				if (availableVisibleTermsList != null)
+					t = availableVisibleTermsList.get(index);
+				else
+					t = B4OCore.getTerm(termFilterString, index);
 				if (t != null)
 				{
 					item.setText(0,t.getName());
