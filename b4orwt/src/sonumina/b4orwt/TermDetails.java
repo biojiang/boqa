@@ -9,6 +9,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
@@ -38,8 +41,8 @@ public class TermDetails extends Composite
 	private TermID currentTermID;
 	private FormText text;
 
-//	private Shell externalShell;
-//	private Shell externalBrowser;
+	private Shell externalShell;
+	private Browser externalBrowser;
 
 	public TermDetails(Composite parent, int style)
 	{
@@ -47,20 +50,34 @@ public class TermDetails extends Composite
 		
 		setLayout(new FillLayout());
 
-//		externalShell = new Shell(parent.getDisplay());
-		
+		externalShell = new Shell(parent.getDisplay(),SWT.TITLE|SWT.CLOSE|SWT.MAX|SWT.RESIZE);
+		externalShell.setLayout(new FillLayout());
+		externalShell.addShellListener(new ShellAdapter() {
+			@Override
+			public void shellClosed(ShellEvent e) {
+				e.doit = false;
+				externalShell.setVisible(false);
+			}
+			
+			@Override
+			public void shellDeactivated(ShellEvent e) {
+				externalShell.forceActive();
+			}
+		});
+		externalBrowser = new Browser(externalShell, 0);
+	
 		if (USE_EMBEDDED_BROWSER)
 		{
 			browser = new Browser(this, style);
-			browser.addLocationListener(new LocationAdapter() {
-				@Override
-				public void changing(LocationEvent event) {
-				System.out.println(event.location);
-//					JSExecutor.executeJS("window.open(\"http://www.google.de\",\"fabn\");");
-//					System.out.println(browser.evaluate("document.location.href;"));
-//					event.doit = false;
-				}
-			});
+//			browser.addLocationListener(new LocationAdapter() {
+//				@Override
+//				public void changing(LocationEvent event) {
+//				System.out.println(event.location);
+////					JSExecutor.executeJS("window.open(\"http://www.google.de\",\"fabn\");");
+////					System.out.println(browser.evaluate("document.location.href;"));
+//					event.doit = true;
+//				}
+//			});
 		}
 		
 		text = new FormText(this, SWT.BORDER);
@@ -69,8 +86,9 @@ public class TermDetails extends Composite
 			@Override
 			public void linkActivated(HyperlinkEvent e)
 			{
-				System.out.println(e.getHref());
-				super.linkActivated(e);
+				externalShell.open();
+				externalShell.setText((String)e.getHref());
+				externalBrowser.setUrl((String)e.getHref());
 			}
 		});
 		
@@ -133,7 +151,8 @@ public class TermDetails extends Composite
 						{
 							if (ref.startsWith("FMA:"))
 							{
-								str.append(String.format("<a href=\"http://www.berkeleybop.org/obo/%s?\">",ref));
+//								str.append(String.format("<a href=\"http://www.berkeleybop.org/obo/%s?\">",ref));
+								str.append("<a href=\"http://www.google.de\">test");
 								str2.append(String.format("<a href=\"http://www.berkeleybop.org/obo/%s?\">",ref));
 								closeTag = true;
 							}
