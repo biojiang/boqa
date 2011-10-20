@@ -2,7 +2,9 @@ package sonumina.b4orwt;
 
 import org.eclipse.rwt.application.ApplicationConfiguration;
 import org.eclipse.rwt.application.ApplicationConfigurator;
+import org.eclipse.ui.forms.internal.widgets.formtextkit.FormTextResource;
 import org.eclipse.ui.forms.internal.widgets.togglehyperlinkkit.ToggleHyperlinkResource;
+import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.ToggleHyperlink;
 
 /**
@@ -17,7 +19,9 @@ public class B4ORWTConfigurator implements ApplicationConfigurator
 	{
 		/* Needed for Forms */
 		config.addThemableWidget(ToggleHyperlink.class);
+		config.addThemableWidget(FormText.class);
 		config.addResource(new ToggleHyperlinkResource());
+		config.addResource(new FormTextResource());
 
 		/* Add our own styles */
 		config.addStyleSheet("org.eclipse.rap.rwt.theme.Default", "b4o.css");
