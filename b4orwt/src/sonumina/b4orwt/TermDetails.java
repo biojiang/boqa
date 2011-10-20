@@ -1,24 +1,21 @@
 package sonumina.b4orwt;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import ontologizer.go.DescriptionParser;
 import ontologizer.go.TermID;
 
-import org.eclipse.rwt.RWT;
-import org.eclipse.rwt.internal.widgets.JSExecutor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.LocationAdapter;
-import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.FormText;
-import org.eclipse.ui.forms.widgets.Hyperlink;
 
 /**
  * A Component that show details a term.
@@ -28,6 +25,8 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
  */
 public class TermDetails extends Composite
 {
+	private static Logger logger = Logger.getLogger(TermDetails.class.getName());
+
 	public interface ITermDetailsProvider
 	{
 		public String getName(TermID term);
@@ -176,7 +175,14 @@ public class TermDetails extends Composite
 			browser.setText(str.toString());
 
 		str2.append("</form>");
-		text.setText(str2.toString(), true, false);
+		
+		try
+		{
+			text.setText(str2.toString(), true, false);
+		} catch (RuntimeException e)
+		{
+			logger.log(Level.WARNING, e.getLocalizedMessage(), e);
+		}
 		
 		currentTermID = term;
 	}
