@@ -599,15 +599,22 @@ public class B4ORWT implements IEntryPoint
 	    TableColumn nameColumn = new TableColumn(availableTermsTable, 0);
 	    nameColumn.setResizable(true);
 	    nameColumn.setWidth(320);
+	    nameColumn.setText("Name");
 	    TableColumn idColumn = new TableColumn(availableTermsTable, 0);
 	    idColumn.setResizable(true);
 	    idColumn.setWidth(100);
+	    idColumn.setText("Id");
 	    TableColumn itemsColumn = new TableColumn(availableTermsTable, SWT.RIGHT);
-	    itemsColumn.setWidth(40);
+	    itemsColumn.setText("#Items");
+	    itemsColumn.pack();
+	    itemsColumn.setWidth(itemsColumn.getWidth() + 6);
+	    if (itemsColumn.getWidth() < 50)
+	    	itemsColumn.setWidth(50);
 
 //	    availableTermsTable.setData( Table.ENABLE_RICH_TEXT, Boolean.TRUE ); /* RWT */
 //	    availableTermsTable.setData( Table.ITEM_HEIGHT, new Integer(20)); /* RWT */
 
+	    availableTermsTable.setHeaderVisible(true);
 	    availableTermsTable.addListener( SWT.SetData, new Listener()
 	    {
 	    	@Override
@@ -643,8 +650,11 @@ public class B4ORWT implements IEntryPoint
 	    	@Override
 	    	public void mouseDown(MouseEvent e) {
 				int index = availableTermsTable.getSelectionIndex();
-				Term t = B4OCore.getTerm(termFilterString, index);
-				selectedTermDetails.setTermID(t.getID());
+				if (index >= 0)
+				{
+					Term t = B4OCore.getTerm(termFilterString, index);
+					selectedTermDetails.setTermID(t.getID());
+				}
 	    	}
 		});
 	    
