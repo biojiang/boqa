@@ -230,7 +230,7 @@ if (file.exists("fnd.txt"))
 
 	res.list<-evaluate(d,v)
 	res.list.freq.vs.freq<-res.list
-	save(res.list.freq.vs.freq,file="b4o_res.list.freq.vs.freq.RObj")
+	save(res.list.freq.vs.freq,file="b4o_res.list.freq.vs.freq.RObj",compress=T)
 }
 
 # ssss
