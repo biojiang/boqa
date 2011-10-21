@@ -143,10 +143,9 @@ public class TermDetails extends Composite
 						
 						if (ref != null)
 						{
-							if (ref.startsWith("FMA:"))
+							if (ref.startsWith("FMA:") || ref.startsWith("PATO:"))
 							{
-//								str.append(String.format("<a href=\"http://www.berkeleybop.org/obo/%s?\">",ref));
-								str.append("<a href=\"http://www.google.de\">test");
+								str.append(String.format("<a href=\"http://www.berkeleybop.org/obo/%s?\">",ref));
 								str2.append(String.format("<a href=\"http://www.berkeleybop.org/obo/%s?\">",ref));
 								closeTag = true;
 							} else
