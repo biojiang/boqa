@@ -149,6 +149,9 @@ public class TermDetails extends Composite
 								str.append("<a href=\"http://www.google.de\">test");
 								str2.append(String.format("<a href=\"http://www.berkeleybop.org/obo/%s?\">",ref));
 								closeTag = true;
+							} else
+							{
+								logger.info("No idea what to do with: " + ref);
 							}
 						}
 						str.append(txt);
