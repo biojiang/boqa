@@ -49,18 +49,13 @@ public class TermDetails extends Composite
 		
 		setLayout(new FillLayout());
 
-		externalShell = new Shell(parent.getDisplay(),SWT.TITLE|SWT.CLOSE|SWT.MAX|SWT.RESIZE);
+		externalShell = new Shell(parent.getDisplay(),SWT.TITLE|SWT.CLOSE|SWT.MAX|SWT.RESIZE|SWT.ON_TOP);
 		externalShell.setLayout(new FillLayout());
 		externalShell.addShellListener(new ShellAdapter() {
 			@Override
 			public void shellClosed(ShellEvent e) {
 				e.doit = false;
 				externalShell.setVisible(false);
-			}
-			
-			@Override
-			public void shellDeactivated(ShellEvent e) {
-				externalShell.forceActive();
 			}
 		});
 		externalBrowser = new Browser(externalShell, 0);
