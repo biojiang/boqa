@@ -80,10 +80,10 @@ public class EmpiricalDistribution implements IDistribution
 	 * Returns for x the value for the distribution function F(x) = P(X <= x).
 	 * 
 	 * @param observation
-	 * @param lowerTail
+	 * @param upperTail
 	 * @return
 	 */
-	public double cdf(double x, boolean lowerTail)
+	public double cdf(double x, boolean upperTail)
 	{
 		int idx = Arrays.binarySearch(observations, x);
 		
