@@ -45,4 +45,18 @@ public class EmpiricalDistributionTest
 		assertEquals(dis.cdf(1.01,false),3/(double)obs.length,0.0001);
 	}
 
+	@Test
+	public void testWithCountsAndNonObservations()
+	{
+		double [] obs = new double[]{1, 1.5, 2, 2.5, 3, 3.5, 4, 0.5 };
+		int [] counts = new int[]{2, 1, 1, 1, 1, 1, 1, 1};
+		int totalCounts = 0;
+		for (int i=0;i<counts.length;i++)
+			totalCounts += counts[i];
+		
+		EmpiricalDistribution dis = new EmpiricalDistribution(obs,counts);
+		assertEquals(dis.cdf(0.51,false),1/(double)totalCounts,0.0001);
+		assertEquals(dis.cdf(1.01,false),3/(double)totalCounts,0.0001);
+	}
+
 }
