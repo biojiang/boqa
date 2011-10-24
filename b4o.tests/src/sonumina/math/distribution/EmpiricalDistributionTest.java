@@ -1,8 +1,10 @@
-package sonumina.b4o.calculation;
+package sonumina.math.distribution;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import sonumina.math.distribution.EmpiricalDistribution;
 
 public class EmpiricalDistributionTest
 {
