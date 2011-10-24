@@ -14,7 +14,7 @@ public class EmpiricalDistribution implements IDistribution
 {
 	private double [] observations;
 	
-	/**  */
+	/**  The cumulative counts */
 	private int [] cumCounts;
 
 	/**
@@ -89,6 +89,9 @@ public class EmpiricalDistribution implements IDistribution
 		
 		if (cumCounts == null)
 		{
+			/* See doc to binarySearch */
+			if (idx < 0)
+				idx = - idx - 1;
 			for (;idx<observations.length;idx++)
 				if (observations[idx] != x)
 					break;
