@@ -92,12 +92,19 @@ public class EmpiricalDistribution implements IDistribution
 			/* See doc to binarySearch */
 			if (idx < 0)
 				idx = - idx - 1;
+
 			for (;idx<observations.length;idx++)
 				if (observations[idx] != x)
 					break;
 			return idx/(double)observations.length;
 		} else
 		{
+			if (idx < 0)
+			{
+				 /* We have to subtract one more as cumCounts[i] contains the cdf() for i
+				  * and i points to the next larger observation of x */
+				idx = - idx - 1 - 1;
+			}
 			return cumCounts[idx] / (double)cumCounts[cumCounts.length - 1];
 		}
 	}
