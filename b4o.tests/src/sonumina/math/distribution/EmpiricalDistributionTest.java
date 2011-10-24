@@ -30,8 +30,8 @@ public class EmpiricalDistributionTest
 			totalCounts += counts[i];
 		
 		EmpiricalDistribution dis = new EmpiricalDistribution(obs,counts);
-		assertEquals(dis.cdf(0.5,false),1/(double)totalCounts,0.0001);
-		assertEquals(dis.cdf(1,false),3/(double)totalCounts,0.0001);
+		assertEquals(1/(double)totalCounts,dis.cdf(0.5,false),0.0001);
+		assertEquals(3/(double)totalCounts,dis.cdf(1,false),0.0001);
 	}
 	
 	@Test
@@ -55,8 +55,8 @@ public class EmpiricalDistributionTest
 			totalCounts += counts[i];
 		
 		EmpiricalDistribution dis = new EmpiricalDistribution(obs,counts);
-		assertEquals(dis.cdf(0.51,false),1/(double)totalCounts,0.0001);
-		assertEquals(dis.cdf(1.01,false),3/(double)totalCounts,0.0001);
+		assertEquals(1/(double)totalCounts,dis.cdf(0.5,false),0.0001);
+		assertEquals(3/(double)totalCounts,dis.cdf(1,false),0.0001);
 	}
 
 }
