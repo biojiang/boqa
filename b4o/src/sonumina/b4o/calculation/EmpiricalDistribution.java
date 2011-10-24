@@ -36,7 +36,7 @@ public class EmpiricalDistribution
 	public double cdf(double x, boolean lowerTail)
 	{
 		int idx = Arrays.binarySearch(observations, x);
-		return idx/observations.length;
+		return idx/(double)observations.length;
 	}
 	
 }
