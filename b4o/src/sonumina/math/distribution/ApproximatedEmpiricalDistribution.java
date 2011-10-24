@@ -18,8 +18,6 @@ public class ApproximatedEmpiricalDistribution implements IDistribution
 
 	public ApproximatedEmpiricalDistribution(double [] newObservations, int newNumberOfBins)
 	{
-		int [] counts = new int[numberOfBins];
-		
 		double [] observations = new double[newObservations.length];
 		for (int i=0;i<observations.length;i++)
 			observations[i] = newObservations[i];
@@ -29,10 +27,11 @@ public class ApproximatedEmpiricalDistribution implements IDistribution
 		max = observations[observations.length - 1];
 		numberOfBins = newNumberOfBins;
 
+		int [] counts = new int[numberOfBins];
 		for (int i=0;i<observations.length;i++)
 			counts[findBin(observations[i])]++;
 
-		for (int i=1;i<observations.length;i++)
+		for (int i=1;i<numberOfBins; i++)
 			counts[i] += counts[i-1];
 		
 		cumCounts = counts;
@@ -40,13 +39,16 @@ public class ApproximatedEmpiricalDistribution implements IDistribution
 	
 	private int findBin(double observation)
 	{
-		int bin = (int)Math.floor((observation - min) / (max - min) * numberOfBins);
+		int bin = (int)Math.floor((observation - min) / (max - min + 1) * numberOfBins);
 		return bin;
 	}
 
 	@Override
 	public double cdf(double x, boolean lowerTail)
 	{
-		return findBin(x) / (double)cumCounts[cumCounts.length];
+		int bin = findBin(x);
+		if (bin < 0) return 0;
+		if (bin >= numberOfBins) return 1;  
+		return cumCounts[bin] / (double)cumCounts[cumCounts.length - 1];
 	}
 }
