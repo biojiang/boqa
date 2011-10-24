@@ -89,11 +89,13 @@ public class EmpiricalDistribution implements IDistribution
 		
 		if (cumCounts == null)
 		{
-			
 			for (;idx<observations.length;idx++)
 				if (observations[idx] != x)
 					break;
 			return idx/(double)observations.length;
-		} else return 0.0;
+		} else
+		{
+			return cumCounts[idx] / (double)cumCounts[cumCounts.length - 1];
+		}
 	}
 }
