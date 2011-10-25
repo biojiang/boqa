@@ -2255,22 +2255,8 @@ public class B4O
 			{
 				if (querySize > MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION)
 					querySize = MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION;
-				
-				int [][] queries;
-				synchronized (queryCache)
-				{
-					queries = queryCache.getQueries(querySize);
-					if (queries == null)
-					{
-						int [] shuffledTerms = newShuffledTerms(); 
-						
-						queries = new int[SIZE_OF_SCORE_DISTRIBUTION][querySize];
-						for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
-							chooseTerms(rnd, querySize, queries[j], shuffledTerms);
-						
-						queryCache.setQueries(querySize, queries);
-					}
-				}
+
+				int [][] queries = getRandomizedQueries(rnd, querySize);
 
 				if (CACHE_SCORE_DISTRIBUTION)
 				{
@@ -2342,6 +2328,30 @@ public class B4O
 		}
 		
 		return res;
+	}
+
+	/**
+	 * @param rnd
+	 * @param querySize
+	 * @return
+	 */
+	private static int[][] getRandomizedQueries(Random rnd, int querySize) {
+		int[][] queries;
+		synchronized (queryCache)
+		{
+			queries = queryCache.getQueries(querySize);
+			if (queries == null)
+			{
+				int [] shuffledTerms = newShuffledTerms(); 
+				
+				queries = new int[SIZE_OF_SCORE_DISTRIBUTION][querySize];
+				for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
+					chooseTerms(rnd, querySize, queries[j], shuffledTerms);
+				
+				queryCache.setQueries(querySize, queries);
+			}
+		}
+		return queries;
 	}
 
 	/**
