@@ -1452,15 +1452,17 @@ public class B4O
 		{
 			for (Association a : g2a)
 			{
-				/* Worst implementation ever! */
-				Integer evidence = evidences.get(a.getEvidence());
-				if (evidence == null)
-					evidence = 1;
-				else
-					evidence++;
-				
-				evidences.put(a.getEvidence(), evidence);
-				
+				if (a.getEvidence() != null)
+				{
+					/* Worst implementation ever! */
+					Integer evidence = evidences.get(a.getEvidence());
+					if (evidence == null)
+						evidence = 1;
+					else
+						evidence++;
+	
+					evidences.put(a.getEvidence(), evidence);
+				}
 			}
 		}
 		
