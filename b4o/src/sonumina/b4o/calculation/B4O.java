@@ -2428,7 +2428,7 @@ public class B4O
 	 * @param chosen where the chosen values are deposited.
 	 * @param storage defines the elements from which to choose
 	 */
-	private static void choose(Random rnd, int size, int[] chosen, int[] storage)
+	public static void choose(Random rnd, int size, int[] chosen, int[] storage)
 	{
 		/* Choose terms randomly as the size of observed terms. We avoid drawing the same term but
 		 * alter shuffledTerms such that it can be used again in the next iteration.
