@@ -2260,45 +2260,8 @@ public class B4O
 
 				if (CACHE_SCORE_DISTRIBUTION)
 				{
-					Distribution d;
-					
-					synchronized (scoreDistributions)
-					{
-						d = scoreDistributions.getDistribution(i * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize);
-
-						if (d == null)
-						{
-							/* Determine score distribution */
-							double [] scores = new double[SIZE_OF_SCORE_DISTRIBUTION];
-							double maxScore = Double.NEGATIVE_INFINITY;
-
-							for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
-							{
-								scores[j] = simScoreVsItem(queries[j], i);
-								if (scores[j] > maxScore) maxScore = scores[j];
-							}
-
-							/* throw into equidistant binnings */
-							int [] hist = new int[1000];
-							for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
-							{
-								int bin = Distribution.getBin(scores[j], maxScore);
-								hist[bin]++;
-							}
-
-							d = new Distribution(hist,maxScore);
-							scoreDistributions.setDistribution(i * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize, d);
-						}
-					}
+					Distribution d = getScoreDistribution(querySize, i, queries);
 					res.marginals[i] = d.getP(score);
-//					{
-//						int count = 0;
-//						for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
-//						{
-//							double randomScore = simScoreVsItem(queries[j], i);
-//							if (randomScore >= score) count++;
-//						}
-//					}
 				} else
 				{
 					int count = 0;
@@ -2328,6 +2291,50 @@ public class B4O
 		}
 		
 		return res;
+	}
+
+	/**
+	 * Returns the score distribution for the given item for the given query size.
+	 * If the score distribution has not been created yet, create it using the supplied
+	 * queries.
+	 * 
+	 * @param querySize
+	 * @param item
+	 * @param queries
+	 * @return
+	 */
+	private static Distribution getScoreDistribution(int querySize, int item, int[][] queries)
+	{
+		Distribution d;
+		synchronized (scoreDistributions)
+		{
+			d = scoreDistributions.getDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize);
+
+			if (d == null)
+			{
+				/* Determine score distribution */
+				double [] scores = new double[SIZE_OF_SCORE_DISTRIBUTION];
+				double maxScore = Double.NEGATIVE_INFINITY;
+
+				for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
+				{
+					scores[j] = simScoreVsItem(queries[j], item);
+					if (scores[j] > maxScore) maxScore = scores[j];
+				}
+
+				/* throw into equidistant binnings */
+				int [] hist = new int[1000];
+				for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
+				{
+					int bin = Distribution.getBin(scores[j], maxScore);
+					hist[bin]++;
+				}
+
+				d = new Distribution(hist,maxScore);
+				scoreDistributions.setDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize, d);
+			}
+		}
+		return d;
 	}
 
 	/**
