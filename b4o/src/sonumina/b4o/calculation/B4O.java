@@ -233,11 +233,12 @@ public class B4O
 	public static Pattern frequencyFractionPattern = Pattern.compile("(\\d+)/(\\d+)");
 	
 	/* Settings for generation of random data */
-	private final static double ALPHA = 0.001; // 0.01
+	private final static double ALPHA = 0.002; // 0.01
+//	private final static double ALPHA = 0.001;
 	private final static double BETA = 0.10;   // 0.1
 	
 	/* Settings for inference */
-	private final static double ALPHA_GRID[] = new double[]{1e-10,0.0005,0.001,0.005,0.01,0.05,0.1};
+	private final static double ALPHA_GRID[] = new double[]{1e-10,0.0005,0.001,0.005,0.01};
 	private final static double BETA_GRID[] = new double[] {1e-10,0.005,0.01,0.05,0.1,0.2,0.4,0.8,0.9};
 	
 //	private final static int MAX_SAMPLES = 1;
@@ -287,6 +288,9 @@ public class B4O
 	/** Forbid illegal queries */
 	private static final boolean FORBID_ILLEGAL_QUERIES = true;
 
+	/** Precalculate score distribution */
+	private static final boolean PRECALCULATE_SCORE_DISTRIBUTION = false;
+	
 	/** Cache the score distribution */
 	private static final boolean CACHE_SCORE_DISTRIBUTION = false; 
 
@@ -1102,6 +1106,11 @@ public class B4O
 
 			if (CACHE_SCORE_DISTRIBUTION)
 				scoreDistributions = new Distributions(allItemList.size() * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1));
+
+			if (PRECALCULATE_SCORE_DISTRIBUTION)
+			{
+				
+			}
 		}
 
 
