@@ -1104,12 +1104,21 @@ public class B4O
 //				maxSizes = java.lang.Math.max(maxSizes,items2Direct[i].length);
 			queryCache = new QuerySets(MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1);
 
-			if (CACHE_SCORE_DISTRIBUTION)
+			if (CACHE_SCORE_DISTRIBUTION || PRECALCULATE_SCORE_DISTRIBUTION)
 				scoreDistributions = new Distributions(allItemList.size() * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1));
 
 			if (PRECALCULATE_SCORE_DISTRIBUTION)
 			{
-				
+				Random rnd = new Random(9);
+
+				for (int i=0;i<allItemList.size();i++)
+				{
+					for (int qs=0;qs <= MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION; qs++)
+					{
+						int [][] queries = getRandomizedQueries(rnd, qs);
+						Distribution d = getScoreDistribution(qs, i, queries);
+					}
+				}
 			}
 		}
 
@@ -2348,7 +2357,7 @@ public class B4O
 	 */
 	private static int[][] getRandomizedQueries(Random rnd, int querySize)
 	{
-		int[][] queries;
+		int [][] queries;
 		
 		synchronized (queryCache)
 		{
@@ -2430,10 +2439,10 @@ public class B4O
 			int chosenTerm = storage[chosenIndex];
 
 			/* Place last term at the position of the chosen term */
-			storage[chosenIndex] = storage[size - k -1];
+			storage[chosenIndex] = storage[storage.length - k - 1];
 			
 			/* Place chosen term at the last position */
-			storage[size - k - 1] = chosenTerm;
+			storage[storage.length - k - 1] = chosenTerm;
 
 			chosen[k] = chosenTerm;
 		}
