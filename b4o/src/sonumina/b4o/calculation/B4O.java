@@ -2203,7 +2203,7 @@ public class B4O
 	 * 
 	 * @return
 	 */
-	private static Result resnikScore(boolean [] observations, boolean pval, Random rnd)
+	public static Result resnikScore(boolean [] observations, boolean pval, Random rnd)
 	{
 		int [] observedTerms = getMostSpecificTermsSparse(observations);
 		int [] randomizedTerms = new int[observedTerms.length];
