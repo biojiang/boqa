@@ -2331,12 +2331,18 @@ public class B4O
 	}
 
 	/**
-	 * @param rnd
-	 * @param querySize
+	 * Returns an array containing randomized term query. In the returned array,
+	 * the first index distinguishes each random query, and the second index
+	 * distinguishes the terms.   
+	 * 
+	 * @param rnd source of random.
+	 * @param querySize defines the size of the query.
 	 * @return
 	 */
-	private static int[][] getRandomizedQueries(Random rnd, int querySize) {
+	private static int[][] getRandomizedQueries(Random rnd, int querySize)
+	{
 		int[][] queries;
+		
 		synchronized (queryCache)
 		{
 			queries = queryCache.getQueries(querySize);
