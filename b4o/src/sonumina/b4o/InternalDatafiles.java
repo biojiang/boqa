@@ -41,7 +41,10 @@ public class InternalDatafiles extends Datafiles
 		Term c9 = new Term("GO:0000009", "C9", new ParentTermID(c7.getID(),TermRelation.IS_A));
 		Term c10 = new Term("GO:0000010", "C10", new ParentTermID(c9.getID(),TermRelation.IS_A));
 		Term c11 = new Term("GO:0000011", "C11", new ParentTermID(c9.getID(),TermRelation.IS_A));
-		Term c12 = new Term("GO:0000012", "C12", new ParentTermID(c11.getID(),TermRelation.IS_A));
+		Term c12 = new Term("GO:0000012", "C12", new ParentTermID(c8.getID(),TermRelation.IS_A));
+		Term c13 = new Term("GO:0000013", "C13", new ParentTermID(c8.getID(),TermRelation.IS_A));
+		Term c14 = new Term("GO:0000014", "C14", new ParentTermID(c4.getID(),TermRelation.IS_A));
+		Term c15 = new Term("GO:0000015", "C15", new ParentTermID(c4.getID(),TermRelation.IS_A));
 		
 		terms.add(c1);
 		terms.add(c2);
@@ -55,6 +58,9 @@ public class InternalDatafiles extends Datafiles
 		terms.add(c10);
 		terms.add(c11);
 		terms.add(c12);
+		terms.add(c13);
+		terms.add(c14);
+		terms.add(c15);
 		TermContainer termContainer = new TermContainer(terms,"","");
 
 		graph = new Ontology(termContainer);
@@ -65,24 +71,24 @@ public class InternalDatafiles extends Datafiles
 
 		/* Associations */
 		assoc = new AssociationContainer();
-		Random r = new Random(seed);
 
-		/* Randomly assign the items (note that redundant associations are filtered out later) */
-		for (int i=1;i<=5;i++)
-		{
-			String itemName = "item" + i;
-			int numTerms = r.nextInt(2) + 1;
-			
-			System.out.print(itemName + ": ");
-			
-			for (int j=0;j<numTerms;j++)
-			{
-				int tid = r.nextInt(terms.size())+1;
-				assoc.addAssociation(new Association(new ByteString(itemName),tid));
-				System.out.print(tid + " ");
-			}
-			System.out.println();
-		}
+		assoc.addAssociation(new Association(new ByteString("item1"),4));
+		assoc.addAssociation(new Association(new ByteString("item1"),11));
+
+		assoc.addAssociation(new Association(new ByteString("item2"),2));
+		assoc.addAssociation(new Association(new ByteString("item2"),10));
+		assoc.addAssociation(new Association(new ByteString("item2"),13));
+
+		assoc.addAssociation(new Association(new ByteString("item3"),7));
+		assoc.addAssociation(new Association(new ByteString("item3"),15));
+
+		assoc.addAssociation(new Association(new ByteString("item4"),12));
+		assoc.addAssociation(new Association(new ByteString("item4"),13));
+		assoc.addAssociation(new Association(new ByteString("item4"),14));
+
+		assoc.addAssociation(new Association(new ByteString("item5"),6));
+		assoc.addAssociation(new Association(new ByteString("item5"),14));
+
 
 		GODOTWriter.writeDOT(graph, new File("example.dot"), null, tids, new AbstractDotAttributesProvider() {
 			public String getDotNodeAttributes(TermID id) {
