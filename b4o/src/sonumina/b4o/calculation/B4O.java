@@ -1617,7 +1617,7 @@ public class B4O
 				/* Find frequency. We now have a O(n^3) algo. Will be optimized later */
 				for (Association a : as)
 				{
-					if (a.getTermID().equals(tid))
+					if (a.getTermID().equals(tid) && a.getAspect() != null)
 					{
 						f = getFrequencyFromString(a.getAspect().toString());
 						if (f < 1.0)
@@ -2196,6 +2196,22 @@ public class B4O
 	}
 
 	/**
+	 * Creates an array suitable for shuffling.
+	 * 
+	 * @return
+	 */
+	public static int [] newShuffledTerms()
+	{
+		int [] shuffledTerms = new int[slimGraph.getNumberOfVertices()];
+
+		/* Initialize shuffling */
+		for (int i=0;i<shuffledTerms.length;i++)
+			shuffledTerms[i] = i;
+
+		return shuffledTerms;
+	}
+	
+	/**
 	 * Makes the calculation according to Resnick max. We handle the observations as an item
 	 * and compare it to all other items. Also calculates the significance (stored in the 
 	 * marginal attribute).
@@ -2209,7 +2225,6 @@ public class B4O
 	{
 		int [] observedTerms = getMostSpecificTermsSparse(observations);
 		int [] randomizedTerms = new int[observedTerms.length];
-		int [] shuffledTerms = new int[slimGraph.getNumberOfVertices()];
 		
 		int querySize = observedTerms.length;
 		
@@ -2217,9 +2232,6 @@ public class B4O
 		res.scores = new double[allItemList.size()];
 		res.marginals = new double[allItemList.size()];
 	
-		/* Initialize shuffling */
-		for (int i=0;i<shuffledTerms.length;i++)
-			shuffledTerms[i] = i;
 
 		long startTime = System.currentTimeMillis();
 		long lastTime = startTime;
@@ -2250,6 +2262,8 @@ public class B4O
 					queries = queryCache.getQueries(querySize);
 					if (queries == null)
 					{
+						int [] shuffledTerms = newShuffledTerms(); 
+						
 						queries = new int[SIZE_OF_SCORE_DISTRIBUTION][querySize];
 						for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
 							chooseTerms(rnd, querySize, queries[j], shuffledTerms);
@@ -2257,7 +2271,7 @@ public class B4O
 						queryCache.setQueries(querySize, queries);
 					}
 				}
-				
+
 				if (CACHE_SCORE_DISTRIBUTION)
 				{
 					Distribution d;
@@ -2314,6 +2328,8 @@ public class B4O
 			} else
 			{
 				int count = 0;
+				int [] shuffledTerms = newShuffledTerms();
+
 				for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
 				{
 					chooseTerms(rnd, observedTerms.length, randomizedTerms, shuffledTerms);
