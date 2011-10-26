@@ -252,11 +252,12 @@ public class B4O
 	/** Forbid illegal queries */
 	private static final boolean FORBID_ILLEGAL_QUERIES = true;
 
-	/** Precalculate score distribution */
+	/** Cache the score distribution during  calculation */
+	private static final boolean CACHE_SCORE_DISTRIBUTION = false; 
+
+	/** Precalculate score distribution. Always implies CACHE_SCORE_DISTRIBUTION. */
 	private static final boolean PRECALCULATE_SCORE_DISTRIBUTION = false;
 	
-	/** Cache the score distribution */
-	private static final boolean CACHE_SCORE_DISTRIBUTION = false; 
 
 	/** Defines the maximal query size for the cached distribution */
 	private static int MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION = 20;
