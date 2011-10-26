@@ -1,5 +1,6 @@
 package sonumina.math.distribution;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
@@ -9,8 +10,11 @@ import java.util.Arrays;
  * 
  * @author Sebastian Bauer
  */
-public class ApproximatedEmpiricalDistribution implements IDistribution
+public class ApproximatedEmpiricalDistribution implements IDistribution, Serializable
 {
+	private static final long serialVersionUID = 1L;
+	
+	
 	private double min;
 	private double max;
 	private int numberOfBins;
