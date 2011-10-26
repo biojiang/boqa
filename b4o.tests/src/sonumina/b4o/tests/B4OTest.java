@@ -2,13 +2,21 @@ package sonumina.b4o.tests;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.util.HashSet;
 import java.util.Random;
+
+import ontologizer.dotwriter.AbstractDotAttributesProvider;
+import ontologizer.dotwriter.GODOTWriter;
+import ontologizer.go.Term;
+import ontologizer.go.TermID;
 
 import org.junit.Test;
 
 import sonumina.b4o.InternalDatafiles;
 import sonumina.b4o.calculation.B4O;
 import sonumina.b4o.calculation.B4O.Result;
+import sonumina.math.graph.SlimDirectedGraphView;
 
 public class B4OTest {
 
@@ -42,7 +50,6 @@ public class B4OTest {
 					assertEquals(false,seen[storage[i]]);
 					seen[storage[i]] = true;
 				}
-
 				
 				/* Check chosen array for validity */
 				for (int i=0;i<seen.length;i++)
@@ -64,19 +71,46 @@ public class B4OTest {
 		Random rnd = new Random(2);
 
 		B4O.setConsiderFrequenciesOnly(false);
+		B4O.setMaxQuerySizeForCachedDistribution(4);
+
 		B4O.setup(data.graph, data.assoc);
+		
+		/* Write out the graph */
+		GODOTWriter.writeDOT(B4O.graph, new File("example2.dot"), null, new HashSet<TermID>(B4O.graph.getLeafTermIDs()), new AbstractDotAttributesProvider() {
+			public String getDotNodeAttributes(TermID id) {
+				Term t = B4O.graph.getTerm(id);
+				int idx = B4O.slimGraph.getVertexIndex(t);
+				return "label=\""+B4O.graph.getTerm(id).getName()+"\\n" + String.format("%g",B4O.terms2IC[idx]) + "\"";
+			}
+		});
+
+		
+		/* An example for avoiding similarity measure */
+		System.out.println(B4O.simScoreVsItem(new int[]{3,10},2));
+		System.out.println(B4O.simScoreVsItem(new int[]{9,10},2));
+		
+		System.out.println("Mapping");
+		for (int i=0;i<B4O.slimGraph.getNumberOfVertices();i++)
+		{
+			System.out.println(i + " " + B4O.slimGraph.getVertex(i).getIDAsString());
+		}
 
 		int terms = data.graph.getNumberOfTerms();
 		boolean [] obs = new boolean[terms];
 
+//		System.out.print("Annotations: ");
 		for (int i=0;i<B4O.items2DirectTerms[2].length;i++)
+		{
+//			System.out.print(B4O.items2DirectTerms[2][i] + " ");
 			obs[B4O.items2DirectTerms[2][i]] = true;
+		}
+//		System.out.println();
 
 		Result result = B4O.resnikScore(obs, true, rnd);
 		
 		for (int i=0;i<B4O.allItemList.size();i++)
 		{
-			System.out.println(result.getMarginal(i) + "  " + result.getScore(i));
+			System.out.println(result.getMarginal(i) + "  " + result.getMarginalIdeal(i) + " " + result.getScore(i));
 		}
 	}
 }
