@@ -2,8 +2,13 @@ package sonumina.b4o.calculation;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,11 +21,14 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPOutputStream;
 
 import ontologizer.association.Association;
 import ontologizer.association.AssociationContainer;
+import ontologizer.association.AssociationParser;
 import ontologizer.association.Gene2Associations;
 import ontologizer.dotwriter.AbstractDotAttributesProvider;
 import ontologizer.dotwriter.GODOTWriter;
@@ -64,8 +72,10 @@ class QuerySets
  * 
  * @author Sebastian Bauer
  */
-class ApproximatedEmpiricalDistributions
+class ApproximatedEmpiricalDistributions implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+	
 	private ApproximatedEmpiricalDistribution[] distr;
 	
 	ApproximatedEmpiricalDistributions(int numberOfDistributions)
@@ -91,6 +101,9 @@ class ApproximatedEmpiricalDistributions
  */
 public class B4O
 {
+	/** Our logger */
+	private static Logger logger = Logger.getLogger(B4O.class.getCanonicalName());
+
 	public static Ontology graph;
 	public static AssociationContainer assoc;
 	
@@ -253,11 +266,13 @@ public class B4O
 	private static final boolean FORBID_ILLEGAL_QUERIES = true;
 
 	/** Cache the score distribution during  calculation */
-	private static final boolean CACHE_SCORE_DISTRIBUTION = false; 
+	private static final boolean CACHE_SCORE_DISTRIBUTION = true; 
 
 	/** Precalculate score distribution. Always implies CACHE_SCORE_DISTRIBUTION. */
-	private static final boolean PRECALCULATE_SCORE_DISTRIBUTION = false;
+	private static final boolean PRECALCULATE_SCORE_DISTRIBUTION = true;
 	
+	/** Identifies whether score distribution should be stored */
+	private static final boolean STORE_SCORE_DISTRIBUTION = true;
 
 	/** Defines the maximal query size for the cached distribution */
 	private static int MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION = 20;
@@ -1089,6 +1104,25 @@ public class B4O
 					{
 						int [][] queries = getRandomizedQueries(rnd, qs);
 						ApproximatedEmpiricalDistribution d = getScoreDistribution(qs, i, queries);
+					}
+				}
+				
+				if (STORE_SCORE_DISTRIBUTION)
+				{
+					try {
+						File outFile = new File(scoreDistributionDirectory.getAbsolutePath(),"scoreDistributions.gz");
+						OutputStream underlyingStream = new GZIPOutputStream(new FileOutputStream(outFile));
+						ObjectOutputStream oos = new ObjectOutputStream(underlyingStream);
+						oos.writeObject(scoreDistributions);
+						underlyingStream.close();
+						
+						logger.info("Score distribution written to \"" + outFile.getAbsolutePath() + "\"");
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 				}
 			}
