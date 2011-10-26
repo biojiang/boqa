@@ -60,6 +60,22 @@ public class ApproximatedEmpiricalDistribution implements IDistribution
 	}
 	
 	/**
+	 * Returns for x P(X = x) which is not necessarily 0 be this is a discrete distribution.
+	 * 
+	 * @param x
+	 * @return
+	 */
+	public double prob(double x)
+	{
+		int bin = findBin(x);
+		if (bin <= 0) return cdf(x, false);
+		if (bin >= numberOfBins) bin = numberOfBins - 1;  
+
+		double p = (cumCounts[bin] - cumCounts[bin-1]) / (double)cumCounts[cumCounts.length - 1];
+		return p;
+	}
+
+	/**
 	 * Returns the maximum value.
 	 * 
 	 * @return
