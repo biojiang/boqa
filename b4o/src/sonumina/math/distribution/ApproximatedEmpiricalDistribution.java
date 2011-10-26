@@ -29,7 +29,12 @@ public class ApproximatedEmpiricalDistribution implements IDistribution
 
 		int [] counts = new int[numberOfBins];
 		for (int i=0;i<observations.length;i++)
-			counts[findBin(observations[i])]++;
+		{
+			int bin = findBin(observations[i]);
+			if (bin < 0) bin = 0;
+			else if (bin >= numberOfBins) bin = numberOfBins - 1;
+			counts[bin]++;
+		}
 
 		for (int i=1;i<numberOfBins; i++)
 			counts[i] += counts[i-1];
@@ -39,7 +44,8 @@ public class ApproximatedEmpiricalDistribution implements IDistribution
 	
 	private int findBin(double observation)
 	{
-		int bin = (int)Math.floor((observation - min) / (max - min + 1) * numberOfBins);
+		double binDbl = (observation - min) / (max - min) * numberOfBins;
+		int bin = (int)Math.floor(binDbl);
 		return bin;
 	}
 
@@ -49,6 +55,23 @@ public class ApproximatedEmpiricalDistribution implements IDistribution
 		int bin = findBin(x);
 		if (bin < 0) return 0;
 		if (bin >= numberOfBins) return 1;  
-		return cumCounts[bin] / (double)cumCounts[cumCounts.length - 1];
+		double cdf = cumCounts[bin] / (double)cumCounts[cumCounts.length - 1];
+		return cdf;
 	}
+	
+	public String toString()
+	{
+		StringBuilder str = new StringBuilder();
+		
+		str.append("min=" + min);
+		str.append(" max=" + max + " ");
+		
+		for (int bin=0;bin<numberOfBins;bin++)
+		{
+			double obs = bin * (max - min) / numberOfBins + min;
+			str.append(obs);
+			str.append(" ");
+		}
+		return str.toString();
+	};
 }
