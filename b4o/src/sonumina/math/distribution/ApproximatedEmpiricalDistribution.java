@@ -59,6 +59,26 @@ public class ApproximatedEmpiricalDistribution implements IDistribution
 		return cdf;
 	}
 	
+	/**
+	 * Returns the maximum value.
+	 * 
+	 * @return
+	 */
+	public double getMax()
+	{
+		return max;
+	}
+	
+	/**
+	 * Returns the minimum value.
+	 * 
+	 * @return
+	 */
+	public double getMin()
+	{
+		return min;
+	}
+	
 	public String toString()
 	{
 		StringBuilder str = new StringBuilder();
