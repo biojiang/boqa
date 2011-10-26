@@ -1073,9 +1073,6 @@ public class B4O
 		/** Instantiates the query cache */
 		if (CACHE_RANDOM_QUERIES)
 		{
-//			int maxSizes = 0;
-//			for (i=0;i<allItemList.size();i++)
-//				maxSizes = java.lang.Math.max(maxSizes,items2Direct[i].length);
 			queryCache = new QuerySets(MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1);
 
 			if (CACHE_SCORE_DISTRIBUTION || PRECALCULATE_SCORE_DISTRIBUTION)
