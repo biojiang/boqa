@@ -60,44 +60,6 @@ class QuerySets
 }
 
 /**
- * Basic distribution
- *
- * @author Sebastian Bauer
- */
-class Distribution
-{
-	private int [] cum;
-	private double max;
-	
-	public Distribution(int [] counts, double max)
-	{
-		cum = new int[counts.length+1];
-		for (int i=1;i<counts.length+1;i++)
-			cum[i] = cum[i-1] + counts[i-1];
-		this.max = max;
-	}
-	
-	/**
-	 * Returns the p value of the given score
-	 * 
-	 * @param score
-	 * @return
-	 */
-	double getP(double score)
-	{
-		if (score > max) return 1.0 / cum.length;
-		int bin = getBin(score,max);
-		return 1 - (cum[bin] / (double)cum[cum.length - 1]);
-	}
-	
-	static int getBin(double score, double maxScore)
-	{
-		int bin = (int)java.lang.Math.floor(score / maxScore * 999.0);
-		return bin;
-	}
-}
-
-/**
  * Basic container for distributions.
  * 
  * @author Sebastian Bauer
