@@ -31,6 +31,7 @@ import ontologizer.go.Term;
 import ontologizer.go.TermID;
 import ontologizer.set.PopulationSet;
 import ontologizer.types.ByteString;
+import sonumina.math.distribution.ApproximatedEmpiricalDistribution;
 import sonumina.math.graph.SlimDirectedGraphView;
 
 /**
@@ -61,7 +62,7 @@ class QuerySets
 /**
  * Basic distribution
  *
- * @author sba
+ * @author Sebastian Bauer
  */
 class Distribution
 {
@@ -101,21 +102,21 @@ class Distribution
  * 
  * @author Sebastian Bauer
  */
-class Distributions
+class ApproximatedEmpiricalDistributions
 {
-	private Distribution[] distr;
+	private ApproximatedEmpiricalDistribution[] distr;
 	
-	Distributions(int numberOfDistributions)
+	ApproximatedEmpiricalDistributions(int numberOfDistributions)
 	{
-		distr = new Distribution[numberOfDistributions];
+		distr = new ApproximatedEmpiricalDistribution[numberOfDistributions];
 	}
 	
-	public Distribution getDistribution(int i)
+	public ApproximatedEmpiricalDistribution getDistribution(int i)
 	{
 		return distr[i];
 	}
 	
-	public void setDistribution(int i, Distribution dist)
+	public void setDistribution(int i, ApproximatedEmpiricalDistribution dist)
 	{
 		distr[i] = dist;
 	}
@@ -226,7 +227,7 @@ public class B4O
 	private static File scoreDistributionDirectory;
 	
 	/** Stores the score distribution */
-	private static Distributions scoreDistributions;
+	private static ApproximatedEmpiricalDistributions scoreDistributions;
 
 	/** Used to parse frequency information */
 	public static Pattern frequencyPattern = Pattern.compile("(\\d+)\\.?(\\d*)\\s*%");
@@ -253,6 +254,7 @@ public class B4O
 	private final static String RESULT_NAME = "fnd-freq-only.txt";
 	private final static String [] evidenceCodes = null;//new String[]{"PCS","ICE"};
 	private final static int SIZE_OF_SCORE_DISTRIBUTION = 250000;
+	private final static int NUMBER_OF_BINS_IN_APPROXIMATED_SCORE_DISTRIBUTION = 10000;
 	public static int maxTerms = -1;						/* Defines the maximal number of terms a query can have */
 	
 	/** False positives can be explained via inheritance */
@@ -295,7 +297,7 @@ public class B4O
 	private static final boolean CACHE_SCORE_DISTRIBUTION = false; 
 
 	/** Defines the maximal query size for the cached distribution */
-	private static final int MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION = 20;
+	private static int MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION = 20;
 
 	/** Some more verbose output */
 	private static final boolean VERBOSE = false;
@@ -310,6 +312,16 @@ public class B4O
 	public static void setConsiderFrequenciesOnly(boolean frequencies)
 	{
 		CONSIDER_FREQUENCIES_ONLY = frequencies;
+	}
+	
+	/**
+	 * Sets the maximum query size of for a cached distribution.
+	 * 
+	 * @param size
+	 */
+	public static void setMaxQuerySizeForCachedDistribution(int size)
+	{
+		MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION = size;
 	}
 
 	/**
@@ -1105,7 +1117,7 @@ public class B4O
 			queryCache = new QuerySets(MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1);
 
 			if (CACHE_SCORE_DISTRIBUTION || PRECALCULATE_SCORE_DISTRIBUTION)
-				scoreDistributions = new Distributions(allItemList.size() * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1));
+				scoreDistributions = new ApproximatedEmpiricalDistributions(allItemList.size() * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1));
 
 			if (PRECALCULATE_SCORE_DISTRIBUTION)
 			{
@@ -1113,16 +1125,14 @@ public class B4O
 
 				for (int i=0;i<allItemList.size();i++)
 				{
-					for (int qs=0;qs <= MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION; qs++)
+					for (int qs=1;qs <= MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION; qs++)
 					{
 						int [][] queries = getRandomizedQueries(rnd, qs);
-						Distribution d = getScoreDistribution(qs, i, queries);
+						ApproximatedEmpiricalDistribution d = getScoreDistribution(qs, i, queries);
 					}
 				}
 			}
 		}
-
-
 	}
 
 	
@@ -2199,7 +2209,7 @@ public class B4O
 	 * @param item
 	 * @return
 	 */
-	private static double simScoreVsItem(int [] t1, int item)
+	public static double simScoreVsItem(int [] t1, int item)
 	{
 		return simScoreMaxAvgVsItem(t1,item);
 	}
@@ -2240,7 +2250,6 @@ public class B4O
 		Result res = new Result();
 		res.scores = new double[allItemList.size()];
 		res.marginals = new double[allItemList.size()];
-	
 
 		long startTime = System.currentTimeMillis();
 		long lastTime = startTime;
@@ -2267,10 +2276,10 @@ public class B4O
 
 				int [][] queries = getRandomizedQueries(rnd, querySize);
 
-				if (CACHE_SCORE_DISTRIBUTION)
+				if (CACHE_SCORE_DISTRIBUTION || PRECALCULATE_SCORE_DISTRIBUTION)
 				{
-					Distribution d = getScoreDistribution(querySize, i, queries);
-					res.marginals[i] = d.getP(score);
+					ApproximatedEmpiricalDistribution d = getScoreDistribution(querySize, i, queries);
+					res.marginals[i] = 1 - (d.cdf(score,false) - d.prob(score));
 				} else
 				{
 					int count = 0;
@@ -2312,9 +2321,9 @@ public class B4O
 	 * @param queries
 	 * @return
 	 */
-	private static Distribution getScoreDistribution(int querySize, int item, int[][] queries)
+	private static ApproximatedEmpiricalDistribution getScoreDistribution(int querySize, int item, int[][] queries)
 	{
-		Distribution d;
+		ApproximatedEmpiricalDistribution d;
 		synchronized (scoreDistributions)
 		{
 			d = scoreDistributions.getDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize);
@@ -2331,15 +2340,7 @@ public class B4O
 					if (scores[j] > maxScore) maxScore = scores[j];
 				}
 
-				/* throw into equidistant binnings */
-				int [] hist = new int[1000];
-				for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
-				{
-					int bin = Distribution.getBin(scores[j], maxScore);
-					hist[bin]++;
-				}
-
-				d = new Distribution(hist,maxScore);
+				d = new ApproximatedEmpiricalDistribution(scores,NUMBER_OF_BINS_IN_APPROXIMATED_SCORE_DISTRIBUTION);
 				scoreDistributions.setDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize, d);
 			}
 		}
