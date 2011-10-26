@@ -70,7 +70,9 @@ public class ApproximatedEmpiricalDistribution implements IDistribution
 		{
 			double obs = bin * (max - min) / numberOfBins + min;
 			str.append(obs);
-			str.append(" ");
+			str.append(" (");
+			str.append(cumCounts[bin]);
+			str.append(") ");
 		}
 		return str.toString();
 	};
