@@ -28,7 +28,6 @@ import java.util.zip.GZIPOutputStream;
 
 import ontologizer.association.Association;
 import ontologizer.association.AssociationContainer;
-import ontologizer.association.AssociationParser;
 import ontologizer.association.Gene2Associations;
 import ontologizer.dotwriter.AbstractDotAttributesProvider;
 import ontologizer.dotwriter.GODOTWriter;
@@ -1005,6 +1004,26 @@ public class B4O
 		return items;
 	}
 
+	
+	/**
+	 * Calculates a "fingerprint" for the current data. Note that the fingerprint
+	 * is not necessary unqiue but it should be sufficient for the purpose.
+	 * 
+	 * @return
+	 */
+	private static int fingerprint()
+	{
+		int fp = 0x3333;
+		for (int i=0;i<allItemList.size();i++)
+			fp += allItemList.get(i).hashCode();
+		for (int i=0;i<slimGraph.getNumberOfVertices();i++)
+		{
+			fp += slimGraph.getVertex(i).getID().id;
+			fp += slimGraph.getVertex(i).getName().hashCode();
+		}
+		return fp;
+	}
+
 	/**
 	 * Setups the B4O for the given ontology and associations.
 	 * 
@@ -1113,6 +1132,11 @@ public class B4O
 						File outFile = new File(scoreDistributionDirectory.getAbsolutePath(),"scoreDistributions.gz");
 						OutputStream underlyingStream = new GZIPOutputStream(new FileOutputStream(outFile));
 						ObjectOutputStream oos = new ObjectOutputStream(underlyingStream);
+						
+						/* The fingerprint shall ensure that the score distribution and ontology/associations are compatible */
+						oos.writeInt(fingerprint());
+						
+						/* Finally, Write store distribution */
 						oos.writeObject(scoreDistributions);
 						underlyingStream.close();
 						
