@@ -24,6 +24,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -2361,6 +2363,9 @@ public class B4O
 		return res;
 	}
 
+	/** Lock for the score distribution */
+	private static ReentrantReadWriteLock scoreDistributionLock = new ReentrantReadWriteLock();
+	
 	/**
 	 * Returns the score distribution for the given item for the given query size.
 	 * If the score distribution has not been created yet, create it using the supplied
@@ -2373,11 +2378,14 @@ public class B4O
 	 */
 	private static ApproximatedEmpiricalDistribution getScoreDistribution(int querySize, int item, int[][] queries)
 	{
-		ApproximatedEmpiricalDistribution d;
-		synchronized (scoreDistributions)
-		{
-			d = scoreDistributions.getDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize);
+		scoreDistributionLock.readLock().lock();
+		ApproximatedEmpiricalDistribution d = scoreDistributions.getDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize);
+		scoreDistributionLock.readLock().unlock();
 
+		if (d == null)
+		{
+			scoreDistributionLock.writeLock().lock();
+			d = scoreDistributions.getDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize);
 			if (d == null)
 			{
 				/* Determine score distribution */
@@ -2393,7 +2401,9 @@ public class B4O
 				d = new ApproximatedEmpiricalDistribution(scores,NUMBER_OF_BINS_IN_APPROXIMATED_SCORE_DISTRIBUTION);
 				scoreDistributions.setDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize, d);
 			}
+			scoreDistributionLock.writeLock().unlock();
 		}
+
 		return d;
 	}
 
