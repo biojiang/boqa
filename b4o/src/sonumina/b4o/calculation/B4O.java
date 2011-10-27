@@ -1150,16 +1150,46 @@ public class B4O
 			if (PRECALCULATE_SCORE_DISTRIBUTION)
 			{
 				Random rnd = new Random(9);
+				ExecutorService es = null;
+
+				if (getNumProcessors() > 1) es = Executors.newFixedThreadPool(getNumProcessors());
+				else es = null;
 
 				for (int i=0;i<allItemList.size();i++)
 				{
-					for (int qs=1;qs <= MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION; qs++)
-					{
-						int [][] queries = getRandomizedQueries(rnd, qs);
-						ApproximatedEmpiricalDistribution d = getScoreDistribution(qs, i, queries);
+					final long seed = rnd.nextLong();
+					final int item = i;
+					
+					Runnable run = new Runnable() {
+						@Override
+						public void run() {
+							Random rnd = new Random(seed);
+
+							for (int qs=1;qs <= MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION; qs++)
+							{
+								int [][] queries = getRandomizedQueries(rnd, qs);
+								ApproximatedEmpiricalDistribution d = getScoreDistribution(qs, item, queries);
+							}
+						}
+					};
+
+					if (es != null)
+						es.execute(run);
+					else run.run();
+				}
+
+				/* Cleanup */
+				if (es != null)
+				{
+					es.shutdown();
+					try {
+						while (!es.awaitTermination(10, TimeUnit.SECONDS));
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
 				}
-				
+
+
 				if (STORE_SCORE_DISTRIBUTION && !distributionLoaded)
 				{
 					try {
@@ -1199,7 +1229,7 @@ public class B4O
 	public static void benchmark(Ontology newOntology, AssociationContainer newAssociations) throws InterruptedException, IOException
 	{
 		int i;
-		int numProcessors = MEASURE_TIME?1:Runtime.getRuntime().availableProcessors();
+		int numProcessors = getNumProcessors();
 
 		/* TODO: Get rid of this uglyness */
 		graph = newOntology;
@@ -1412,6 +1442,14 @@ public class B4O
 		synchronized (summary) {
 			summary.close();
 		}
+	}
+
+	/**
+	 * @return
+	 */
+	private static int getNumProcessors() {
+		int numProcessors = MEASURE_TIME?1:Runtime.getRuntime().availableProcessors();
+		return numProcessors;
 	}
 
 	/**
