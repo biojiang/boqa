@@ -2,10 +2,13 @@ package sonumina.b4o.calculation;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -24,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import ontologizer.association.Association;
@@ -1108,10 +1112,38 @@ public class B4O
 		/** Instantiates the query cache */
 		if (CACHE_RANDOM_QUERIES)
 		{
+			boolean distributionLoaded = false;
+			
 			queryCache = new QuerySets(MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1);
 
 			if (CACHE_SCORE_DISTRIBUTION || PRECALCULATE_SCORE_DISTRIBUTION)
-				scoreDistributions = new ApproximatedEmpiricalDistributions(allItemList.size() * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1));
+			{
+				try {
+					File inFile = new File(scoreDistributionDirectory.getAbsolutePath(),"scoreDistributions.gz");
+					InputStream underlyingStream = new GZIPInputStream(new FileInputStream(inFile));
+					ObjectInputStream ois = new ObjectInputStream(underlyingStream);
+					
+					int fingerprint = ois.readInt();
+					if (fingerprint == fingerprint())
+					{
+						scoreDistributions = (ApproximatedEmpiricalDistributions)ois.readObject();
+						distributionLoaded = true;
+						logger.info("Score distribution loaded from \"" + inFile.getAbsolutePath() + "\"");
+					}
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				if (!distributionLoaded)
+					scoreDistributions = new ApproximatedEmpiricalDistributions(allItemList.size() * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1));
+			}
 
 			if (PRECALCULATE_SCORE_DISTRIBUTION)
 			{
@@ -1126,7 +1158,7 @@ public class B4O
 					}
 				}
 				
-				if (STORE_SCORE_DISTRIBUTION)
+				if (STORE_SCORE_DISTRIBUTION && !distributionLoaded)
 				{
 					try {
 						File outFile = new File(scoreDistributionDirectory.getAbsolutePath(),"scoreDistributions.gz");
