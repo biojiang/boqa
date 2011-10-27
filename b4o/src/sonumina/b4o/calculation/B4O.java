@@ -2407,6 +2407,9 @@ public class B4O
 		return d;
 	}
 
+	/** Lock for randomized querys */
+	private static ReentrantReadWriteLock queriesLock = new ReentrantReadWriteLock();
+
 	/**
 	 * Returns an array containing randomized term query. In the returned array,
 	 * the first index distinguishes each random query, and the second index
@@ -2418,10 +2421,13 @@ public class B4O
 	 */
 	private static int[][] getRandomizedQueries(Random rnd, int querySize)
 	{
-		int [][] queries;
-		
-		synchronized (queryCache)
+		queriesLock.readLock().lock();
+		int [][] queries = queryCache.getQueries(querySize);
+		queriesLock.readLock().unlock();
+
+		if (queries == null)
 		{
+			queriesLock.writeLock().lock();
 			queries = queryCache.getQueries(querySize);
 			if (queries == null)
 			{
@@ -2433,6 +2439,7 @@ public class B4O
 				
 				queryCache.setQueries(querySize, queries);
 			}
+			queriesLock.writeLock().unlock();
 		}
 		return queries;
 	}
