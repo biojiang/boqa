@@ -4,12 +4,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 import ontologizer.go.ParentTermID;
 import ontologizer.go.Term;
@@ -21,6 +20,8 @@ import sonumina.math.graph.Edge;
 
 public class WordNetParser
 {
+	private static Logger logger = Logger.getLogger(WordNetParser.class.getCanonicalName());
+
 	static class Pointer extends Edge<WordNetTerm>
 	{
 		public Pointer(WordNetTerm source, WordNetTerm dest)
@@ -71,17 +72,28 @@ public class WordNetParser
 		}
 	}
 	
+	/**
+	 * Parses the word net file.
+	 * 
+	 * @param fileName
+	 * @return
+	 * @throws IOException
+	 */
 	public static TermContainer parserWordnet(String fileName) throws IOException
 	{
 		BufferedReader in = new BufferedReader(new FileReader(new File(fileName)));
 
+		/** Maps a unique id to a word net term */
 		HashMap<String,WordNetTerm> wordNetMap = new HashMap<String,WordNetTerm>();
+		
+		/** Arrangement as graph */
 		DirectedGraph<WordNetTerm> wordNetGraph = new DirectedGraph<WordNetParser.WordNetTerm>();
 
 		String line;
 		
 		while ((line = in.readLine()) != null)
 		{
+			/* Ignore empty lines and comments */
 			if (line.length() == 0) continue;
 			if (!Character.isDigit(line.charAt(0))) continue;
 
@@ -117,6 +129,9 @@ public class WordNetParser
 			
 			int pCnt = Integer.parseInt(entries[wCur]);
 			int pCur = wCur + 1;
+
+//			if (source.id.equals("09917593"))
+//				System.out.println(pCnt + " ");
 			for (int i=0;i<pCnt;i++)
 			{
 				String pointerSymb = entries[pCur];
@@ -124,8 +139,11 @@ public class WordNetParser
 				String pos = entries[pCur+2];
 				String st = entries[pCur+3]; /* source/target */
 
-				if (pos.equals("n") && (pointerSymb.equals("@") || pointerSymb.equals("~")))
+				if (pos.equals("n") && (pointerSymb.equals("@") || pointerSymb.equals("@i") || pointerSymb.equals("~")))// || pointerSymb.equals("%p")))
 				{
+//					if (source.id.equals("09917593"))
+//						System.out.print(synsetOffset + "(" + pointerSymb + ")" + " ");
+
 					WordNetTerm dest = wordNetMap.get(synsetOffset);
 					if (dest == null)
 					{
@@ -141,12 +159,22 @@ public class WordNetParser
 
 					Pointer e;
 					if (pointerSymb.equals("~"))
+					{
 						e = new Pointer(source, dest);
-					else e = new Pointer(dest, source);
-					wordNetGraph.addEdge(e);
+					} else
+					{
+						e = new Pointer(dest, source);
+					}
+
+					if (!wordNetGraph.hasEdge(e.getSource(), e.getDest()))
+						wordNetGraph.addEdge(e);
+
 				}
 				pCur += 4;
 			}
+
+//			if (source.id.equals("09917593"))
+//				System.out.println();
 
 			String glos = null;
 			
@@ -159,21 +187,22 @@ public class WordNetParser
 			source.glos = glos;
 		}
 
-		HashSet<Term> terms = new HashSet<Term>(); 
+		/* Now construct the terms */
+		int numRelations = 0;
+		HashSet<Term> terms = new HashSet<Term>();
 		for (WordNetTerm t : wordNetGraph)
 		{
-			System.out.println(t.words.get(0));
-			
 			ArrayList<ParentTermID> parentList = new ArrayList<ParentTermID>();
 			
 			Iterator<WordNetTerm> iter = wordNetGraph.getParentNodes(t);
 			if (iter != null)
 			{
-				if (iter.hasNext())
+				while (iter.hasNext())
 				{
 					WordNetTerm p = iter.next();
 					ParentTermID pt = new ParentTermID(new TermID("WNO:" + p.id), TermRelation.IS_A);
 					parentList.add(pt);
+					numRelations++;
 				}
 			}
 			
@@ -184,6 +213,8 @@ public class WordNetParser
 			nt.setDefinition(t.glos);
 			terms.add(nt);
 		}
+
+		logger.info("Contains " + terms.size() + " terms with " + numRelations + " relations");
 
 		return new TermContainer(terms, "OBO","Unknown");
 	}
