@@ -139,7 +139,7 @@ public class WordNetParser
 				String pos = entries[pCur+2];
 				String st = entries[pCur+3]; /* source/target */
 
-				if (pos.equals("n") && (pointerSymb.equals("@") || pointerSymb.equals("@i") || pointerSymb.equals("~")))// || pointerSymb.equals("%p")))
+				if (pos.equals("n") && (pointerSymb.equals("@") || pointerSymb.equals("@i") || pointerSymb.equals("~") || pointerSymb.equals("%p")))
 				{
 //					if (source.id.equals("09917593"))
 //						System.out.print(synsetOffset + "(" + pointerSymb + ")" + " ");
@@ -158,7 +158,7 @@ public class WordNetParser
 					}
 
 					Pointer e;
-					if (pointerSymb.equals("~"))
+					if (pointerSymb.equals("~") || pointerSymb.equals("%p"))
 					{
 						e = new Pointer(source, dest);
 					} else
