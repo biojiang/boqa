@@ -751,11 +751,11 @@ public class B4ORWT implements IEntryPoint
 	    shell.layout();
 	    updateAvailableTermsTable();
 	    shell.open();
-	    while( !shell.isDisposed() ) {
-	      if( !display.readAndDispatch() )
-	        display.sleep();
-	    }
-	    display.dispose();
+//	    while( !shell.isDisposed() ) {
+//	      if( !display.readAndDispatch() )
+//	        display.sleep();
+//	    }
+//	    display.dispose();
 	    return 0;
 	}
 
