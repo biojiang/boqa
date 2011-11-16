@@ -1788,13 +1788,31 @@ public class B4O
 				item2TermFrequenciesOrder[i][j] = freqs[j].termIdx;
 		}
 
+		createDiffVectors();
+
+		/* Calculate IC */
+		terms2IC = new double[slimGraph.getNumberOfVertices()];
+		for (i=0;i<slimGraph.getNumberOfVertices();i++)
+		{
+			Term t = slimGraph.getVertex(i);
+			terms2IC[i] = -Math.log(((double)termEnumerator.getAnnotatedGenes(t.getID()).totalAnnotatedCount() / allItemList.size()));
+		}
+	}
+
+	/**
+	 * Create the diff annotation vectors.
+	 */
+	private static void createDiffVectors()
+	{
+		int i;
+
 		long sum=0;
 		/* Fill diff matrix */
 		diffOnTerms = new int[allItemList.size()][];
 		diffOffTerms = new int[allItemList.size()][];
 		diffOnTerms[0] = items2Terms[0]; /* For the first step, all terms must be activated */
 		diffOffTerms[0] = new int[0];
-		for (i=1;i<allItems.getGeneCount();i++)
+		for (i=1;i<allItemList.size();i++)
 		{
 			int prevOnTerms[] = items2Terms[i-1];
 			int newOnTerms[] = items2Terms[i];
@@ -1809,7 +1827,7 @@ public class B4O
 		diffOnTermsFreqs = new int[allItemList.size()][][];
 		diffOffTermsFreqs = new int[allItemList.size()][][];
 		factors = new double[allItemList.size()][];
-		for (int item=0;item<allItems.getGeneCount();item++)
+		for (int item=0;item<allItemList.size();item++)
 		{
 			int numTerms = items2TermFrequencies[item].length;
 			int numTermsWithExplicitFrequencies = 0;
@@ -1889,14 +1907,6 @@ public class B4O
 				prevArray = newArray;
 				config++;
 			}
-		}
-
-		/* Calculate IC */
-		terms2IC = new double[slimGraph.getNumberOfVertices()];
-		for (i=0;i<slimGraph.getNumberOfVertices();i++)
-		{
-			Term t = slimGraph.getVertex(i);
-			terms2IC[i] = -Math.log(((double)termEnumerator.getAnnotatedGenes(t.getID()).totalAnnotatedCount() / allItemList.size()));
 		}
 	}
 
