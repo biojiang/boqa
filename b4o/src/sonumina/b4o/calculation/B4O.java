@@ -490,7 +490,9 @@ public class B4O
 	 */
 	private static void determineCases(boolean [] observedTerms, boolean [] hidden, Configuration stats)
 	{
-		for (int i=0;i<slimGraph.getNumberOfVertices();i++)
+		int numTerms = slimGraph.getNumberOfVertices();
+
+		for (int i=0;i<numTerms;i++)
 		{
 			Configuration.NodeCase c = getNodeCase(i,hidden,observedTerms);
 			stats.increment(c);
@@ -507,44 +509,90 @@ public class B4O
 	 * @param item
 	 * @param observed
 	 * @param takeFrequenciesIntoAccount select, if frequencies should be taken into account.
+	 * @param hiddenStorage is the storage used to store the hidden states. It must correspond to the states of the previous item (item -1). If this is the first item,
+	 *  it must be 0.
 	 * @return
 	 */
-	private static WeightedConfigurationList determineCasesForItem(int item, boolean [] observed, boolean takeFrequenciesIntoAccount)
+	private static WeightedConfigurationList determineCasesForItem(int item, boolean [] observed, boolean takeFrequenciesIntoAccount, boolean [] previousHidden, Configuration previousStats )
 	{
-		int numTerms = items2TermFrequencies[item].length;
+		int numAnnotatedTerms = items2TermFrequencies[item].length;
+		int numTerms = slimGraph.getNumberOfVertices();
+
+		if (previousHidden == null && previousStats != null) throw new IllegalArgumentException();
+		if (previousHidden != null && previousStats == null) throw new IllegalArgumentException();
 
 		long now;
-		
 		if (MEASURE_TIME)
 			now = System.nanoTime();
 
 		/* Tracks the hidden state configuration that matches the observed state best */
 //		double bestScore = Double.NEGATIVE_INFINITY;
 //		boolean [] bestTaken = new boolean[numTermsWithExplicitFrequencies];
-		
+
 		WeightedConfigurationList statsList = new WeightedConfigurationList();
 
 		if (true)
 		{
+			boolean [] hidden;
+			Configuration stats;
+			
+			if (previousHidden == null) hidden = new boolean[numTerms];
+			else hidden = previousHidden;
+			
+			if (previousStats == null) stats = new Configuration();
+			else stats = previousStats;
+			
 			if (!takeFrequenciesIntoAccount)
 			{
-				boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
-				Configuration stats = new Configuration();
-				
-				for (int h : items2DirectTerms[item])
+				/* New */
+				int [] diffOn = diffOnTerms[item];
+				int [] diffOff = diffOffTerms[item];
+
+				/* Decrement config stats of the nodes we are going to change */
+				for (int i=0;i<diffOn.length;i++)
+					stats.decrement(getNodeCase(diffOn[i],hidden,observed));
+				for (int i=0;i<diffOff.length;i++)
+					stats.decrement(getNodeCase(diffOff[i],hidden,observed));
+
+				/* Change nodes states */
+				for (int i=0;i<diffOn.length;i++)
+					hidden[diffOn[i]] = true;
+				for (int i=0;i<diffOff.length;i++)
+					hidden[diffOff[i]] = false;
+
+				/* Increment config states of nodes that we have just changed */
+				for (int i=0;i<diffOn.length;i++)
+					stats.increment(getNodeCase(diffOn[i],hidden,observed));
+				for (int i=0;i<diffOff.length;i++)
+					stats.increment(getNodeCase(diffOff[i],hidden,observed));
+
+				/* Old */
+				if (false)
 				{
-					hidden[h] = true;
-					activateAncestors(h, hidden);
+					boolean [] oldHidden = new boolean[numTerms];
+					Configuration oldStats = new Configuration();
+					for (int h : items2DirectTerms[item])
+					{
+						oldHidden[h] = true;
+						activateAncestors(h, oldHidden);
+					}
+					determineCases(observed, oldHidden, oldStats);
+					if (!oldStats.equals(stats))
+						throw new RuntimeException("States don't match");
+					statsList.add(oldStats,0);
+				} else
+				{
+					statsList.add(stats.clone(),0);
 				}
-				determineCases(observed, hidden, stats);
-				statsList.add(stats,0);
 			} else
 			{
-				boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
-				
-				Configuration stats = new Configuration();
-				
 				/* Initialize stats */
+				if (previousHidden != null)
+				{
+					for (int i=0;i<hidden.length;i++)
+						hidden[i] = false;
+				}
+				stats.clear();
 				determineCases(observed, hidden, stats);
 	
 				/* Loop over all tracked configurations that may appear due to the
@@ -584,7 +632,7 @@ public class B4O
 				/* Determine the number of terms that have non-1.0 frequency. We restrict them
 				 * to the top 6 (the less probable) due to complexity issues and hope that this
 				 * a good enough approximation. */
-				for (int i=0;i<numTerms && i<6;i++)
+				for (int i=0;i<numAnnotatedTerms && i<6;i++)
 				{
 					if (items2TermFrequencies[item][item2TermFrequenciesOrder[item][i]] >= 1.0)
 						break;
@@ -620,7 +668,7 @@ public class B4O
 				}
 
 				/* second, activate mandatory terms */
-				for (int i=numTermsWithExplicitFrequencies;i<numTerms;i++)
+				for (int i=numTermsWithExplicitFrequencies;i<numAnnotatedTerms;i++)
 				{
 					int ti = item2TermFrequenciesOrder[item][i];
 					int h = items2DirectTerms[item][ti];  /* global index of term */
@@ -705,7 +753,7 @@ public class B4O
 	 */
 	public static double score(int item, double alpha, double beta, boolean [] observedTerms, boolean takeFrequenciesIntoAccount)
 	{
-		WeightedConfigurationList stats = determineCasesForItem(item,observedTerms,takeFrequenciesIntoAccount);
+		WeightedConfigurationList stats = determineCasesForItem(item,observedTerms,takeFrequenciesIntoAccount, null, null);
 		return stats.score(alpha,beta);
 	}
 
@@ -2036,16 +2084,21 @@ public class B4O
 			es = Executors.newFixedThreadPool(numThreads);
 		else
 			es = null;
-		
+
+		final boolean [] previousHidden = new boolean[slimGraph.getNumberOfVertices()];
+		final Configuration previousStat = new Configuration();
+		determineCases(observations.observations, previousHidden, previousStat);
+
 		for (i=0;i<allItemList.size();i++)
 		{
 			final int item = i;
 			
 			/* Construct the runnable suitable for the calculation for a single item */
 			Runnable run = new Runnable() {
+				
 				@Override
 				public void run() {
-					WeightedConfigurationList stats = determineCasesForItem(item,observations.observations,takeFrequenciesIntoAccount);
+					WeightedConfigurationList stats = determineCasesForItem(item,observations.observations,takeFrequenciesIntoAccount,numThreads>1?null:previousHidden,numThreads>1?null:previousStat);
 					
 					for (int a=0;a<ALPHA_GRID.length;a++)
 					{
