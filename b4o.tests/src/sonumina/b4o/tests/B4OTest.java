@@ -23,6 +23,7 @@ import org.junit.Test;
 
 import sonumina.b4o.InternalDatafiles;
 import sonumina.b4o.calculation.B4O;
+import sonumina.b4o.calculation.Observations;
 import sonumina.b4o.calculation.B4O.Result;
 import sonumina.math.graph.SlimDirectedGraphView;
 
@@ -137,7 +138,7 @@ public class B4OTest {
 		
 		AssociationContainer assocs = new AssociationContainer();
 		
-		for (int i=0;i<1000;i++)
+		for (int i=0;i<100000;i++)
 		{
 			ByteString item = new ByteString("item" + i);
 			
@@ -157,8 +158,15 @@ public class B4OTest {
 		B4O.setConsiderFrequenciesOnly(false);
 		B4O.setPrecalculateScoreDistribution(false);
 		B4O.setCacheScoreDistribution(false);
+		B4O.setPrecalculateItemMaxs(false);
 		B4O.setup(ontology, assocs);
 		System.err.println("Setted up ontology and associations");
-		
+
+		Observations o = new Observations();
+		o.observations = new boolean[B4O.getOntology().getNumberOfTerms()];
+
+		System.err.println("Calculating");
+		Result result = B4O.assignMarginals(o, false, 1);
+
 	}
 }
