@@ -107,20 +107,25 @@ public class B4OTest {
 		int terms = data.graph.getNumberOfTerms();
 		boolean [] obs = new boolean[terms];
 
-//		System.out.print("Annotations: ");
 		for (int i=0;i<B4O.items2DirectTerms[2].length;i++)
 		{
-//			System.out.print(B4O.items2DirectTerms[2][i] + " ");
-			obs[B4O.items2DirectTerms[2][i]] = true;
+			int t=B4O.items2DirectTerms[2][i];
+			obs[t] = true;
+			B4O.activateAncestors(t, obs);
 		}
-//		System.out.println();
 
 		Result result = B4O.resnikScore(obs, true, rnd);
 		
 		for (int i=0;i<B4O.allItemList.size();i++)
-		{
 			System.out.println(result.getMarginal(i) + " " + result.getScore(i));
-		}
+
+		Observations o = new Observations();
+		o.observations = obs;
+		
+		result = B4O.assignMarginals(o, false);
+		for (int i=0;i<B4O.allItemList.size();i++)
+			System.out.println(result.getMarginal(i) + " " + result.getScore(i));
+		
 	}
 	
 
@@ -141,7 +146,10 @@ public class B4OTest {
 		for (int i=0;i<100000;i++)
 		{
 			ByteString item = new ByteString("item" + i);
-			
+
+//			Association a = new Association(item,slim.getVertex(10).getIDAsString());
+//			assocs.addAssociation(a);
+
 			for (int j=0;j<rnd.nextInt(16)+2;j++)
 			{
 				Term t;
@@ -165,8 +173,11 @@ public class B4OTest {
 		Observations o = new Observations();
 		o.observations = new boolean[B4O.getOntology().getNumberOfTerms()];
 
+		long start = System.nanoTime();
 		System.err.println("Calculating");
 		Result result = B4O.assignMarginals(o, false, 1);
+		long end = System.nanoTime();
 
+		System.err.println(((end - start)/1000/1000) + "ms");
 	}
 }
