@@ -3,13 +3,21 @@ package sonumina.b4o.tests;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Random;
 
+import ontologizer.association.Association;
+import ontologizer.association.AssociationContainer;
 import ontologizer.dotwriter.AbstractDotAttributesProvider;
 import ontologizer.dotwriter.GODOTWriter;
+import ontologizer.go.OBOParser;
+import ontologizer.go.OBOParserException;
+import ontologizer.go.Ontology;
 import ontologizer.go.Term;
+import ontologizer.go.TermContainer;
 import ontologizer.go.TermID;
+import ontologizer.types.ByteString;
 
 import org.junit.Test;
 
@@ -110,7 +118,47 @@ public class B4OTest {
 		
 		for (int i=0;i<B4O.allItemList.size();i++)
 		{
-			System.out.println(result.getMarginal(i) + "  " + result.getMarginalIdeal(i) + " " + result.getScore(i));
+			System.out.println(result.getMarginal(i) + " " + result.getScore(i));
 		}
+	}
+	
+
+	@Test
+	public void testLargeNumberOfItems() throws IOException, OBOParserException
+	{
+		Random rnd = new Random(2);
+
+		OBOParser hpoParser = new OBOParser("../b4o/data/human-phenotype-ontology.obo.gz");
+		hpoParser.doParse();
+		
+		TermContainer tc = new TermContainer(hpoParser.getTermMap(),hpoParser.getFormatVersion(),hpoParser.getDate());
+		Ontology ontology = new Ontology(tc);
+		SlimDirectedGraphView<Term> slim = ontology.getSlimGraphView();
+		
+		AssociationContainer assocs = new AssociationContainer();
+		
+		for (int i=0;i<1000;i++)
+		{
+			ByteString item = new ByteString("item" + i);
+			
+			for (int j=0;j<rnd.nextInt(16)+2;j++)
+			{
+				Term t;
+				do
+				{
+					t = slim.getVertex(rnd.nextInt(slim.getNumberOfVertices()));
+				} while (t.isObsolete());
+				Association a = new Association(item,t.getIDAsString());
+				assocs.addAssociation(a);
+			}
+		}
+
+		System.err.println("Constructed data set");
+		B4O.setConsiderFrequenciesOnly(false);
+		B4O.setPrecalculateScoreDistribution(false);
+		B4O.setCacheScoreDistribution(false);
+		B4O.setup(ontology, assocs);
+		System.err.println("Setted up ontology and associations");
+		
 	}
 }
