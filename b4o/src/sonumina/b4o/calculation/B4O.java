@@ -1043,6 +1043,12 @@ public class B4O
 
 //		graph.findRedundantISARelations();
 
+		if (micaMatrix != null)
+		{
+			System.err.println("setup() called a 2nd time.");
+			micaMatrix = null;
+		}
+
 		HashSet<ByteString> itemsToBeConsidered = new HashSet<ByteString>(associations.getAllAnnotatedGenes());
 		provideGlobals(itemsToBeConsidered);
 		
