@@ -129,4 +129,12 @@ final public class Configuration implements Cloneable
 			c.stats[i] = stats[i];
 		return c;
 	}
+	
+	public boolean equals(Configuration obj)
+	{
+		for (int i=0;i<obj.stats.length;i++)
+			if (obj.stats[i] != stats[i])
+				return false;
+		return true;
+	}
 }
