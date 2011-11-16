@@ -1788,6 +1788,7 @@ public class B4O
 				item2TermFrequenciesOrder[i][j] = freqs[j].termIdx;
 		}
 
+		long sum=0;
 		/* Fill diff matrix */
 		diffOnTerms = new int[allItemList.size()][];
 		diffOffTerms = new int[allItemList.size()][];
@@ -1800,7 +1801,10 @@ public class B4O
 
 			diffOnTerms[i] = setDiff(newOnTerms, prevOnTerms);
 			diffOffTerms[i] = setDiff(prevOnTerms, newOnTerms);
+
+			sum += diffOnTerms[i].length + diffOffTerms[i].length;
 		}
+		System.err.println(sum + " differences detected (" + (double)sum/allItemList.size() + " per item)");
 
 		diffOnTermsFreqs = new int[allItemList.size()][][];
 		diffOffTermsFreqs = new int[allItemList.size()][][];
