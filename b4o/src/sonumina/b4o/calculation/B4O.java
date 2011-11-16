@@ -262,7 +262,7 @@ public class B4O
 	private static final boolean PRECALCULATE_MAXICS = true;
 	
 	/** Use precalculated max items. Speeds up Resnik */
-	private static final boolean PRECALCULATE_ITEM_MAXS = true;
+	private static boolean PRECALCULATE_ITEM_MAXS = true;
 	
 	/** Cache the queries */
 	private static final boolean CACHE_RANDOM_QUERIES = true; 
@@ -271,10 +271,10 @@ public class B4O
 	private static final boolean FORBID_ILLEGAL_QUERIES = true;
 
 	/** Cache the score distribution during  calculation */
-	private static final boolean CACHE_SCORE_DISTRIBUTION = true; 
+	private static boolean CACHE_SCORE_DISTRIBUTION = true; 
 
 	/** Precalculate score distribution. Always implies CACHE_SCORE_DISTRIBUTION. */
-	private static final boolean PRECALCULATE_SCORE_DISTRIBUTION = true;
+	private static boolean PRECALCULATE_SCORE_DISTRIBUTION = true;
 	
 	/** Identifies whether score distribution should be stored */
 	private static final boolean STORE_SCORE_DISTRIBUTION = true;
@@ -308,6 +308,37 @@ public class B4O
 	}
 
 	/**
+	 * Precalculate score distribution.
+	 * 
+	 * @param precalc
+	 */
+	public static void setPrecalculateScoreDistribution(boolean precalc)
+	{
+		PRECALCULATE_SCORE_DISTRIBUTION = precalc;
+	}
+	
+	/**
+	 * Set whether we cache the score distribution.
+	 * 
+	 * @param cache
+	 */
+	public static void setCacheScoreDistribution(boolean cache)
+	{
+		CACHE_SCORE_DISTRIBUTION = cache;
+	}
+
+	/**
+	 * Sets whether the matrix that contains the max ic term of two given terms
+	 * shall be precalculated.
+	 * 
+	 * @param precalc
+	 */
+	public static void setPrecalculateItemMaxs(boolean precalc)
+	{
+		PRECALCULATE_ITEM_MAXS = precalc;
+	}
+	
+	/**
 	 * Returns whether false negatives are propagated in a
 	 * top-down fashion.
 	 * 
@@ -317,7 +348,7 @@ public class B4O
 	{
 		return (MODEL_VARIANT & VARIANT_INHERITANCE_POSITIVES) != 0;
 	}
-	
+
 	/**
 	 * Returns whether false positives are propagated in a
 	 * bottom-up fashion.
