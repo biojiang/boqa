@@ -27,7 +27,7 @@ public class AlgorithmsTest
 	public void test()
 	{
 		Vector v1 = new Vector("v1", new int[]{2,6,10,23,27,30,40,76,99});
-		Vector v2 = new Vector("v2", new int[]{2,6,10,23,});
+		Vector v2 = new Vector("v2", new int[]{2,6,10,23});
 		Vector v3 = new Vector("v3", new int[]{2,6,10,24});
 		Vector v4 = new Vector("v4", new int[]{2,6,10});
 		Vector v5 = new Vector("v5", new int[]{2,6,13,23,27,30,40,76,99});
@@ -51,6 +51,13 @@ public class AlgorithmsTest
 				return d;
 			};
 		});
+		
+		assertEquals(6, vs.size());
+		
+		for (Vector v : vs)
+		{
+			System.out.println(v.name);
+		}
 
 		assertNotNull(vs);
 	}
