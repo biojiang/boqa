@@ -54,4 +54,33 @@ public class Algorithms
 		}
 		return list;
 	}
+	
+	/**
+	 * Calculates the hamming distance of the sparsely represented vectors.
+	 * Elements are assumed to be sorted.
+	 * 
+	 * @return
+	 */
+	public static int hammingDistanceSparse(int [] va, int [] vb)
+	{
+		int distance = 0;
+		int i=0,j=0;
+		
+		do
+		{
+			if (va[i] < vb[j])
+			{
+				i++;
+			} else if (va[i] > vb[j]) 
+			{
+				j++;
+			} else
+			{
+				
+			}
+		}
+		while (i < va.length || j < vb.length);
+
+		return 0;
+	}
 }

@@ -44,6 +44,7 @@ import ontologizer.go.Term;
 import ontologizer.go.TermID;
 import ontologizer.set.PopulationSet;
 import ontologizer.types.ByteString;
+import sonumina.algorithms.Algorithms;
 import sonumina.math.distribution.ApproximatedEmpiricalDistribution;
 import sonumina.math.graph.SlimDirectedGraphView;
 
@@ -1727,7 +1728,9 @@ public class B4O
 			
 			for (TermID tid : tids)
 				items2Terms[i][j++] = slimGraph.getVertexIndex(graph.getTerm(tid));
-			
+
+			for (i=0;i<allItemList.size();i++)
+				Arrays.sort(items2Terms[i]);
 			i++;
 		}
 
@@ -1845,6 +1848,24 @@ public class B4O
 			Term t = slimGraph.getVertex(i);
 			terms2IC[i] = -Math.log(((double)termEnumerator.getAnnotatedGenes(t.getID()).totalAnnotatedCount() / allItemList.size()));
 		}
+
+		ArrayList<Integer> itemIndices = new ArrayList<Integer>();
+		for (int o=0;o<allItemList.size();o++)
+			itemIndices.add(o);
+
+		System.out.println("Start");
+		long start = System.nanoTime();
+		Algorithms.approximatedTSP(itemIndices, itemIndices.get(0),
+				new Algorithms.IVertexDistance<Integer>() {
+					@Override
+					public double distance(Integer ai, Integer bi)
+					{
+						int [] at = items2Terms[ai.intValue()];
+						int [] bt = items2Terms[bi.intValue()];
+						return Algorithms.hammingDistanceSparse(at, bt);
+					}
+				});
+		System.out.println("End (" + ((System.nanoTime() - start) / 1000 / 1000) + "ms)");
 	}
 
 	/**
