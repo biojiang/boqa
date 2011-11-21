@@ -3,7 +3,8 @@ package sonumina.algorithms;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Collection;;
+import java.util.Collection;
+import java.util.Vector;
 
 public class Algorithms
 {
@@ -27,31 +28,44 @@ public class Algorithms
 	 * @param distance
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public static <V> List<V> approximatedTSP(Collection<V> vertices, V start, IVertexDistance<V> distance)
 	{
-		LinkedHashSet<V> toDo = new LinkedHashSet<V>(vertices);
+		Object [] toDo = new Object[vertices.size() - 1];
+		int toDoLength = toDo.length;
 		ArrayList<V> list = new ArrayList<V>();
 		list.add(start);
-		toDo.remove(start);
-		
-		while (!toDo.isEmpty())
-		{
-			V newStart = null;
 
+		int i=0;
+		
+		for (V v : vertices)
+		{
+			if (v!=start)
+				toDo[i++] = v;
+		}
+
+		while (toDoLength > 0)
+		{
 			double minDistance = Double.MAX_VALUE;
-			for (V v : toDo)
+			int newStartIndex = -1;
+
+			for (i=0;i<toDoLength;i++)
 			{
+				V v = (V)toDo[i];
 				double nd = distance.distance(start, v);
 				if (nd < minDistance)
 				{
-					newStart = v;
+					newStartIndex = i;
 					minDistance = nd;
 				}
 			}
-			start = newStart;
-			toDo.remove(start);
-			list.add(start);
+
+			list.add((V)toDo[newStartIndex]);
+			toDoLength--;
+			if (toDoLength>0)
+				toDo[newStartIndex] = toDo[toDoLength];
 		}
+
 		return list;
 	}
 	
