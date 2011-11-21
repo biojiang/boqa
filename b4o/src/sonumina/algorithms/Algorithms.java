@@ -88,22 +88,26 @@ public class Algorithms
 	{
 		int distance = 0;
 		int i=0,j=0;
-		
-		do
+
+		while (i < va.length && j < vb.length)
 		{
 			if (va[i] < vb[j])
 			{
+				distance++;
 				i++;
 			} else if (va[i] > vb[j]) 
 			{
+				distance++;
 				j++;
 			} else
 			{
-				
+				i++;
+				j++;
 			}
 		}
-		while (i < va.length || j < vb.length);
 
-		return 0;
+		distance += va.length - i;
+		distance += vb.length - j;
+		return distance;
 	}
 }

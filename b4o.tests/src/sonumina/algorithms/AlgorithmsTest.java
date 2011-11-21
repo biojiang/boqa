@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import org.junit.Test;
 
@@ -24,7 +25,7 @@ public class AlgorithmsTest
 	}
 
 	@Test
-	public void test()
+	public void testTSP()
 	{
 		Vector v1 = new Vector("v1", new int[]{2,6,10,23,27,30,40,76,99});
 		Vector v2 = new Vector("v2", new int[]{2,6,10,23});
@@ -53,12 +54,32 @@ public class AlgorithmsTest
 		});
 		
 		assertEquals(6, vs.size());
-		
-		for (Vector v : vs)
-		{
-			System.out.println(v.name);
-		}
-
 		assertNotNull(vs);
+	}
+	
+	@Test
+	public void testHammingDistance()
+	{
+		Random rnd = new Random();
+
+		boolean [] states1 = new boolean[10000];
+		for (int i=0;i<states1.length;i++)
+			states1[i] = rnd.nextInt(5) < 2;
+
+		boolean [] states2 = new boolean[10000];
+		for (int i=0;i<states2.length;i++)
+			states2[i] = rnd.nextInt(5) < 2;
+
+		int [] sparse1 = Algorithms.spareInt(states1);
+		int [] sparse2 = Algorithms.spareInt(states2);
+
+		int dist1=0;
+		for (int i=0;i<states1.length;i++)
+			if (states1[i] != states2[i])
+				dist1++;
+		
+		assertEquals(dist1,Algorithms.hammingDistanceSparse(sparse1,sparse2));
+		assertEquals(0,Algorithms.hammingDistanceSparse(new int[]{},new int[]{}));
+		assertEquals(2,Algorithms.hammingDistanceSparse(new int[]{1},new int[]{2}));
 	}
 }
