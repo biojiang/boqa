@@ -55,6 +55,29 @@ public class Algorithms
 		return list;
 	}
 	
+	
+	/**
+	 * Returns a spare representation of the given vector. An element
+	 * refers to an index that is true.
+	 * 
+	 * @param dense
+	 * @return
+	 */
+	public static int [] spareInt(boolean [] dense)
+	{
+		int c = 0;
+		for (int i=0;i<dense.length;i++)
+			if (dense[i])
+				c++;
+
+		int [] array = new int[c];
+		c = 0;
+		for (int i=0;i<dense.length;i++)
+			if (dense[i])
+				array[c++] = i;
+		return array;
+	}
+	
 	/**
 	 * Calculates the hamming distance of the sparsely represented vectors.
 	 * Elements are assumed to be sorted.
