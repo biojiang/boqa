@@ -220,8 +220,8 @@ public class B4O
 	private final static double BETA = 0.10;   // 0.1
 	
 	/* Settings for inference */
-	private final static double ALPHA_GRID[] = new double[]{1e-10,0.0005,0.001,0.005,0.01};
-	private final static double BETA_GRID[] = new double[] {1e-10,0.005,0.01,0.05,0.1,0.2,0.4,0.8,0.9};
+	private static double ALPHA_GRID[] = new double[]{1e-10,0.0005,0.001,0.005,0.01};
+	private static double BETA_GRID[] = new double[] {1e-10,0.005,0.01,0.05,0.1,0.2,0.4,0.8,0.9};
 	
 //	private final static int MAX_SAMPLES = 1;
 //	private static boolean CONSIDER_FREQUENCIES_ONLY = false;
@@ -1301,6 +1301,11 @@ public class B4O
 				}
 			}
 		}
+		
+		double numOfTerms = getSlimGraph().getNumberOfVertices();
+		
+		ALPHA_GRID = new double[]{1e-10, 1/numOfTerms, 2/numOfTerms, 3/numOfTerms, 4/numOfTerms, 5/numOfTerms, 6/numOfTerms};
+		BETA_GRID = new double[]{0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9};
 	}
 
 	
@@ -1729,8 +1734,7 @@ public class B4O
 			for (TermID tid : tids)
 				items2Terms[i][j++] = slimGraph.getVertexIndex(graph.getTerm(tid));
 
-			for (i=0;i<allItemList.size();i++)
-				Arrays.sort(items2Terms[i]);
+			Arrays.sort(items2Terms[i]);
 			i++;
 		}
 
@@ -1853,7 +1857,7 @@ public class B4O
 		for (int o=0;o<allItemList.size();o++)
 			itemIndices.add(o);
 
-		System.out.println("Start");
+		System.out.println("Start TSP");
 		long start = System.nanoTime();
 		Algorithms.approximatedTSP(itemIndices, itemIndices.get(0),
 				new Algorithms.IVertexDistance<Integer>() {
