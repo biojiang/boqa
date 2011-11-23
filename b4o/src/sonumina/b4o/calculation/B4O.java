@@ -215,8 +215,8 @@ public class B4O
 	public static Pattern frequencyFractionPattern = Pattern.compile("(\\d+)/(\\d+)");
 	
 	/* Settings for generation of random data */
-	private final static double ALPHA = 0.002; // 0.01
-//	private final static double ALPHA = 0.001;
+//	private final static double ALPHA = 0.002; // 0.01
+	private final static double ALPHA = 0.001;
 	private final static double BETA = 0.10;   // 0.1
 	
 	/* Settings for inference */
@@ -1132,10 +1132,6 @@ public class B4O
 		HashSet<ByteString> itemsToBeConsidered = new HashSet<ByteString>(associations.getAllAnnotatedGenes());
 		provideGlobals(itemsToBeConsidered);
 		
-		/* Define the directory in which the distributions are stored */
-		scoreDistributionDirectory = new File("distribution",allItemList.size() + "-" + CONSIDER_FREQUENCIES_ONLY + "-" + SIZE_OF_SCORE_DISTRIBUTION);
-		scoreDistributionDirectory.mkdirs();
-		
 		/* If we want to consider items with frequencies only, we like to shrink
 		 * the item list to contain only the relevant items.
 		 */
@@ -1154,6 +1150,10 @@ public class B4O
 			System.out.println("There were " + oldSize + " items but we consider only " + allItemList.size() + " of them with frequencies.");
 			System.out.println("Considering " + slimGraph.getNumberOfVertices() + " terms");
 		}
+		
+		/* Define the directory in which the distributions are stored */
+		scoreDistributionDirectory = new File("distribution",allItemList.size() + "-" + CONSIDER_FREQUENCIES_ONLY + "-" + SIZE_OF_SCORE_DISTRIBUTION);
+		scoreDistributionDirectory.mkdirs();
 		
 		/** Here we precaculate the maxICs of two given terms in a dense matrix */
 		if (PRECALCULATE_MAXICS)
@@ -1219,13 +1219,9 @@ public class B4O
 						logger.info("Score distribution loaded from \"" + inFile.getAbsolutePath() + "\"");
 					}
 				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -1302,6 +1298,7 @@ public class B4O
 			}
 		}
 		
+		/* Choose appropriate values */
 		double numOfTerms = getSlimGraph().getNumberOfVertices();
 		
 		ALPHA_GRID = new double[]{1e-10, 1/numOfTerms, 2/numOfTerms, 3/numOfTerms, 4/numOfTerms, 5/numOfTerms, 6/numOfTerms};
