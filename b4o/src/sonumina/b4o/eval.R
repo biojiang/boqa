@@ -233,7 +233,16 @@ if (file.exists("fnd.txt"))
 	save(res.list.freq.vs.freq,file="b4o_res.list.freq.vs.freq.RObj",compress=T)
 }
 
-# ssss
+# values for the table (freq)
+freq.important<-which(d$marg.freq > 0.5)
+freq.positives<-length(freq.important)
+freq.tp<-sum(d$label[freq.important])
+print(sprintf("tp=%d tp+fp=%d ppv=%g",freq.tp,freq.positives,freq.tp/freq.positives))
+
+avg.p.important<-which(d$resnick.avg.p<0.05/2368)
+avg.p.positives<-length(avg.p.important)
+avg.p.tp<-sum(d$label[avg.p.important])
+print(sprintf("tp=%d tp+fp=%d ppv=%g",avg.tp,avg.positives,avg.tp/avg.positives))
 
 col<-c("red","blue","cyan","green","gray","orange","magenta", "black")
 
