@@ -204,9 +204,6 @@ public class B4O
 	/** Contains the query cache, needs to be synched when accessed */
 	private static QuerySets queryCache;
 
-	/** Contains the directory where the score distribution is stored */
-	private static File scoreDistributionDirectory;
-	
 	/** Stores the score distribution */
 	private static ApproximatedEmpiricalDistributions scoreDistributions;
 
@@ -1151,10 +1148,6 @@ public class B4O
 			System.out.println("Considering " + slimGraph.getNumberOfVertices() + " terms");
 		}
 		
-		/* Define the directory in which the distributions are stored */
-		scoreDistributionDirectory = new File("distribution",allItemList.size() + "-" + CONSIDER_FREQUENCIES_ONLY + "-" + SIZE_OF_SCORE_DISTRIBUTION);
-		scoreDistributionDirectory.mkdirs();
-		
 		/** Here we precaculate the maxICs of two given terms in a dense matrix */
 		if (PRECALCULATE_MAXICS)
 		{
@@ -1201,13 +1194,14 @@ public class B4O
 		if (CACHE_RANDOM_QUERIES)
 		{
 			boolean distributionLoaded = false;
+			String scoreDistributionsName = "scoreDistributions-" + allItemList.size() + "-" + CONSIDER_FREQUENCIES_ONLY + "-" + SIZE_OF_SCORE_DISTRIBUTION + ".gz";
 			
 			queryCache = new QuerySets(MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1);
 
 			if (CACHE_SCORE_DISTRIBUTION || PRECALCULATE_SCORE_DISTRIBUTION)
 			{
 				try {
-					File inFile = new File(scoreDistributionDirectory.getAbsolutePath(),"scoreDistributions.gz");
+					File inFile = new File(scoreDistributionsName);
 					InputStream underlyingStream = new GZIPInputStream(new FileInputStream(inFile));
 					ObjectInputStream ois = new ObjectInputStream(underlyingStream);
 					
@@ -1275,7 +1269,7 @@ public class B4O
 				if (STORE_SCORE_DISTRIBUTION && !distributionLoaded)
 				{
 					try {
-						File outFile = new File(scoreDistributionDirectory.getAbsolutePath(),"scoreDistributions.gz");
+						File outFile = new File(scoreDistributionsName);
 						OutputStream underlyingStream = new GZIPOutputStream(new FileOutputStream(outFile));
 						ObjectOutputStream oos = new ObjectOutputStream(underlyingStream);
 						
