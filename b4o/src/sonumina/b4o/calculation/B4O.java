@@ -1848,19 +1848,22 @@ public class B4O
 		for (int o=0;o<allItemList.size();o++)
 			itemIndices.add(o);
 
-		System.out.println("Start TSP");
-		long start = System.nanoTime();
-		Algorithms.approximatedTSP(itemIndices, itemIndices.get(0),
-				new Algorithms.IVertexDistance<Integer>() {
-					@Override
-					public double distance(Integer ai, Integer bi)
-					{
-						int [] at = items2Terms[ai.intValue()];
-						int [] bt = items2Terms[bi.intValue()];
-						return Algorithms.hammingDistanceSparse(at, bt);
-					}
-				});
-		System.out.println("End (" + ((System.nanoTime() - start) / 1000 / 1000) + "ms)");
+		if (false)
+		{
+			System.out.println("Start TSP");
+			long start = System.nanoTime();
+			Algorithms.approximatedTSP(itemIndices, itemIndices.get(0),
+					new Algorithms.IVertexDistance<Integer>() {
+						@Override
+						public double distance(Integer ai, Integer bi)
+						{
+							int [] at = items2Terms[ai.intValue()];
+							int [] bt = items2Terms[bi.intValue()];
+							return Algorithms.hammingDistanceSparse(at, bt);
+						}
+					});
+			System.out.println("End (" + ((System.nanoTime() - start) / 1000 / 1000) + "ms)");
+		}
 	}
 
 	/**
