@@ -87,6 +87,7 @@ public class B4OCore
 		}
 		
 		B4O.setConsiderFrequenciesOnly(false);
+		B4O.setPrecalculateScoreDistribution(false);
 		B4O.setup(localOntology, localAssociations);
 
 		ontology = B4O.getOntology();
