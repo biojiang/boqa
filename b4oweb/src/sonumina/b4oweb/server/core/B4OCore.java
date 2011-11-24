@@ -86,6 +86,7 @@ public class B4OCore
 			localAssociations = new AssociationContainer();
 		}
 		
+		B4O.setConsiderFrequenciesOnly(false);
 		B4O.setup(localOntology, localAssociations);
 
 		ontology = B4O.getOntology();
