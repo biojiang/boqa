@@ -242,7 +242,7 @@ print(sprintf("tp=%d tp+fp=%d ppv=%g",freq.tp,freq.positives,freq.tp/freq.positi
 avg.p.important<-which(d$resnick.avg.p<0.05/2368)
 avg.p.positives<-length(avg.p.important)
 avg.p.tp<-sum(d$label[avg.p.important])
-print(sprintf("tp=%d tp+fp=%d ppv=%g",avg.tp,avg.positives,avg.tp/avg.positives))
+print(sprintf("tp=%d tp+fp=%d ppv=%g",avg.p.tp,avg.p.positives,avg.p.tp/avg.p.positives))
 
 col<-c("red","blue","cyan","green","gray","orange","magenta", "black")
 
