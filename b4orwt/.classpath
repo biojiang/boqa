@@ -18,9 +18,9 @@
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.core.commands_3.6.0.I20110111-0800.jar" sourcepath="WebContent/WEB-INF/lib/org.eclipse.core.commands.source_3.6.0.I20110111-0800.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.equinox.common_3.6.0.v20110523.jar" sourcepath="WebContent/WEB-INF/lib/org.eclipse.equinox.common.source_3.6.0.v20110523.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.rap.jface_1.5.0.20111014-0115.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.rap.ui.forms_1.5.0.20111014-0115.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.rap.rwt_1.5.0.20111018-0113.jar" sourcepath="WebContent/WEB-INF/lib/org.eclipse.rap.rwt.source_1.5.0.20111018-0113.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.rap.jface_1.5.0.20111115-0213.jar" sourcepath="WebContent/WEB-INF/lib/org.eclipse.rap.jface.source_1.5.0.20111115-0213.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.rap.ui.forms_1.5.0.20111115-0213.jar" sourcepath="WebContent/WEB-INF/lib/org.eclipse.rap.ui.forms.source_1.5.0.20111115-0213.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.rap.rwt_1.5.0.20111115-0213.jar" sourcepath="WebContent/WEB-INF/lib/org.eclipse.rap.rwt.source_1.5.0.20111115-0213.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/com.ibm.icu.base_4.4.2.v20110831.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
