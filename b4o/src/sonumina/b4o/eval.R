@@ -239,6 +239,11 @@ freq.positives<-length(freq.important)
 freq.tp<-sum(d$label[freq.important])
 print(sprintf("tp=%d tp+fp=%d ppv=%g",freq.tp,freq.positives,freq.tp/freq.positives))
 
+freq.ideal.important<-which(d$marg.freq.ideal > 0.5)
+freq.ideal.positives<-length(freq.ideal.important)
+freq.ideal.tp<-sum(d$label[freq.ideal.important])
+print(sprintf("tp=%d tp+fp=%d ppv=%g",freq.ideal.tp,freq.ideal.positives,freq.ideal.tp/freq.ideal.positives))
+
 avg.p.important<-which(d$resnick.avg.p<0.05/2368)
 avg.p.positives<-length(avg.p.important)
 avg.p.tp<-sum(d$label[avg.p.important])
