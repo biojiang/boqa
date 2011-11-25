@@ -1265,7 +1265,7 @@ public class B4O
 							for (int qs=1;qs <= MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION; qs++)
 							{
 								int [][] queries = getRandomizedQueries(rnd, qs);
-								ApproximatedEmpiricalDistribution d = getScoreDistribution(qs, item, queries);
+								getScoreDistribution(qs, item, queries);
 							}
 						}
 					};
@@ -2576,13 +2576,12 @@ public class B4O
 				if (scores[j] > maxScore) maxScore = scores[j];
 			}
 
+			ApproximatedEmpiricalDistribution d2 = new ApproximatedEmpiricalDistribution(scores,NUMBER_OF_BINS_IN_APPROXIMATED_SCORE_DISTRIBUTION);
+
 			scoreDistributionLock.writeLock().lock();
 			d = scoreDistributions.getDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize);
 			if (d == null)
-			{
-				d = new ApproximatedEmpiricalDistribution(scores,NUMBER_OF_BINS_IN_APPROXIMATED_SCORE_DISTRIBUTION);
-				scoreDistributions.setDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize, d);
-			}
+				scoreDistributions.setDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize, d2);
 			scoreDistributionLock.writeLock().unlock();
 		}
 
