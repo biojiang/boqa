@@ -2566,20 +2566,20 @@ public class B4O
 
 		if (d == null)
 		{
+			/* Determine score distribution */
+			double [] scores = new double[SIZE_OF_SCORE_DISTRIBUTION];
+			double maxScore = Double.NEGATIVE_INFINITY;
+
+			for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
+			{
+				scores[j] = simScoreVsItem(queries[j], item);
+				if (scores[j] > maxScore) maxScore = scores[j];
+			}
+
 			scoreDistributionLock.writeLock().lock();
 			d = scoreDistributions.getDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize);
 			if (d == null)
 			{
-				/* Determine score distribution */
-				double [] scores = new double[SIZE_OF_SCORE_DISTRIBUTION];
-				double maxScore = Double.NEGATIVE_INFINITY;
-
-				for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
-				{
-					scores[j] = simScoreVsItem(queries[j], item);
-					if (scores[j] > maxScore) maxScore = scores[j];
-				}
-
 				d = new ApproximatedEmpiricalDistribution(scores,NUMBER_OF_BINS_IN_APPROXIMATED_SCORE_DISTRIBUTION);
 				scoreDistributions.setDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize, d);
 			}
