@@ -47,7 +47,6 @@ public class B4O
 		   if (cl.hasOption('m'))
 		   {
 			   sonumina.b4o.calculation.B4O.maxTerms = Integer.parseInt(cl.getOptionValue('m'));
-			   sonumina.b4o.calculation.B4O.setMaxQuerySizeForCachedDistribution(sonumina.b4o.calculation.B4O.maxTerms);
 		   }
 
 		   if (cl.hasOption('c'))
