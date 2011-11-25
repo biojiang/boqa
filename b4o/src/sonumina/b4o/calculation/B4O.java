@@ -1296,7 +1296,7 @@ public class B4O
 		double numOfTerms = getSlimGraph().getNumberOfVertices();
 		
 		ALPHA_GRID = new double[]{1e-10, 1/numOfTerms, 2/numOfTerms, 3/numOfTerms, 4/numOfTerms, 5/numOfTerms, 6/numOfTerms};
-		BETA_GRID = new double[]{0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9};
+		BETA_GRID = new double[]{0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95};
 	}
 
 	
