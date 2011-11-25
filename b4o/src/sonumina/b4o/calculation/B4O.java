@@ -212,7 +212,7 @@ public class B4O
 	
 	/* Settings for generation of random data */
 //	private final double ALPHA = 0.002; // 0.01
-	private static double ALPHA = 0.001;
+	private static double ALPHA = 0.002;
 	private static double BETA = 0.10;   // 0.1
 	
 	/* Settings for inference */
@@ -1123,6 +1123,8 @@ public class B4O
 			fp += slimGraph.getVertex(i).getID().id;
 			fp += slimGraph.getVertex(i).getName().hashCode();
 		}
+		fp += new Random(SIZE_OF_SCORE_DISTRIBUTION).nextInt();
+		fp += new Random(MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION).nextInt();
 		return fp;
 	}
 
@@ -1249,7 +1251,7 @@ public class B4O
 
 				if (getNumProcessors() > 1) es = Executors.newFixedThreadPool(getNumProcessors());
 				else es = null;
-
+				
 				for (int i=0;i<allItemList.size();i++)
 				{
 					final long seed = rnd.nextLong();
