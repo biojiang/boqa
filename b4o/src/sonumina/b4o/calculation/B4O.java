@@ -24,7 +24,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -212,9 +211,9 @@ public class B4O
 	public static Pattern frequencyFractionPattern = Pattern.compile("(\\d+)/(\\d+)");
 	
 	/* Settings for generation of random data */
-//	private final static double ALPHA = 0.002; // 0.01
-	private final static double ALPHA = 0.001;
-	private final static double BETA = 0.10;   // 0.1
+//	private final double ALPHA = 0.002; // 0.01
+	private static double ALPHA = 0.001;
+	private static double BETA = 0.10;   // 0.1
 	
 	/* Settings for inference */
 	private static double ALPHA_GRID[] = new double[]{1e-10,0.0005,0.001,0.005,0.01};
@@ -284,6 +283,26 @@ public class B4O
 	private static final boolean VERBOSE = false;
 
 	/* Some configuration stuff */
+	
+	/**
+	 * Set alpha value used in the simulation.
+	 * 
+	 * @param alpha
+	 */
+	public static void setSimulationAlpha(double alpha)
+	{
+		ALPHA = alpha;
+	}
+
+	/**
+	 * Set alpha value used in the simulation.
+	 * 
+	 * @param alpha
+	 */
+	public static void setSimulationBeta(double beta)
+	{
+		BETA = beta;
+	}
 	
 	/**
 	 * Sets, whether only frequencies should be considered.
