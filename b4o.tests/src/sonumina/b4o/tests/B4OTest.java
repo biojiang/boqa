@@ -29,8 +29,6 @@ import sonumina.math.graph.SlimDirectedGraphView;
 
 public class B4OTest {
 
-	private static InternalDatafiles data = new InternalDatafiles();
-
 	/**
 	 * Tests the choose function.
 	 */
@@ -77,6 +75,10 @@ public class B4OTest {
 	@Test
 	public void test()
 	{
+		InternalDatafiles data = new InternalDatafiles();
+		int terms = data.graph.getNumberOfTerms();
+		assertEquals(15,terms);
+
 		Random rnd = new Random(2);
 
 		B4O.setConsiderFrequenciesOnly(false);
@@ -89,7 +91,7 @@ public class B4OTest {
 			public String getDotNodeAttributes(TermID id) {
 				Term t = B4O.graph.getTerm(id);
 				int idx = B4O.slimGraph.getVertexIndex(t);
-				return "shape=\"box\",label=\""+B4O.graph.getTerm(id).getName()+"\\n" + String.format("%g",B4O.terms2IC[idx]) + "\"";
+				return "shape=\"box\",label=\""+B4O.graph.getTerm(id).getName()+"\\n" + B4O.getNumberOfItemsAnnotatedToTerm(idx) + " " + String.format("%g",B4O.terms2IC[idx]) + "\"";
 			}
 		});
 
@@ -104,7 +106,6 @@ public class B4OTest {
 			System.out.println(i + " " + B4O.slimGraph.getVertex(i).getIDAsString());
 		}
 
-		int terms = data.graph.getNumberOfTerms();
 		boolean [] obs = new boolean[terms];
 
 		for (int i=0;i<B4O.items2DirectTerms[2].length;i++)
