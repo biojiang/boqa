@@ -12,6 +12,11 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+/**
+ * Main entry point of the B4O benchmark.
+ * 
+ * @author Sebastian Bauer
+ */
 public class B4O
 {
 	static private String ontologyPath;
