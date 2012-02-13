@@ -131,6 +131,12 @@ public class InternalDatafiles extends Datafiles
 							else
 								return "shape=\"box\",label=\""+vt+"\"";
 						}
+						
+						@Override
+						public String getDotEdgeAttributes(String src, String dest)
+						{
+							return "dir=\"back\"";
+						}
 					});
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
