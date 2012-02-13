@@ -143,7 +143,7 @@ public class B4OTest {
 		
 		AssociationContainer assocs = new AssociationContainer();
 		
-		for (int i=0;i<100000;i++)
+		for (int i=0;i<10000;i++)
 		{
 			ByteString item = new ByteString("item" + i);
 
