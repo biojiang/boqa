@@ -3,7 +3,9 @@
     <wb-module deploy-name="b4orwt">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/external"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/internal"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src.grappa"/>
         <property name="context-root" value="b4orwt"/>
         <property name="java-output-path" value="/b4orwt/build/classes"/>
     </wb-module>
