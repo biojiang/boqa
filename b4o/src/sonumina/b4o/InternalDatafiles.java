@@ -81,7 +81,6 @@ public class InternalDatafiles extends Datafiles
 		assoc.addAssociation(new Association(new ByteString("item1"),4));
 		assoc.addAssociation(new Association(new ByteString("item1"),11));
 
-		assoc.addAssociation(new Association(new ByteString("item2"),2));
 		assoc.addAssociation(new Association(new ByteString("item2"),10));
 		assoc.addAssociation(new Association(new ByteString("item2"),13));
 
