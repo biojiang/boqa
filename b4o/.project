@@ -3,7 +3,6 @@
 	<name>b4o</name>
 	<comment></comment>
 	<projects>
-		<project>ontologizer</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
