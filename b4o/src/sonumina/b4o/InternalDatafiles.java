@@ -1,11 +1,14 @@
 package sonumina.b4o;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.HashSet;
 import java.util.Random;
 
 import ontologizer.association.Association;
 import ontologizer.association.AssociationContainer;
+import ontologizer.association.Gene2Associations;
 import ontologizer.benchmark.Datafiles;
 import ontologizer.dotwriter.AbstractDotAttributesProvider;
 import ontologizer.dotwriter.GODOTWriter;
@@ -16,6 +19,9 @@ import ontologizer.go.TermContainer;
 import ontologizer.go.TermID;
 import ontologizer.go.TermRelation;
 import ontologizer.types.ByteString;
+import sonumina.math.graph.AbstractGraph.DotAttributesProvider;
+import sonumina.math.graph.DirectedGraph;
+import sonumina.math.graph.Edge;
 
 /**
  * Class representing some internal data files.
@@ -26,7 +32,7 @@ public class InternalDatafiles extends Datafiles
 {
 	public static long seed = 1;
 	
-	public InternalDatafiles()
+	public InternalDatafiles() 
 	{
 		/* Go Graph */
 		HashSet<Term> terms = new HashSet<Term>();
@@ -89,7 +95,6 @@ public class InternalDatafiles extends Datafiles
 		assoc.addAssociation(new Association(new ByteString("item5"),6));
 		assoc.addAssociation(new Association(new ByteString("item5"),14));
 
-
 		GODOTWriter.writeDOT(graph, new File("example.dot"), null, tids, new AbstractDotAttributesProvider() {
 			public String getDotNodeAttributes(TermID id) {
 
@@ -97,6 +102,44 @@ public class InternalDatafiles extends Datafiles
 			}
 		});
 
+		DirectedGraph<String> graphWithItems = new DirectedGraph<String>();
+		for (Term term : terms)
+			graphWithItems.addVertex(term.getName());
+
+		for (Term term : terms)
+		{
+			for (ParentTermID pid : term.getParents())
+			{
+				graphWithItems.addEdge(new Edge<String>(graph.getTerm(pid.termid).getName(),term.getName()));
+			}
+		}
+		
+		graphWithItems.addVertex("item1");
+		graphWithItems.addVertex("item2");
+		graphWithItems.addVertex("item3");
+		graphWithItems.addVertex("item4");
+		graphWithItems.addVertex("item5");
+
+		for (Gene2Associations g2a : assoc)
+			for (TermID tid : g2a.getAssociations())
+				graphWithItems.addEdge(new Edge<String>(graph.getTerm(tid).getName(),g2a.name().toString()));
+
+		try {
+			graphWithItems.writeDOT(new FileOutputStream("full.dot"), new DotAttributesProvider<String>()
+					{
+						@Override
+						public String getDotNodeAttributes(String vt)
+						{
+							if (vt.startsWith("C"))
+								return "label=\""+vt+"\"";
+							else
+								return "shape=\"box\",label=\""+vt+"\"";
+						}
+					});
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
