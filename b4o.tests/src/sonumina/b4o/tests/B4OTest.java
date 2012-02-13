@@ -89,7 +89,7 @@ public class B4OTest {
 			public String getDotNodeAttributes(TermID id) {
 				Term t = B4O.graph.getTerm(id);
 				int idx = B4O.slimGraph.getVertexIndex(t);
-				return "label=\""+B4O.graph.getTerm(id).getName()+"\\n" + String.format("%g",B4O.terms2IC[idx]) + "\"";
+				return "shape=\"box\",label=\""+B4O.graph.getTerm(id).getName()+"\\n" + String.format("%g",B4O.terms2IC[idx]) + "\"";
 			}
 		});
 
