@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.HashSet;
-import java.util.Random;
 
 import ontologizer.association.Association;
 import ontologizer.association.AssociationContainer;
@@ -30,8 +29,6 @@ import sonumina.math.graph.Edge;
  */
 public class InternalDatafiles extends Datafiles
 {
-	public static long seed = 1;
-	
 	public InternalDatafiles() 
 	{
 		/* Go Graph */
