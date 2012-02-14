@@ -109,102 +109,102 @@ public class B4O
 	/** Our logger */
 	private static Logger logger = Logger.getLogger(B4O.class.getCanonicalName());
 
-	public static Ontology graph;
-	public static AssociationContainer assoc;
+	public Ontology graph;
+	public AssociationContainer assoc;
 	
 	/** Term enumerator */
-	private static GOTermEnumerator termEnumerator;
+	private GOTermEnumerator termEnumerator;
 	
 	/** Slim variant of the graph */
-	public static SlimDirectedGraphView<Term> slimGraph;
+	public SlimDirectedGraphView<Term> slimGraph;
 
 	/** An array of all items */
-	public static ArrayList<ByteString> allItemList;
+	public ArrayList<ByteString> allItemList;
 	
 	/** Map items to their index */
-	public static HashMap<ByteString,Integer> item2Index;
+	public HashMap<ByteString,Integer> item2Index;
 
 	/** Links items to terms */
-	public static int [][] items2Terms;
+	public int [][] items2Terms;
 
 	/**
 	 * For each item, contains the term ids which need to be switched on, if
 	 * the previous item was on.
 	 */
-	public static int [][] diffOnTerms;
+	public int [][] diffOnTerms;
 	
 	/**
 	 * Same as diffOnTerms but for switching off terms.
 	 */
-	public static int [][] diffOffTerms;
+	public int [][] diffOffTerms;
 
 	/**
-	 * Similiar to diffOnTerms but each adjacent frequency-implied state
+	 * Similar to diffOnTerms but each adjacent frequency-implied state
 	 */
-	public static int [][][] diffOnTermsFreqs;
+	public int [][][] diffOnTermsFreqs;
 	
 	/**
-	 * Similiar to diffOffTerms but each adjacent frequency-implied state
+	 * Similar to diffOffTerms but each adjacent frequency-implied state
 	 */
-	public static int [][][] diffOffTermsFreqs;
+	public int [][][] diffOffTermsFreqs;
 	
 	/**
 	 * The factors of each combination.
 	 */
-	public static double [][] factors;
+	public double [][] factors;
 
 	/** Links items to directly associated terms */
-	public static int [][] items2DirectTerms;
+	public int [][] items2DirectTerms;
 
 	/**
 	 * Links items to the frequencies of corresponding directly associated terms.
 	 * Frequencies are interpreted as probabilities that the corresponding term
 	 * is on.
 	 */ 
-	public static double [][] items2TermFrequencies;
+	public double [][] items2TermFrequencies;
 	
 	/**
 	 * This contains the (ascending) order of the items2TermFrequencies,
 	 * E.g., use item2TermFrequenciesOrder[0][2] to determine the term
 	 * that is associated to first item and has the third lowest frequency.
 	 */
-	public static int [][] item2TermFrequenciesOrder;
+	public int [][] item2TermFrequenciesOrder;
 	
 	/** Indicates whether an item have explicit frequencies */
-	public static boolean [] itemHasFrequencies;
+	public boolean [] itemHasFrequencies;
 	
 	/** Contains all the ancestors of the terms */
-	public static int [][] term2Ancestors;
+	public int [][] term2Ancestors;
 
 	/** Contains the parents of the terms */
-	public static int [][] term2Parents;
+	public int [][] term2Parents;
 	
 	/** Contains the children of the term */
-	public static int [][] term2Children;
+	public int [][] term2Children;
 	
 	/** Contains the descendants of the (i.e., children, grand-children, etc.) */
-	public static int [][] term2Descendants;
+	public int [][] term2Descendants;
 
 	/** Contains the order of the terms */
-	public static int [] termsInTopologicalOrder;
+	public int [] termsInTopologicalOrder;
 	
 	/** Contains the topological rank of the term */
-	public static int [] termsToplogicalRank;
+	public int [] termsToplogicalRank;
 
 	/** Contains the IC of the terms */
-	public static double [] terms2IC;
+	public double [] terms2IC;
 
 	/** Contains the term with maximum common ancestor of two terms */
-	private static int micaMatrix[][];
+	private int micaMatrix[][];
 
 	/** Contains for each item the max mica for the given term */ 
-	private static int [][] micaForItem;
+	private int [][] micaForItem;
 	
 	/** Contains the query cache, needs to be synched when accessed */
-	private static QuerySets queryCache;
+	private QuerySets queryCache;
 
 	/** Stores the score distribution */
-	private static ApproximatedEmpiricalDistributions scoreDistributions;
+	private ApproximatedEmpiricalDistributions scoreDistributions;
 
 	/** Used to parse frequency information */
 	public static Pattern frequencyPattern = Pattern.compile("(\\d+)\\.?(\\d*)\\s*%");
@@ -212,12 +212,12 @@ public class B4O
 	
 	/* Settings for generation of random data */
 //	private final double ALPHA = 0.002; // 0.01
-	private static double ALPHA = 0.002;
-	private static double BETA = 0.10;   // 0.1
+	private double ALPHA = 0.002;
+	private double BETA = 0.10;   // 0.1
 	
 	/* Settings for inference */
-	private static double ALPHA_GRID[] = new double[]{1e-10,0.0005,0.001,0.005,0.01};
-	private static double BETA_GRID[] = new double[] {1e-10,0.005,0.01,0.05,0.1,0.2,0.4,0.8,0.9};
+	private double ALPHA_GRID[] = new double[]{1e-10,0.0005,0.001,0.005,0.01};
+	private double BETA_GRID[] = new double[] {1e-10,0.005,0.01,0.05,0.1,0.2,0.4,0.8,0.9};
 	
 //	private final static int MAX_SAMPLES = 1;
 //	private static boolean CONSIDER_FREQUENCIES_ONLY = false;
@@ -226,13 +226,13 @@ public class B4O
 //	private final static int SIZE_OF_SCORE_DISTRIBUTION = 250000;
 //	public static int maxTerms = -1;
 
-	private final static int MAX_SAMPLES = 5;
-	private static boolean CONSIDER_FREQUENCIES_ONLY = true;
-	private final static String RESULT_NAME = "fnd-freq-only.txt";
-	private final static String [] evidenceCodes = null;//new String[]{"PCS","ICE"};
-	private final static int SIZE_OF_SCORE_DISTRIBUTION = 250000;
-	private final static int NUMBER_OF_BINS_IN_APPROXIMATED_SCORE_DISTRIBUTION = 10000;
-	public static int maxTerms = -1;						/* Defines the maximal number of terms a query can have */
+	private final int MAX_SAMPLES = 5;
+	private boolean CONSIDER_FREQUENCIES_ONLY = true;
+	private final String RESULT_NAME = "fnd-freq-only.txt";
+	private final String [] evidenceCodes = null;//new String[]{"PCS","ICE"};
+	private final int SIZE_OF_SCORE_DISTRIBUTION = 250000;
+	private final int NUMBER_OF_BINS_IN_APPROXIMATED_SCORE_DISTRIBUTION = 10000;
+	public int maxTerms = -1;						/* Defines the maximal number of terms a query can have */
 	
 	/** False positives can be explained via inheritance */
 	private static int VARIANT_INHERITANCE_POSITIVES = 1<<0;
@@ -244,43 +244,43 @@ public class B4O
 	private static int VARIANT_RESPECT_FREQUENCIES = 1<<2;
 
 	/** Defines the model as a combination of above flags */
-	private static int MODEL_VARIANT = VARIANT_RESPECT_FREQUENCIES | VARIANT_INHERITANCE_NEGATIVES;// | VARIANT_INHERITANCE_POSITIVES;
+	private int MODEL_VARIANT = VARIANT_RESPECT_FREQUENCIES | VARIANT_INHERITANCE_NEGATIVES;// | VARIANT_INHERITANCE_POSITIVES;
 
 	/** If set to true, empty observation are allowed */
-	private static boolean ALLOW_EMPTY_OBSERVATIONS = false;
+	private boolean ALLOW_EMPTY_OBSERVATIONS = false;
 	
 	/** Activate debugging */
-	private static final boolean DEBUG = false;
+	private final boolean DEBUG = false;
 	
 	/** Use threading */
-	private static final boolean THREADING_IN_SIMULATION = true;
+	private final boolean THREADING_IN_SIMULATION = true;
 	
 	/** Use cached MaxIC terms. Speeds up Resnik */
-	private static final boolean PRECALCULATE_MAXICS = true;
+	private final boolean PRECALCULATE_MAXICS = true;
 	
 	/** Use precalculated max items. Speeds up Resnik */
-	private static boolean PRECALCULATE_ITEM_MAXS = true;
+	private boolean PRECALCULATE_ITEM_MAXS = true;
 	
 	/** Cache the queries */
-	private static final boolean CACHE_RANDOM_QUERIES = true; 
+	private final boolean CACHE_RANDOM_QUERIES = true; 
 
 	/** Forbid illegal queries */
-	private static final boolean FORBID_ILLEGAL_QUERIES = true;
+	private final boolean FORBID_ILLEGAL_QUERIES = true;
 
 	/** Cache the score distribution during  calculation */
-	private static boolean CACHE_SCORE_DISTRIBUTION = true; 
+	private boolean CACHE_SCORE_DISTRIBUTION = true; 
 
 	/** Precalculate score distribution. Always implies CACHE_SCORE_DISTRIBUTION. */
-	private static boolean PRECALCULATE_SCORE_DISTRIBUTION = true;
+	private boolean PRECALCULATE_SCORE_DISTRIBUTION = true;
 	
 	/** Identifies whether score distribution should be stored */
-	private static final boolean STORE_SCORE_DISTRIBUTION = true;
+	private final boolean STORE_SCORE_DISTRIBUTION = true;
 
 	/** Defines the maximal query size for the cached distribution */
-	private static int MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION = 20;
+	private int MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION = 20;
 
 	/** Some more verbose output */
-	private static final boolean VERBOSE = false;
+	private final boolean VERBOSE = false;
 
 	/* Some configuration stuff */
 	
@@ -289,7 +289,7 @@ public class B4O
 	 * 
 	 * @param alpha
 	 */
-	public static void setSimulationAlpha(double alpha)
+	public void setSimulationAlpha(double alpha)
 	{
 		ALPHA = alpha;
 	}
@@ -299,7 +299,7 @@ public class B4O
 	 * 
 	 * @param alpha
 	 */
-	public static void setSimulationBeta(double beta)
+	public void setSimulationBeta(double beta)
 	{
 		BETA = beta;
 	}
@@ -309,7 +309,7 @@ public class B4O
 	 * 
 	 * @param frequencies
 	 */
-	public static void setConsiderFrequenciesOnly(boolean frequencies)
+	public void setConsiderFrequenciesOnly(boolean frequencies)
 	{
 		CONSIDER_FREQUENCIES_ONLY = frequencies;
 	}
@@ -319,7 +319,7 @@ public class B4O
 	 * 
 	 * @param size
 	 */
-	public static void setMaxQuerySizeForCachedDistribution(int size)
+	public void setMaxQuerySizeForCachedDistribution(int size)
 	{
 		MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION = size;
 	}
@@ -329,7 +329,7 @@ public class B4O
 	 * 
 	 * @param precalc
 	 */
-	public static void setPrecalculateScoreDistribution(boolean precalc)
+	public void setPrecalculateScoreDistribution(boolean precalc)
 	{
 		PRECALCULATE_SCORE_DISTRIBUTION = precalc;
 	}
@@ -339,7 +339,7 @@ public class B4O
 	 * 
 	 * @param cache
 	 */
-	public static void setCacheScoreDistribution(boolean cache)
+	public void setCacheScoreDistribution(boolean cache)
 	{
 		CACHE_SCORE_DISTRIBUTION = cache;
 	}
@@ -350,7 +350,7 @@ public class B4O
 	 * 
 	 * @param precalc
 	 */
-	public static void setPrecalculateItemMaxs(boolean precalc)
+	public void setPrecalculateItemMaxs(boolean precalc)
 	{
 		PRECALCULATE_ITEM_MAXS = precalc;
 	}
@@ -361,7 +361,7 @@ public class B4O
 	 * 
 	 * @return
 	 */
-	public static boolean areFalseNegativesPropagated()
+	public boolean areFalseNegativesPropagated()
 	{
 		return (MODEL_VARIANT & VARIANT_INHERITANCE_POSITIVES) != 0;
 	}
@@ -372,7 +372,7 @@ public class B4O
 	 * 
 	 * @return
 	 */
-	public static boolean areFalsePositivesPropagated()
+	public boolean areFalsePositivesPropagated()
 	{
 		return (MODEL_VARIANT & VARIANT_INHERITANCE_NEGATIVES) != 0;
 	}
@@ -382,7 +382,7 @@ public class B4O
 	 *  
 	 * @return
 	 */
-	public static boolean allFalsesArePropagated()
+	public boolean allFalsesArePropagated()
 	{
 		return areFalseNegativesPropagated() && areFalsePositivesPropagated();
 	}
@@ -392,7 +392,7 @@ public class B4O
 	 * 
 	 * @return
 	 */
-	public static boolean respectFrequencies()
+	public boolean respectFrequencies()
 	{
 		return (MODEL_VARIANT & VARIANT_RESPECT_FREQUENCIES) != 0;
 	}
@@ -406,7 +406,7 @@ public class B4O
 	 * @param observed
 	 * @return
 	 */
-	private static boolean observeNode(Random rnd, int node, boolean [] hidden, boolean [] observed)
+	private boolean observeNode(Random rnd, int node, boolean [] hidden, boolean [] observed)
 	{
 		if (areFalsePositivesPropagated())
 		{
@@ -444,7 +444,7 @@ public class B4O
 	 * @param observed
 	 * @return
 	 */
-	private static Configuration.NodeCase getNodeCase(int node, boolean [] hidden, boolean [] observed)
+	private Configuration.NodeCase getNodeCase(int node, boolean [] hidden, boolean [] observed)
 	{
 		if (areFalsePositivesPropagated())
 		{
@@ -505,7 +505,7 @@ public class B4O
 	 * @param hidden
 	 * @param stats
 	 */
-	private static void determineCases(boolean [] observedTerms, boolean [] hidden, Configuration stats)
+	private void determineCases(boolean [] observedTerms, boolean [] hidden, Configuration stats)
 	{
 		int numTerms = slimGraph.getNumberOfVertices();
 
@@ -516,9 +516,9 @@ public class B4O
 		}
 	}
 	
-	static final boolean MEASURE_TIME = false;
+	private static final boolean MEASURE_TIME = false;
 
-	static long timeDuration;
+	private long timeDuration;
 	
 	/**
 	 * Determines the case of the given items and the given observations.
@@ -530,7 +530,7 @@ public class B4O
 	 *  it must be 0.
 	 * @return
 	 */
-	private static WeightedConfigurationList determineCasesForItem(int item, boolean [] observed, boolean takeFrequenciesIntoAccount, boolean [] previousHidden, Configuration previousStats )
+	private WeightedConfigurationList determineCasesForItem(int item, boolean [] observed, boolean takeFrequenciesIntoAccount, boolean [] previousHidden, Configuration previousStats )
 	{
 		int numAnnotatedTerms = items2TermFrequencies[item].length;
 		int numTerms = slimGraph.getNumberOfVertices();
@@ -723,7 +723,7 @@ public class B4O
 	 * @param observed
 	 * @return
 	 */
-	public static double scoreNode(int termIndex, double alpha, double beta, boolean [] hidden, boolean [] observed)
+	public double scoreNode(int termIndex, double alpha, double beta, boolean [] hidden, boolean [] observed)
 	{
 		double score = 0.0;
 
@@ -751,7 +751,7 @@ public class B4O
 	 * @return
 	 */
 	@SuppressWarnings("unused")
-	private static double scoreHidden(boolean [] observedTerms, double alpha, double beta, boolean [] hidden)
+	private double scoreHidden(boolean [] observedTerms, double alpha, double beta, boolean [] hidden)
 	{
 		Configuration stats = new Configuration();
 		determineCases(observedTerms, hidden, stats);
@@ -768,7 +768,7 @@ public class B4O
 	 * @param takeFrequenciesIntoAccount
 	 * @return
 	 */
-	public static double score(int item, double alpha, double beta, boolean [] observedTerms, boolean takeFrequenciesIntoAccount)
+	public double score(int item, double alpha, double beta, boolean [] observedTerms, boolean takeFrequenciesIntoAccount)
 	{
 		WeightedConfigurationList stats = determineCasesForItem(item,observedTerms,takeFrequenciesIntoAccount, null, null);
 		return stats.score(alpha,beta);
@@ -781,7 +781,7 @@ public class B4O
 	 * @param states
 	 * @return
 	 */
-	public static boolean orParents(int v, boolean [] states)
+	public boolean orParents(int v, boolean [] states)
 	{
 		int [] parents = term2Parents[v];
 		for (int i=0;i<parents.length;i++)
@@ -796,7 +796,7 @@ public class B4O
 	 * @param states
 	 * @return
 	 */
-	public static boolean andParents(int v, boolean [] states)
+	public boolean andParents(int v, boolean [] states)
 	{
 		int [] parents = term2Parents[v];
 		for (int i=0;i<parents.length;i++)
@@ -811,7 +811,7 @@ public class B4O
 	 * @param states
 	 * @return
 	 */
-	public static boolean andChildren(int v, boolean [] states)
+	public boolean andChildren(int v, boolean [] states)
 	{
 		int [] children = term2Children[v];
 		for (int i=0;i<children.length;i++)
@@ -826,7 +826,7 @@ public class B4O
 	 * @param states
 	 * @return
 	 */
-	public static boolean orChildren(int v, boolean [] states)
+	public boolean orChildren(int v, boolean [] states)
 	{
 		int [] children = term2Children[v];
 		for (int i=0;i<children.length;i++)
@@ -840,7 +840,7 @@ public class B4O
 	 * @param item
 	 * @return
 	 */
-	public static Observations generateObservations(int item, Random rnd)
+	public Observations generateObservations(int item, Random rnd)
 	{
 		int retry = 0;
 
@@ -1048,7 +1048,7 @@ public class B4O
 	 * @param i
 	 * @param observations
 	 */
-	public static void deactivateAncestors(int i, boolean [] observations)
+	public void deactivateAncestors(int i, boolean [] observations)
 	{
 		for (int j=0;j<term2Ancestors[i].length;j++)
 			observations[term2Ancestors[i][j]] = false;
@@ -1060,7 +1060,7 @@ public class B4O
 	 * @param i
 	 * @param observations
 	 */
-	public static void activateAncestors(int i, boolean[] observations)
+	public void activateAncestors(int i, boolean[] observations)
 	{
 		for (int j=0;j<term2Ancestors[i].length;j++)
 			observations[term2Ancestors[i][j]] = true;
@@ -1072,7 +1072,7 @@ public class B4O
 	 * @param i
 	 * @param observations
 	 */
-	private static void deactivateDecendants(int i, boolean[] observations)
+	private void deactivateDecendants(int i, boolean[] observations)
 	{
 		for (int j=0;j<term2Descendants[i].length;j++)
 			observations[term2Descendants[i][j]] = false;
@@ -1084,7 +1084,7 @@ public class B4O
 	 * 
 	 * @return
 	 */
-	private static Set<ByteString> extractItemsWithFrequencies()
+	private Set<ByteString> extractItemsWithFrequencies()
 	{
 		HashSet<ByteString> items = new HashSet<ByteString>();
 
@@ -1113,7 +1113,7 @@ public class B4O
 	 * 
 	 * @return
 	 */
-	private static int fingerprint()
+	private int fingerprint()
 	{
 		int fp = 0x3333;
 		for (int i=0;i<allItemList.size();i++)
@@ -1134,7 +1134,7 @@ public class B4O
 	 * @param ontology
 	 * @param associations
 	 */
-	public static void setup(Ontology ontology, AssociationContainer associations)
+	public void setup(Ontology ontology, AssociationContainer associations)
 	{
 		assoc = associations;
 		graph = ontology;
@@ -1329,7 +1329,7 @@ public class B4O
 	 * @throws IOException
 	 */
 	@SuppressWarnings("unused")
-	public static void benchmark(Ontology newOntology, AssociationContainer newAssociations) throws InterruptedException, IOException
+	public void benchmark(Ontology newOntology, AssociationContainer newAssociations) throws InterruptedException, IOException
 	{
 		int i;
 		int numProcessors = getNumProcessors();
@@ -1654,7 +1654,7 @@ public class B4O
 	 * @param allItemsToBeConsidered
 	 */
 	@SuppressWarnings("unused")
-	private static void provideGlobals(Set<ByteString> allItemsToBeConsidered)
+	private void provideGlobals(Set<ByteString> allItemsToBeConsidered)
 	{
 		int i;
 
@@ -1890,7 +1890,7 @@ public class B4O
 	/**
 	 * Create the diff annotation vectors.
 	 */
-	private static void createDiffVectors()
+	private void createDiffVectors()
 	{
 		int i;
 
@@ -2004,7 +2004,7 @@ public class B4O
 	 * @param i
 	 * @return
 	 */
-	public static int getNumberOfItemsAnnotatedToTerm(int i)
+	public int getNumberOfItemsAnnotatedToTerm(int i)
 	{
 		Term t = slimGraph.getVertex(i);
 		return termEnumerator.getAnnotatedGenes(t.getID()).totalAnnotatedCount();
@@ -2016,7 +2016,7 @@ public class B4O
 	 * @param freq
 	 * @return
 	 */
-	private static double getFrequencyFromString(String freq)
+	private double getFrequencyFromString(String freq)
 	{
 		double f = 1.0;
 
@@ -2088,7 +2088,7 @@ public class B4O
 	 * @param takeFrequenciesIntoAccount
 	 * @return
 	 */
-	public static Result assignMarginals(Observations observations, boolean takeFrequenciesIntoAccount)
+	public Result assignMarginals(Observations observations, boolean takeFrequenciesIntoAccount)
 	{
 		return assignMarginals(observations, takeFrequenciesIntoAccount, 1);
 	}
@@ -2101,7 +2101,7 @@ public class B4O
 	 * @param numThreads defines the number of threads to be used for the calculation.
 	 * @return
 	 */
-	public static Result assignMarginals(final Observations observations, final boolean takeFrequenciesIntoAccount, final int numThreads)
+	public Result assignMarginals(final Observations observations, final boolean takeFrequenciesIntoAccount, final int numThreads)
 	{
 		int i;
 		
@@ -2228,7 +2228,7 @@ public class B4O
 	 * @param t2
 	 * @return
 	 */
-	private static int commonAncestorWithMaxIC(int t1, int t2)
+	private int commonAncestorWithMaxIC(int t1, int t2)
 	{
 		if (micaMatrix != null)
 		{
@@ -2291,7 +2291,7 @@ public class B4O
 	 * @param terms
 	 * @return
 	 */
-	private static int [] mostSpecificTerms(int [] terms)
+	private int [] mostSpecificTerms(int [] terms)
 	{
 		ArrayList<TermID> termList = new ArrayList<TermID>(terms.length);
 		for (int i = 0;i<terms.length;i++)
@@ -2339,7 +2339,7 @@ public class B4O
 	 * @param observations
 	 * @return
 	 */
-	private static int[] getMostSpecificTermsSparse(boolean[] observations)
+	private int[] getMostSpecificTermsSparse(boolean[] observations)
 	{
 		int numObservedTerms = 0;
 		for (int i = 0;i<observations.length;i++)
@@ -2363,7 +2363,7 @@ public class B4O
 	 * @param tl2
 	 * @return
 	 */
-	private static double simScoreMaxAvg(int[] tl1, int[] tl2)
+	private double simScoreMaxAvg(int[] tl1, int[] tl2)
 	{
 		double score = 0;
 		for (int t1 : tl1)
@@ -2389,7 +2389,7 @@ public class B4O
 	 * @param item
 	 * @return
 	 */
-	private static double simScoreMaxAvgVsItem(int [] tl1, int item)
+	private double simScoreMaxAvgVsItem(int [] tl1, int item)
 	{
 		if (PRECALCULATE_ITEM_MAXS)
 		{
@@ -2409,7 +2409,7 @@ public class B4O
 	 * @param t2
 	 * @return
 	 */
-	private static double simScoreAvg(int[] t1, int[] t2)
+	private double simScoreAvg(int[] t1, int[] t2)
 	{
 		double score = 0;
 		for (int to : t1)
@@ -2431,7 +2431,7 @@ public class B4O
 	 * @param t2
 	 * @return
 	 */
-	private static double simScore(int[] t1, int[] t2)
+	private double simScore(int[] t1, int[] t2)
 	{
 		return simScoreMaxAvg(t1,t2);
 	}
@@ -2443,7 +2443,7 @@ public class B4O
 	 * @param item
 	 * @return
 	 */
-	public static double simScoreVsItem(int [] t1, int item)
+	public double simScoreVsItem(int [] t1, int item)
 	{
 		return simScoreMaxAvgVsItem(t1,item);
 	}
@@ -2453,7 +2453,7 @@ public class B4O
 	 * 
 	 * @return
 	 */
-	public static int [] newShuffledTerms()
+	public int [] newShuffledTerms()
 	{
 		int [] shuffledTerms = new int[slimGraph.getNumberOfVertices()];
 
@@ -2474,7 +2474,7 @@ public class B4O
 	 * 
 	 * @return
 	 */
-	public static Result resnikScore(boolean [] observations, boolean pval, Random rnd)
+	public Result resnikScore(boolean [] observations, boolean pval, Random rnd)
 	{
 		int [] observedTerms = getMostSpecificTermsSparse(observations);
 		int [] randomizedTerms = new int[observedTerms.length];
@@ -2558,7 +2558,7 @@ public class B4O
 	 * @param queries
 	 * @return
 	 */
-	private static ApproximatedEmpiricalDistribution getScoreDistribution(int querySize, int item, int[][] queries)
+	private ApproximatedEmpiricalDistribution getScoreDistribution(int querySize, int item, int[][] queries)
 	{
 		scoreDistributionLock.readLock().lock();
 		ApproximatedEmpiricalDistribution d = scoreDistributions.getDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize);
@@ -2589,7 +2589,7 @@ public class B4O
 	}
 
 	/** Lock for randomized querys */
-	private static ReentrantReadWriteLock queriesLock = new ReentrantReadWriteLock();
+	private ReentrantReadWriteLock queriesLock = new ReentrantReadWriteLock();
 
 	/**
 	 * Returns an array containing randomized term query. In the returned array,
@@ -2600,7 +2600,7 @@ public class B4O
 	 * @param querySize defines the size of the query.
 	 * @return
 	 */
-	private static int[][] getRandomizedQueries(Random rnd, int querySize)
+	private int[][] getRandomizedQueries(Random rnd, int querySize)
 	{
 		queriesLock.readLock().lock();
 		int [][] queries = queryCache.getQueries(querySize);
@@ -2633,7 +2633,7 @@ public class B4O
 	 * @param chosen
 	 * @param storage
 	 */
-	private static void chooseTerms(Random rnd, int size, int[] chosen, int[] storage)
+	private void chooseTerms(Random rnd, int size, int[] chosen, int[] storage)
 	{
 		if (FORBID_ILLEGAL_QUERIES)
 		{
@@ -2713,9 +2713,9 @@ public class B4O
 	 * @returns an array of Results.
 	 *  1. model without frequencies
 	 *  2. model with frequencies
-	 *  3. resnick (score and p value)
+	 *  3. resnik (score and p value)
 	 */
-	private static ExperimentStore processItem(int item, boolean provideGraph, Random rnd)
+	private ExperimentStore processItem(int item, boolean provideGraph, Random rnd)
 	{
 		int i;
 	
@@ -2878,7 +2878,7 @@ public class B4O
 	 * 
 	 * @return
 	 */
-	public static SlimDirectedGraphView<Term> getSlimGraph()
+	public SlimDirectedGraphView<Term> getSlimGraph()
 	{
 		return slimGraph;
 	}
@@ -2888,7 +2888,7 @@ public class B4O
 	 * 
 	 * @return
 	 */
-	public static Ontology getOntology()
+	public Ontology getOntology()
 	{
 		return graph;
 	}
@@ -2898,7 +2898,7 @@ public class B4O
 	 * 
 	 * @return
 	 */
-	public static AssociationContainer getAssociations()
+	public AssociationContainer getAssociations()
 	{
 		return assoc;
 	}
@@ -2908,7 +2908,7 @@ public class B4O
 	 * @param itemId
 	 * @return
 	 */
-	public static int[] getTermsDirectlyAnnotatedTo(int itemId)
+	public int[] getTermsDirectlyAnnotatedTo(int itemId)
 	{
 		return items2DirectTerms[itemId]; 
 	}
@@ -2921,7 +2921,7 @@ public class B4O
 	 * @param itemId
 	 * @return
 	 */
-	public static double[] getFrequenciesOfTermsDirectlyAnnotatedTo(int itemId)
+	public double[] getFrequenciesOfTermsDirectlyAnnotatedTo(int itemId)
 	{
 		return items2TermFrequencies[itemId];
 	}
@@ -2932,7 +2932,7 @@ public class B4O
 	 * @param t
 	 * @return
 	 */
-	public static int[] getParents(int t)
+	public int[] getParents(int t)
 	{
 		return term2Parents[t];
 	}

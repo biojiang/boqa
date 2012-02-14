@@ -22,6 +22,8 @@ public class B4O
 	static private String ontologyPath;
 	static private String annotationPath;
 
+	static sonumina.b4o.calculation.B4O b4o = new sonumina.b4o.calculation.B4O();
+
 	/**
 	 * Parses the command line.
 	 * 
@@ -33,7 +35,7 @@ public class B4O
 	   opt.addOption("o", "ontology", true, "Path or URL to the ontology file. Default is \"" + ontologyPath + "\"");
 	   opt.addOption("a", "annotations", true, "Path or URL to files containing annotations. Default is \"" + annotationPath + "\"");
 	   opt.addOption("c", "considerFreqOnly", false, "If specified, only items with frequencies are considered.");
-	   opt.addOption("m", "maxTerms", true, "Defines the maximal number of terms a random query can have. Default is " + sonumina.b4o.calculation.B4O.maxTerms);
+	   opt.addOption("m", "maxTerms", true, "Defines the maximal number of terms a random query can have. Default is " + b4o.maxTerms);
 	   opt.addOption("h", "help", false, "Shows this help");
 
 	   try
@@ -51,11 +53,11 @@ public class B4O
 		   
 		   if (cl.hasOption('m'))
 		   {
-			   sonumina.b4o.calculation.B4O.maxTerms = Integer.parseInt(cl.getOptionValue('m'));
+			   b4o.maxTerms = Integer.parseInt(cl.getOptionValue('m'));
 		   }
 
 		   if (cl.hasOption('c'))
-			   sonumina.b4o.calculation.B4O.setConsiderFrequenciesOnly(true);
+			   b4o.setConsiderFrequenciesOnly(true);
 		   
 		   ontologyPath = cl.getOptionValue('o',ontologyPath);
 		   annotationPath = cl.getOptionValue('a', annotationPath);
@@ -82,7 +84,7 @@ public class B4O
 		GlobalPreferences.setProxyHost("realproxy.charite.de");
 
 		Datafiles df = new Datafiles(ontologyPath,annotationPath);
-		sonumina.b4o.calculation.B4O.benchmark(df.graph, df.assoc);
+		b4o.benchmark(df.graph, df.assoc);
 
 		OntologizerThreadGroups.workerThreadGroup.interrupt();
 	}

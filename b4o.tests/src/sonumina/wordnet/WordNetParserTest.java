@@ -115,7 +115,8 @@ public class WordNetParserTest
 		}
 
 		System.err.println("Constructed data set");
-		B4O.setup(ontology, assocs);
+		final B4O b4o = new B4O();
+		b4o.setup(ontology, assocs);
 		System.err.println("Setted up ontology and associations");
 		
 	}

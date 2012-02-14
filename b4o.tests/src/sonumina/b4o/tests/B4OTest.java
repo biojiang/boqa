@@ -79,52 +79,54 @@ public class B4OTest {
 		int terms = data.graph.getNumberOfTerms();
 		assertEquals(15,terms);
 
+		final B4O b4o = new B4O();
+
 		Random rnd = new Random(2);
 
-		B4O.setConsiderFrequenciesOnly(false);
-		B4O.setMaxQuerySizeForCachedDistribution(4);
+		b4o.setConsiderFrequenciesOnly(false);
+		b4o.setMaxQuerySizeForCachedDistribution(4);
 
-		B4O.setup(data.graph, data.assoc);
+		b4o.setup(data.graph, data.assoc);
 		
 		/* Write out the graph */
-		GODOTWriter.writeDOT(B4O.graph, new File("example2.dot"), null, new HashSet<TermID>(B4O.graph.getLeafTermIDs()), new AbstractDotAttributesProvider() {
+		GODOTWriter.writeDOT(b4o.graph, new File("example2.dot"), null, new HashSet<TermID>(b4o.graph.getLeafTermIDs()), new AbstractDotAttributesProvider() {
 			public String getDotNodeAttributes(TermID id) {
-				Term t = B4O.graph.getTerm(id);
-				int idx = B4O.slimGraph.getVertexIndex(t);
-				return "shape=\"box\",label=\""+B4O.graph.getTerm(id).getName()+"\\n" + B4O.getNumberOfItemsAnnotatedToTerm(idx) + " " + String.format("%g",B4O.terms2IC[idx]) + "\"";
+				Term t = b4o.graph.getTerm(id);
+				int idx = b4o.slimGraph.getVertexIndex(t);
+				return "shape=\"box\",label=\""+b4o.graph.getTerm(id).getName()+"\\n" + b4o.getNumberOfItemsAnnotatedToTerm(idx) + " " + String.format("%g",b4o.terms2IC[idx]) + "\"";
 			}
 		});
 
 		
 		/* An example for avoiding similarity measure */
-		System.out.println(B4O.simScoreVsItem(new int[]{3,10},2));
-		System.out.println(B4O.simScoreVsItem(new int[]{9,10},2));
+		assertEquals(0.9163, b4o.simScoreVsItem(new int[]{3,10},2), 0.001);
+		assertEquals(1.26286432, b4o.simScoreVsItem(new int[]{9,10},2), 0.001);
 		
 		System.out.println("Mapping");
-		for (int i=0;i<B4O.slimGraph.getNumberOfVertices();i++)
+		for (int i=0;i<b4o.slimGraph.getNumberOfVertices();i++)
 		{
-			System.out.println(i + " " + B4O.slimGraph.getVertex(i).getIDAsString());
+			System.out.println(i + " " + b4o.slimGraph.getVertex(i).getIDAsString());
 		}
 
 		boolean [] obs = new boolean[terms];
 
-		for (int i=0;i<B4O.items2DirectTerms[2].length;i++)
+		for (int i=0;i<b4o.items2DirectTerms[2].length;i++)
 		{
-			int t=B4O.items2DirectTerms[2][i];
+			int t=b4o.items2DirectTerms[2][i];
 			obs[t] = true;
-			B4O.activateAncestors(t, obs);
+			b4o.activateAncestors(t, obs);
 		}
 
-		Result result = B4O.resnikScore(obs, true, rnd);
+		Result result = b4o.resnikScore(obs, true, rnd);
 		
-		for (int i=0;i<B4O.allItemList.size();i++)
+		for (int i=0;i<b4o.allItemList.size();i++)
 			System.out.println(result.getMarginal(i) + " " + result.getScore(i));
 
 		Observations o = new Observations();
 		o.observations = obs;
 		
-		result = B4O.assignMarginals(o, false);
-		for (int i=0;i<B4O.allItemList.size();i++)
+		result = b4o.assignMarginals(o, false);
+		for (int i=0;i<b4o.allItemList.size();i++)
 			System.out.println(result.getMarginal(i) + " " + result.getScore(i));
 		
 	}
@@ -134,6 +136,8 @@ public class B4OTest {
 	public void testLargeNumberOfItems() throws IOException, OBOParserException
 	{
 		Random rnd = new Random(2);
+
+		final B4O b4o = new B4O();
 
 		OBOParser hpoParser = new OBOParser("../b4o/data/human-phenotype-ontology.obo.gz");
 		hpoParser.doParse();
@@ -164,19 +168,19 @@ public class B4OTest {
 		}
 
 		System.err.println("Constructed data set");
-		B4O.setConsiderFrequenciesOnly(false);
-		B4O.setPrecalculateScoreDistribution(false);
-		B4O.setCacheScoreDistribution(false);
-		B4O.setPrecalculateItemMaxs(false);
-		B4O.setup(ontology, assocs);
+		b4o.setConsiderFrequenciesOnly(false);
+		b4o.setPrecalculateScoreDistribution(false);
+		b4o.setCacheScoreDistribution(false);
+		b4o.setPrecalculateItemMaxs(false);
+		b4o.setup(ontology, assocs);
 		System.err.println("Setted up ontology and associations");
 
 		Observations o = new Observations();
-		o.observations = new boolean[B4O.getOntology().getNumberOfTerms()];
+		o.observations = new boolean[b4o.getOntology().getNumberOfTerms()];
 
 		long start = System.nanoTime();
 		System.err.println("Calculating");
-		Result result = B4O.assignMarginals(o, false, 1);
+		Result result = b4o.assignMarginals(o, false, 1);
 		long end = System.nanoTime();
 
 		System.err.println(((end - start)/1000/1000) + "ms");
