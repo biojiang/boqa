@@ -33,6 +33,8 @@ public class B4OCore
 	static final String DEFINITIONS_PATH = "/home/sba/workspace/b4oweb/human-phenotype-ontology.obo.gz";
 	static final String ASSOCIATIONS_PATH = "/home/sba/workspace/b4oweb/phenotype_annotation.omim.gz";
 
+	static B4O b4o = new B4O();
+	
 	/**
 	 * The static ontology object. Defines terms that the user can select.
 	 */
@@ -86,13 +88,13 @@ public class B4OCore
 			localAssociations = new AssociationContainer();
 		}
 		
-		B4O.setConsiderFrequenciesOnly(false);
-		B4O.setPrecalculateScoreDistribution(false);
-		B4O.setup(localOntology, localAssociations);
+		b4o.setConsiderFrequenciesOnly(false);
+		b4o.setPrecalculateScoreDistribution(false);
+		b4o.setup(localOntology, localAssociations);
 
-		ontology = B4O.getOntology();
-		associations = B4O.getAssociations();
-		slimGraph = B4O.getSlimGraph();
+		ontology = b4o.getOntology();
+		associations = b4o.getAssociations();
+		slimGraph = b4o.getSlimGraph();
 
 		logger.info("Got ontology, associations and slim graph");
 
@@ -292,7 +294,7 @@ public class B4OCore
 		for (int id : serverIds)
 		{
 			observations[sorted2Idx[id]] = true;
-			B4O.activateAncestors(sorted2Idx[id],observations);
+			b4o.activateAncestors(sorted2Idx[id],observations);
 		}
 		
 		List<ItemResultEntry> resultList = new ArrayList<ItemResultEntry>();
@@ -300,7 +302,7 @@ public class B4OCore
 		Observations o = new Observations();
 		o.observations = observations;
 
-		Result result = B4O.assignMarginals(o, true, multiThreading?numberOfThreads:1);
+		Result result = b4o.assignMarginals(o, true, multiThreading?numberOfThreads:1);
 		for (int i=0;i<result.size();i++)
 		{
 			ItemResultEntry newEntry = ItemResultEntry.create(i, result.getMarginal(i));
@@ -328,7 +330,7 @@ public class B4OCore
 	 */
 	public static String getItemName(int itemId)
 	{
-		return B4O.allItemList.get(itemId).toString();
+		return b4o.allItemList.get(itemId).toString();
 	}
 
 	/**
@@ -340,7 +342,7 @@ public class B4OCore
 	 */
 	public static int getNumberOfTermsAnnotatedToTerm(int serverId)
 	{
-		return B4O.getNumberOfItemsAnnotatedToTerm(sorted2Idx[serverId]);
+		return b4o.getNumberOfItemsAnnotatedToTerm(sorted2Idx[serverId]);
 	}
 
 	/**
@@ -351,7 +353,7 @@ public class B4OCore
 	 */
 	public static int[] getTermsDirectlyAnnotatedTo(int itemId)
 	{
-		int [] t = B4O.getTermsDirectlyAnnotatedTo(itemId);
+		int [] t = b4o.getTermsDirectlyAnnotatedTo(itemId);
 		int [] st = new int[t.length];
 		
 		for (int i=0;i<t.length;i++)
@@ -368,7 +370,7 @@ public class B4OCore
 	 */
 	public static double[] getFrequenciesOfTermsDirectlyAnnotatedTo(int itemId)
 	{
-		double [] f = B4O.getFrequenciesOfTermsDirectlyAnnotatedTo(itemId);
+		double [] f = b4o.getFrequenciesOfTermsDirectlyAnnotatedTo(itemId);
 		double [] sf = new double[f.length];
 		for (int i=0;i<sf.length;i++)
 			sf[i] = f[i];
@@ -383,7 +385,7 @@ public class B4OCore
 	 */
 	public static int[] getParents(int t)
 	{
-		int [] p = B4O.getParents(sorted2Idx[t]);
+		int [] p = b4o.getParents(sorted2Idx[t]);
 		int [] np = new int[p.length];
 		for (int i=0;i<p.length;i++)
 			np[i] = idx2Sorted[p[i]];
