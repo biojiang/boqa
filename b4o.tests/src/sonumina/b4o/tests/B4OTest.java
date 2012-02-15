@@ -1,34 +1,30 @@
 package sonumina.b4o.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Random;
 
 import ontologizer.association.Association;
 import ontologizer.association.AssociationContainer;
-import ontologizer.dotwriter.AbstractDotAttributesProvider;
-import ontologizer.dotwriter.GODOTWriter;
 import ontologizer.go.OBOParser;
 import ontologizer.go.OBOParserException;
 import ontologizer.go.Ontology;
 import ontologizer.go.Term;
 import ontologizer.go.TermContainer;
-import ontologizer.go.TermID;
 import ontologizer.types.ByteString;
 
 import org.junit.Test;
 
 import sonumina.b4o.InternalDatafiles;
 import sonumina.b4o.calculation.B4O;
-import sonumina.b4o.calculation.Observations;
 import sonumina.b4o.calculation.B4O.Result;
-import sonumina.math.graph.SlimDirectedGraphView;
+import sonumina.b4o.calculation.Observations;
 import sonumina.math.graph.AbstractGraph.DotAttributesProvider;
+import sonumina.math.graph.SlimDirectedGraphView;
 
 public class B4OTest {
 
@@ -124,8 +120,11 @@ public class B4OTest {
 					}
 				});
 
+
+		assertEquals(7,b4o.getCommonAncestorWithMaxIC(11,12));
+		assertTrue(b4o.getCommonAncestorWithMaxIC(9,11) == 4 || b4o.getCommonAncestorWithMaxIC(9,11) == 6);
 		
-		/* An example for avoiding similarity measure */
+		/* The follow to scores represent an example for avoiding similarity measure */
 		
 		/* The terms match the terms of the item */
 		assertEquals(0.9163, b4o.simScoreVsItem(new int[]{3,10}, 2), 0.001);

@@ -2875,6 +2875,19 @@ public class B4O
 	}
 	
 	/**
+	 * Returns the mica of term, i.e., the a common ancestor of the
+	 * given terms whose information content is maximal.
+	 * 
+	 * @param t1
+	 * @param t2
+	 * @return
+	 */
+	public int getCommonAncestorWithMaxIC(int t1, int t2)
+	{
+		return commonAncestorWithMaxIC(t1,t2);
+	}
+	
+	/**
 	 * Returns the current slim graph.
 	 * 
 	 * @return
