@@ -128,11 +128,18 @@ public class B4OTest {
 		/* An example for avoiding similarity measure */
 		
 		/* The terms match the terms of the item */
-		assertEquals(0.9163, b4o.simScoreVsItem(new int[]{3,10},2), 0.001);
+		assertEquals(0.9163, b4o.simScoreVsItem(new int[]{3,10}, 2), 0.001);
 		
 		/* The terms don't match the terms of the item */
-		assertEquals(1.26286432, b4o.simScoreVsItem(new int[]{9,10},2), 0.001);
+		assertEquals(1.26286432, b4o.simScoreVsItem(new int[]{9,10}, 2), 0.001);
 		
+		/* The terms match the terms of the item */
+		assertEquals(1.26286432, b4o.simScoreVsItem(new int[]{12,9}, 0), 0.001);
+		
+		/* Some other values */
+		assertEquals(0.91629073, b4o.simScoreVsItem(new int[]{10}, 0), 0.001);
+		assertEquals(1.14733979, b4o.simScoreVsItem(new int[]{9,10,12}, 0), 0.001);
+
 		System.out.println("Term Mapping");
 		for (int i=0;i<b4o.slimGraph.getNumberOfVertices();i++)
 			System.out.println(i + " ->  " + b4o.slimGraph.getVertex(i).getIDAsString());
