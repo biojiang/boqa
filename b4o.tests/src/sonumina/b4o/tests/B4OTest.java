@@ -174,8 +174,11 @@ public class B4OTest {
 		b4oNoPrecalc.setMaxQuerySizeForCachedDistribution(4);
 		b4oNoPrecalc.setup(data.graph, data.assoc);
 		
-		assertEquals(0.9163, b4oNoPrecalc.simScoreVsItem(new int[]{3,10},2), 0.001);
-		assertEquals(1.26286432, b4oNoPrecalc.simScoreVsItem(new int[]{9,10},2), 0.001);
+		assertEquals(0.9163, b4oNoPrecalc.simScoreVsItem(new int[]{3,10}, 2), 0.001);
+		assertEquals(1.26286432, b4oNoPrecalc.simScoreVsItem(new int[]{9,10}, 2), 0.001);
+		assertEquals(1.26286432, b4oNoPrecalc.simScoreVsItem(new int[]{12,9}, 0), 0.001);
+		assertEquals(0.91629073, b4oNoPrecalc.simScoreVsItem(new int[]{10}, 0), 0.001);
+		assertEquals(1.14733979, b4oNoPrecalc.simScoreVsItem(new int[]{9,10,12}, 0), 0.001);
 	}
 	
 
