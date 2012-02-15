@@ -2365,6 +2365,30 @@ public class B4O
 		public double termSim(int t1, int t2);
 	}
 
+	
+	/**
+	 * Term similarity measure according to resnik
+	 */
+	private final ITermSim resnikTermSim = new ITermSim()
+	{
+		@Override
+		public double termSim(int t1, int t2)
+		{
+			return terms2IC[commonAncestorWithMaxIC(t1, t2)];
+		}
+	};
+	
+	/**
+	 * Term similarity measure according to lin.
+	 */
+	private final ITermSim linTermSim = new ITermSim()
+	{
+		public double termSim(int t1, int t2)
+		{
+			return 2*terms2IC[commonAncestorWithMaxIC(t1, t2)] / (terms2IC[t1] + terms2IC[t2]); 
+		};
+	};
+	
 	/**
 	 * Score two list of terms according to max-avg-of-best
 	 * method using the given term similarity measure.
@@ -2395,7 +2419,7 @@ public class B4O
 
 	
 	/**
-	 * Score two list of terms according to resnick-max-avg-of-best
+	 * Score two list of terms according to resnik-max-avg-of-best
 	 * method.
 	 * 
 	 * @param tl1
@@ -2404,27 +2428,11 @@ public class B4O
 	 */
 	private double resScoreMaxAvg(int[] tl1, int[] tl2)
 	{
-		double totalScore = 0;
-		for (int t1 : tl1)
-		{
-			double maxScore = Double.NEGATIVE_INFINITY;
-
-			for (int t2 : tl2)
-			{
-				int common = commonAncestorWithMaxIC(t1, t2);
-				double score = terms2IC[common];
-				
-				if (score > maxScore) maxScore = score;
-			}
-			
-			totalScore += maxScore;
-		}
-		totalScore /= tl1.length;
-		return totalScore;
+		return scoreMaxAvg(tl1, tl2, resnikTermSim);
 	}
 	
 	/**
-	 * Score two list of terms according to resnick-max-avg-of-best
+	 * Score two list of terms according to lin-max-avg-of-best
 	 * method.
 
 	 * @param tl1
@@ -2433,23 +2441,7 @@ public class B4O
 	 */
 	public double linScoreMaxAvg(int [] tl1, int [] tl2)
 	{
-		double totalScore = 0;
-		for (int t1 : tl1)
-		{
-			double maxScore = Double.NEGATIVE_INFINITY;
-
-			for (int t2 : tl2)
-			{
-				int common = commonAncestorWithMaxIC(t1, t2);
-				double score = 2*terms2IC[common] / (terms2IC[t1] + terms2IC[t2]); 
-
-				if (score > maxScore) maxScore = terms2IC[common];
-			}
-			
-			totalScore += maxScore;
-		}
-		totalScore /= tl1.length;
-		return totalScore;
+		return scoreMaxAvg(tl1, tl2, linTermSim);
 	}
 
 	/**
