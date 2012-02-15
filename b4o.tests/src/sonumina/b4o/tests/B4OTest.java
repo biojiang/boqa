@@ -10,6 +10,7 @@ import java.util.Random;
 
 import ontologizer.association.Association;
 import ontologizer.association.AssociationContainer;
+import ontologizer.benchmark.Datafiles;
 import ontologizer.go.OBOParser;
 import ontologizer.go.OBOParserException;
 import ontologizer.go.Ontology;
@@ -196,6 +197,69 @@ public class B4OTest {
 		assertEquals(1.14733979, b4oNoPrecalc.simScoreVsItem(new int[]{9,10,12}, 0), 0.001);
 	}
 	
+	@Test
+	public void testVsOldItemMax() throws InterruptedException, IOException
+	{
+		final B4O b4o = new B4O();
+
+		Datafiles df = new Datafiles("../b4o/data/human-phenotype-ontology.obo.gz","../b4o/data/phenotype_annotation.omim.gz");
+
+		b4o.setConsiderFrequenciesOnly(false);
+		b4o.setCacheScoreDistribution(false);
+		b4o.setPrecalculateItemMaxs(false);
+		b4o.setPrecalculateScoreDistribution(false);
+		b4o.setup(df.graph, df.assoc);
+
+		/* This is older code */
+		int [][] micaForItem = new int[b4o.allItemList.size()][b4o.slimGraph.getNumberOfVertices()];
+		for (int item = 0; item < b4o.allItemList.size(); item++)
+		{
+			/* The fixed set */
+			int [] t2 = b4o.items2DirectTerms[item];
+
+			for (int to = 0; to < b4o.slimGraph.getNumberOfVertices(); to++)
+			{
+				double maxIC = Double.NEGATIVE_INFINITY;
+				int maxCommon = -1;
+
+				for (int ti : t2)
+				{
+					int common = b4o.getCommonAncestorWithMaxIC(to, ti);
+					if (b4o.terms2IC[common] > maxIC)
+					{
+						maxIC = b4o.terms2IC[common];
+						maxCommon = common;
+					}
+				}
+				micaForItem[item][to] = maxCommon;
+			}
+		}
+
+//		micaForItem = new int[allItemList.size()][slimGraph.getNumberOfVertices()];
+//
+//		for (int item = 0; item < allItemList.size(); item++)
+//		{
+//			/* The fixed set */
+//			int [] t2 = items2DirectTerms[item];
+//
+//			for (int to = 0; to < slimGraph.getNumberOfVertices(); to++)
+//			{
+//				double maxIC = Double.NEGATIVE_INFINITY;
+//				int maxCommon = -1;
+//
+//				for (int ti : t2)
+//				{
+//					int common = commonAncestorWithMaxIC(to, ti);
+//					if (terms2IC[common] > maxIC)
+//					{
+//						maxIC = terms2IC[common];
+//						maxCommon = common;
+//					}
+//				}
+//				micaForItem[item][to] = maxCommon;
+//			}
+//		}
+	}
 
 	@Test
 	public void testLargeNumberOfItems() throws IOException, OBOParserException
@@ -206,7 +270,6 @@ public class B4OTest {
 
 		OBOParser hpoParser = new OBOParser("../b4o/data/human-phenotype-ontology.obo.gz");
 		hpoParser.doParse();
-		
 		TermContainer tc = new TermContainer(hpoParser.getTermMap(),hpoParser.getFormatVersion(),hpoParser.getDate());
 		Ontology ontology = new Ontology(tc);
 		SlimDirectedGraphView<Term> slim = ontology.getSlimGraphView();
