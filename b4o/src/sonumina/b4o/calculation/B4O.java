@@ -2465,7 +2465,7 @@ public class B4O
 	}
 	
 	/**
-	 * Makes the calculation according to Resnick max. We handle the observations as an item
+	 * Makes the calculation according to Resnik max. We handle the observations as an item
 	 * and compare it to all other items. Also calculates the significance (stored in the 
 	 * marginal attribute).
 	 * 
