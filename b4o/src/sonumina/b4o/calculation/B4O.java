@@ -2367,7 +2367,7 @@ public class B4O
 
 	
 	/**
-	 * Term similarity measure according to resnik
+	 * Term similarity measure according to Resnik
 	 */
 	private final ITermSim resnikTermSim = new ITermSim()
 	{
@@ -2379,14 +2379,30 @@ public class B4O
 	};
 	
 	/**
-	 * Term similarity measure according to lin.
+	 * Term similarity measure according to Lin. Note that the similarity
+	 * of terms with information content of 0 is defined as 1 here.
 	 */
 	private final ITermSim linTermSim = new ITermSim()
 	{
 		public double termSim(int t1, int t2)
 		{
-			return 2*terms2IC[commonAncestorWithMaxIC(t1, t2)] / (terms2IC[t1] + terms2IC[t2]); 
+			double nominator = 2*terms2IC[commonAncestorWithMaxIC(t1, t2)];
+			double denominator = terms2IC[t1] + terms2IC[t2]; 
+			if (nominator <= 0.0 && denominator <= 0.0) return 1;
+			return nominator / denominator;
 		};
+	};
+
+	/**
+	 * Term similarity measure according to Jiang and Conrath 
+	 */
+	private final ITermSim jcTermSim = new ITermSim()
+	{
+		@Override
+		public double termSim(int t1, int t2)
+		{
+			return ((double)1)/(1+terms2IC[t1] + terms2IC[t2] - 2 *terms2IC[commonAncestorWithMaxIC(t1, t2)]);
+		}
 	};
 	
 	/**
@@ -2426,7 +2442,7 @@ public class B4O
 	 * @param tl2
 	 * @return
 	 */
-	private double resScoreMaxAvg(int[] tl1, int[] tl2)
+	public double resScoreMaxAvg(int[] tl1, int[] tl2)
 	{
 		return scoreMaxAvg(tl1, tl2, resnikTermSim);
 	}
