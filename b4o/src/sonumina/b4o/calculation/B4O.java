@@ -2480,7 +2480,7 @@ public class B4O
 	 * @param item
 	 * @return
 	 */
-	private double simScoreMaxAvgVsItem(int [] tl1, int item)
+	private double resScoreMaxAvgVsItem(int [] tl1, int item)
 	{
 		if (PRECALCULATE_ITEM_MAXS)
 		{
@@ -2536,7 +2536,7 @@ public class B4O
 	 */
 	public double simScoreVsItem(int [] t1, int item)
 	{
-		return simScoreMaxAvgVsItem(t1,item);
+		return resScoreMaxAvgVsItem(t1,item);
 	}
 
 	/**
