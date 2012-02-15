@@ -2461,6 +2461,19 @@ public class B4O
 	}
 
 	/**
+	 * Score two list of terms according to jc-max-avg-of-best
+	 * method.
+
+	 * @param tl1
+	 * @param tl2
+	 * @return
+	 */
+	public double jcScoreMaxAvg(int [] tl1, int [] tl2)
+	{
+		return scoreMaxAvg(tl1, tl2, jcTermSim);
+	}
+
+	/**
 	 * Sim score avg one list of a term vs an item.
 	 * 
 	 * @param tl1

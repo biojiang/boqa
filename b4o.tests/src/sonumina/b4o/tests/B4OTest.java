@@ -121,8 +121,23 @@ public class B4OTest {
 				});
 
 
+		/* Common ancestors */
 		assertEquals(7,b4o.getCommonAncestorWithMaxIC(11,12));
 		assertTrue(b4o.getCommonAncestorWithMaxIC(9,11) == 4 || b4o.getCommonAncestorWithMaxIC(9,11) == 6);
+		
+		/* Resnik */
+		assertEquals(0.223144,b4o.resScoreMaxAvg(new int[]{7}, new int[]{8}),0.001);
+		assertTrue(b4o.resScoreMaxAvg(new int[]{7}, new int[]{8}) == b4o.resScoreMaxAvg(new int[]{11}, new int[]{8}));
+
+		/* Lin */
+		assertEquals(0.243529,b4o.linScoreMaxAvg(new int[]{7}, new int[]{8}),0.001);
+		assertEquals(1,b4o.linScoreMaxAvg(new int[]{12}, new int[]{12}),0.001);
+		assertEquals(1,b4o.linScoreMaxAvg(new int[]{0}, new int[]{0}),0.001);
+		
+		/* JC */
+		assertEquals(0.42,b4o.jcScoreMaxAvg(new int[]{7}, new int[]{8}),0.001);
+		assertEquals(1,b4o.jcScoreMaxAvg(new int[]{12}, new int[]{12}),0.001);
+		assertEquals(1,b4o.jcScoreMaxAvg(new int[]{0}, new int[]{0}),0.001);
 		
 		/* The follow to scores represent an example for avoiding similarity measure */
 		
