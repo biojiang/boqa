@@ -1169,7 +1169,7 @@ public class B4O
 			System.out.println("Considering " + slimGraph.getNumberOfVertices() + " terms");
 		}
 		
-		/** Here we precaculate the maxICs of two given terms in a dense matrix */
+		/** Here we precalculate the maxICs of two given terms in a dense matrix */
 		if (PRECALCULATE_MAXICS)
 		{
 			int [][] newMaxICMatrix = new int[slimGraph.getNumberOfVertices()][];
