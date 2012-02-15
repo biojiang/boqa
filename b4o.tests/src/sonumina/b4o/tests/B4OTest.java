@@ -3,6 +3,8 @@ package sonumina.b4o.tests;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Random;
@@ -26,6 +28,7 @@ import sonumina.b4o.calculation.B4O;
 import sonumina.b4o.calculation.Observations;
 import sonumina.b4o.calculation.B4O.Result;
 import sonumina.math.graph.SlimDirectedGraphView;
+import sonumina.math.graph.AbstractGraph.DotAttributesProvider;
 
 public class B4OTest {
 
@@ -73,9 +76,9 @@ public class B4OTest {
 	}
 
 	@Test
-	public void test()
+	public void test() throws FileNotFoundException
 	{
-		InternalDatafiles data = new InternalDatafiles();
+		final InternalDatafiles data = new InternalDatafiles();
 		int terms = data.graph.getNumberOfTerms();
 		assertEquals(15,terms);
 
@@ -88,25 +91,55 @@ public class B4OTest {
 
 		b4o.setup(data.graph, data.assoc);
 		
-		/* Write out the graph */
-		GODOTWriter.writeDOT(b4o.graph, new File("example2.dot"), null, new HashSet<TermID>(b4o.graph.getLeafTermIDs()), new AbstractDotAttributesProvider() {
-			public String getDotNodeAttributes(TermID id) {
-				Term t = b4o.graph.getTerm(id);
-				int idx = b4o.slimGraph.getVertexIndex(t);
-				return "shape=\"box\",label=\""+b4o.graph.getTerm(id).getName()+"\\n" + b4o.getNumberOfItemsAnnotatedToTerm(idx) + " " + String.format("%g",b4o.terms2IC[idx]) + "\"";
-			}
-		});
+		/* Write out the graph with ICs */
+		data.getGraphWithItems().writeDOT(new FileOutputStream("full-with-ics.dot"), new DotAttributesProvider<String>()
+				{
+					@Override
+					public String getDotNodeAttributes(String vt)
+					{
+						if (vt.startsWith("C"))
+						{
+							StringBuilder info = new StringBuilder();
+							for (Term t : data.graph)
+							{
+								if (t.getName().equals(vt))
+								{
+									int idx = b4o.slimGraph.getVertexIndex(t);
+									info.append("\\n" + b4o.getNumberOfItemsAnnotatedToTerm(idx) + " " + String.format("%g",b4o.terms2IC[idx]));
+									break;
+								}
+							}
+							
+							return "label=\""+vt+info.toString()+"\"";
+							
+						}
+						else
+							return "shape=\"box\",label=\""+vt+"\"";
+					}
+					
+					@Override
+					public String getDotEdgeAttributes(String src, String dest)
+					{
+						return "dir=\"back\"";
+					}
+				});
 
 		
 		/* An example for avoiding similarity measure */
+		
+		/* The terms match the terms of the item */
 		assertEquals(0.9163, b4o.simScoreVsItem(new int[]{3,10},2), 0.001);
+		
+		/* The terms don't match the terms of the item */
 		assertEquals(1.26286432, b4o.simScoreVsItem(new int[]{9,10},2), 0.001);
 		
-		System.out.println("Mapping");
+		System.out.println("Term Mapping");
 		for (int i=0;i<b4o.slimGraph.getNumberOfVertices();i++)
-		{
-			System.out.println(i + " " + b4o.slimGraph.getVertex(i).getIDAsString());
-		}
+			System.out.println(i + " ->  " + b4o.slimGraph.getVertex(i).getIDAsString());
+		
+		System.out.println("Item Mapping");
+		for (int i=0;i<b4o.allItemList.size();i++)
+			System.out.println(i + " -> " +b4o.allItemList.get(i));
 
 		boolean [] obs = new boolean[terms];
 
@@ -128,7 +161,15 @@ public class B4OTest {
 		result = b4o.assignMarginals(o, false);
 		for (int i=0;i<b4o.allItemList.size();i++)
 			System.out.println(result.getMarginal(i) + " " + result.getScore(i));
+
+		B4O b4oNoPrecalc = new B4O();
+		b4oNoPrecalc.setConsiderFrequenciesOnly(false);
+		b4oNoPrecalc.setPrecalculateItemMaxs(false);
+		b4oNoPrecalc.setMaxQuerySizeForCachedDistribution(4);
+		b4oNoPrecalc.setup(data.graph, data.assoc);
 		
+		assertEquals(0.9163, b4oNoPrecalc.simScoreVsItem(new int[]{3,10},2), 0.001);
+		assertEquals(1.26286432, b4oNoPrecalc.simScoreVsItem(new int[]{9,10},2), 0.001);
 	}
 	
 
