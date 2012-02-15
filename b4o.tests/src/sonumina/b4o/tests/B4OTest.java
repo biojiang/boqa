@@ -206,11 +206,11 @@ public class B4OTest {
 
 		b4o.setConsiderFrequenciesOnly(false);
 		b4o.setCacheScoreDistribution(false);
-		b4o.setPrecalculateItemMaxs(false);
+		b4o.setPrecalculateItemMaxs(true);
 		b4o.setPrecalculateScoreDistribution(false);
 		b4o.setup(df.graph, df.assoc);
 
-		/* This is older code */
+		/* This is older code which we keep for testing here */
 		int [][] micaForItem = new int[b4o.allItemList.size()][b4o.slimGraph.getNumberOfVertices()];
 		for (int item = 0; item < b4o.allItemList.size(); item++)
 		{
@@ -234,31 +234,11 @@ public class B4OTest {
 				micaForItem[item][to] = maxCommon;
 			}
 		}
-
-//		micaForItem = new int[allItemList.size()][slimGraph.getNumberOfVertices()];
-//
-//		for (int item = 0; item < allItemList.size(); item++)
-//		{
-//			/* The fixed set */
-//			int [] t2 = items2DirectTerms[item];
-//
-//			for (int to = 0; to < slimGraph.getNumberOfVertices(); to++)
-//			{
-//				double maxIC = Double.NEGATIVE_INFINITY;
-//				int maxCommon = -1;
-//
-//				for (int ti : t2)
-//				{
-//					int common = commonAncestorWithMaxIC(to, ti);
-//					if (terms2IC[common] > maxIC)
-//					{
-//						maxIC = terms2IC[common];
-//						maxCommon = common;
-//					}
-//				}
-//				micaForItem[item][to] = maxCommon;
-//			}
-//		}
+		
+		/* Now the test */
+		for (int i=0;i<micaForItem.length;i++)
+			for (int j=0;j<micaForItem[i].length;j++)
+				assertEquals(b4o.terms2IC[micaForItem[i][j]],b4o.resnikTermSim.maxScoreForItem[i][j],0.00001); 
 	}
 
 	@Test

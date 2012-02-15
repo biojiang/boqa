@@ -199,7 +199,7 @@ public class B4O
 
 	/** Contains for each item the max mica for the given term */ 
 	private int [][] micaForItem;
-		
+
 	/** Contains the query cache, needs to be synched when accessed */
 	private QuerySets queryCache;
 
@@ -1209,6 +1209,27 @@ public class B4O
 					micaForItem[item][to] = maxCommon;
 				}
 			}
+
+			/* Do it in a more general way */
+			double [][] maxScoreForItem;
+			
+			maxScoreForItem = resnikTermSim.maxScoreForItem = new double[allItemList.size()][slimGraph.getNumberOfVertices()];
+			
+			for (int item = 0; item < allItemList.size(); item++)
+			{
+				/* The fixed set */
+				int [] t2 = items2DirectTerms[item];
+				
+				/* The set representing a single query term */
+				int [] t1 = new int[1];
+
+				for (int to = 0; to < slimGraph.getNumberOfVertices(); to++)
+				{
+					t1[0] = to;
+					maxScoreForItem[item][to] = scoreMaxAvg(t1, t2, resnikTermSim);
+				}
+			}
+
 		}
 		
 		/** Instantiates the query cache */
@@ -2365,11 +2386,21 @@ public class B4O
 		public double termSim(int t1, int t2);
 	}
 
+	/**
+	 * Class implementing a term similarity measure.
+	 *  
+	 * @author Sebastian Bauer
+	 */
+	public static abstract class AbstractTermSim implements ITermSim
+	{
+		/** Contains for each item the maximal score for the given term */ 
+		public double [][] maxScoreForItem;
+	}
 	
 	/**
 	 * Term similarity measure according to Resnik
 	 */
-	private final ITermSim resnikTermSim = new ITermSim()
+	public final AbstractTermSim resnikTermSim = new AbstractTermSim()
 	{
 		@Override
 		public double termSim(int t1, int t2)
@@ -2382,7 +2413,7 @@ public class B4O
 	 * Term similarity measure according to Lin. Note that the similarity
 	 * of terms with information content of 0 is defined as 1 here.
 	 */
-	private final ITermSim linTermSim = new ITermSim()
+	private final AbstractTermSim linTermSim = new AbstractTermSim()
 	{
 		public double termSim(int t1, int t2)
 		{
@@ -2396,7 +2427,7 @@ public class B4O
 	/**
 	 * Term similarity measure according to Jiang and Conrath 
 	 */
-	private final ITermSim jcTermSim = new ITermSim()
+	private final AbstractTermSim jcTermSim = new AbstractTermSim()
 	{
 		@Override
 		public double termSim(int t1, int t2)
