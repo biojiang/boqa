@@ -29,6 +29,8 @@ import sonumina.math.graph.Edge;
  */
 public class InternalDatafiles extends Datafiles
 {
+	private DirectedGraph<String> graphWithItems;
+
 	public InternalDatafiles() 
 	{
 		/* Go Graph */
@@ -98,7 +100,7 @@ public class InternalDatafiles extends Datafiles
 			}
 		});
 
-		DirectedGraph<String> graphWithItems = new DirectedGraph<String>();
+		graphWithItems = new DirectedGraph<String>();
 		for (Term term : terms)
 			graphWithItems.addVertex(term.getName());
 
@@ -142,6 +144,14 @@ public class InternalDatafiles extends Datafiles
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Returns the graph together with items
+	 */
+	public DirectedGraph<String> getGraphWithItems()
+	{
+		return graphWithItems;
 	}
 
 }
