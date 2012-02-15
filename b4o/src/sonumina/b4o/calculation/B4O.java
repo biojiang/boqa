@@ -199,7 +199,7 @@ public class B4O
 
 	/** Contains for each item the max mica for the given term */ 
 	private int [][] micaForItem;
-	
+		
 	/** Contains the query cache, needs to be synched when accessed */
 	private QuerySets queryCache;
 
@@ -2356,6 +2356,45 @@ public class B4O
 	}
 
 	/**
+	 * Defines a function to determine the term similarity.
+	 * 
+	 * @author Sebastian Bauer
+	 */
+	public static interface ITermSim
+	{
+		public double termSim(int t1, int t2);
+	}
+
+	/**
+	 * Score two list of terms according to max-avg-of-best
+	 * method using the given term similarity measure.
+	 * 
+	 * @param tl1
+	 * @param tl2
+	 * @param termSim
+	 * @return
+	 */
+	private double scoreMaxAvg(int[] tl1, int[] tl2, ITermSim termSim)
+	{
+		double totalScore = 0;
+		for (int t1 : tl1)
+		{
+			double maxScore = Double.NEGATIVE_INFINITY;
+
+			for (int t2 : tl2)
+			{
+				double score = termSim.termSim(t1,t2);
+				if (score > maxScore) maxScore = score;
+			}
+			
+			totalScore += maxScore;
+		}
+		totalScore /= tl1.length;
+		return totalScore;
+	}
+
+	
+	/**
 	 * Score two list of terms according to resnick-max-avg-of-best
 	 * method.
 	 * 
@@ -2363,23 +2402,54 @@ public class B4O
 	 * @param tl2
 	 * @return
 	 */
-	private double simScoreMaxAvg(int[] tl1, int[] tl2)
+	private double resScoreMaxAvg(int[] tl1, int[] tl2)
 	{
-		double score = 0;
+		double totalScore = 0;
 		for (int t1 : tl1)
 		{
-			double maxIC = Double.NEGATIVE_INFINITY;
+			double maxScore = Double.NEGATIVE_INFINITY;
 
 			for (int t2 : tl2)
 			{
 				int common = commonAncestorWithMaxIC(t1, t2);
-				if (terms2IC[common] > maxIC) maxIC = terms2IC[common];
+				double score = terms2IC[common];
+				
+				if (score > maxScore) maxScore = score;
 			}
 			
-			score += maxIC;
+			totalScore += maxScore;
 		}
-		score /= tl1.length;
-		return score;
+		totalScore /= tl1.length;
+		return totalScore;
+	}
+	
+	/**
+	 * Score two list of terms according to resnick-max-avg-of-best
+	 * method.
+
+	 * @param tl1
+	 * @param tl2
+	 * @return
+	 */
+	public double linScoreMaxAvg(int [] tl1, int [] tl2)
+	{
+		double totalScore = 0;
+		for (int t1 : tl1)
+		{
+			double maxScore = Double.NEGATIVE_INFINITY;
+
+			for (int t2 : tl2)
+			{
+				int common = commonAncestorWithMaxIC(t1, t2);
+				double score = 2*terms2IC[common] / (terms2IC[t1] + terms2IC[t2]); 
+
+				if (score > maxScore) maxScore = terms2IC[common];
+			}
+			
+			totalScore += maxScore;
+		}
+		totalScore /= tl1.length;
+		return totalScore;
 	}
 
 	/**
@@ -2399,7 +2469,7 @@ public class B4O
 			score /= tl1.length;
 			return score;
 		}
-		return simScoreMaxAvg(tl1,items2DirectTerms[item]);
+		return resScoreMaxAvg(tl1,items2DirectTerms[item]);
 	}
 	
 	/**
@@ -2433,7 +2503,7 @@ public class B4O
 	 */
 	private double simScore(int[] t1, int[] t2)
 	{
-		return simScoreMaxAvg(t1,t2);
+		return resScoreMaxAvg(t1,t2);
 	}
 	
 	/**
