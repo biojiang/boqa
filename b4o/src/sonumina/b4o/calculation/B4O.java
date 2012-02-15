@@ -2383,7 +2383,7 @@ public class B4O
 	}
 
 	/**
-	 * Sim score avg using two lists of terms.
+	 * Sim score avg one list of a term vs an item.
 	 * 
 	 * @param tl1
 	 * @param item
@@ -2470,7 +2470,8 @@ public class B4O
 	 * marginal attribute).
 	 * 
 	 * @param observations
-	 * @param determines the significance.
+	 * @param pval to be set to true if significance should be determined
+	 * @param rnd the random source
 	 * 
 	 * @return
 	 */
