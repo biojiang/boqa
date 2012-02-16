@@ -197,9 +197,6 @@ public class B4O
 	/** Contains the term with maximum common ancestor of two terms */
 	private int micaMatrix[][];
 
-	/** Contains for each item the max mica for the given term */ 
-	private int [][] micaForItem;
-
 	/** Contains the query cache, needs to be synched when accessed */
 	private QuerySets queryCache;
 
@@ -1185,31 +1182,6 @@ public class B4O
 		/** Here we precalculate for each item the term which contributes as maximum ic term to the resnick calculation */
 		if (PRECALCULATE_ITEM_MAXS)
 		{
-			micaForItem = new int[allItemList.size()][slimGraph.getNumberOfVertices()];
-
-			for (int item = 0; item < allItemList.size(); item++)
-			{
-				/* The fixed set */
-				int [] t2 = items2DirectTerms[item];
-
-				for (int to = 0; to < slimGraph.getNumberOfVertices(); to++)
-				{
-					double maxIC = Double.NEGATIVE_INFINITY;
-					int maxCommon = -1;
-
-					for (int ti : t2)
-					{
-						int common = commonAncestorWithMaxIC(to, ti);
-						if (terms2IC[common] > maxIC)
-						{
-							maxIC = terms2IC[common];
-							maxCommon = common;
-						}
-					}
-					micaForItem[item][to] = maxCommon;
-				}
-			}
-
 			/* Do it in a more general way */
 			double [][] maxScoreForItem;
 			
@@ -2517,7 +2489,7 @@ public class B4O
 		{
 			double score = 0;
 			for (int t1 : tl1)
-				score += terms2IC[micaForItem[item][t1]];
+				score += resnikTermSim.maxScoreForItem[item][t1];
 			score /= tl1.length;
 			return score;
 		}
