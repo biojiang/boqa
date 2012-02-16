@@ -1169,6 +1169,7 @@ public class B4O
 		/** Here we precalculate the maxICs of two given terms in a dense matrix */
 		if (PRECALCULATE_MAXICS)
 		{
+			logger.info("Calculating max ICs");
 			int [][] newMaxICMatrix = new int[slimGraph.getNumberOfVertices()][];
 			for (int i=0;i<slimGraph.getNumberOfVertices();i++)
 			{
@@ -1177,15 +1178,17 @@ public class B4O
 					newMaxICMatrix[i][j - i - 1] = commonAncestorWithMaxIC(i,j);
 			}
 			micaMatrix = newMaxICMatrix;
+			
+			logger.info("Calculated max ICs");
 		}
 		
 		/** Here we precalculate for each item the term which contributes as maximum ic term to the resnick calculation */
 		if (PRECALCULATE_ITEM_MAXS)
 		{
-			/* Do it in a more general way */
-			double [][] maxScoreForItem;
-			
-			maxScoreForItem = resnikTermSim.maxScoreForItem = new double[allItemList.size()][slimGraph.getNumberOfVertices()];
+			logger.info("Calculating item maxs");
+			resnikTermSim.maxScoreForItem = new double[allItemList.size()][slimGraph.getNumberOfVertices()];
+			linTermSim.maxScoreForItem = new double[allItemList.size()][slimGraph.getNumberOfVertices()];
+			jcTermSim.maxScoreForItem = new double[allItemList.size()][slimGraph.getNumberOfVertices()];
 			
 			for (int item = 0; item < allItemList.size(); item++)
 			{
@@ -1198,10 +1201,13 @@ public class B4O
 				for (int to = 0; to < slimGraph.getNumberOfVertices(); to++)
 				{
 					t1[0] = to;
-					maxScoreForItem[item][to] = scoreMaxAvg(t1, t2, resnikTermSim);
+					resnikTermSim.maxScoreForItem[item][to] = scoreMaxAvg(t1, t2, resnikTermSim);
+					linTermSim.maxScoreForItem[item][to] = scoreMaxAvg(t1, t2, linTermSim);
+					jcTermSim.maxScoreForItem[item][to] = scoreMaxAvg(t1, t2, jcTermSim);
 				}
 			}
-
+			
+			logger.info("Calculated item maxs");
 		}
 		
 		/** Instantiates the query cache */
