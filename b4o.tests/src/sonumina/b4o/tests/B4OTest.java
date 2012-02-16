@@ -72,20 +72,64 @@ public class B4OTest {
 		
 	}
 
+	/**
+	 * A helper function to test similarity values of the internal ontology.
+	 * 
+	 * @param b4o
+	 */
+	private void checkInternalSimValues(B4O b4o)
+	{
+		/* Common ancestors */
+		assertEquals(7,b4o.getCommonAncestorWithMaxIC(11,12));
+		assertTrue(b4o.getCommonAncestorWithMaxIC(9,11) == 4 || b4o.getCommonAncestorWithMaxIC(9,11) == 6);
+		
+		/* Resnik */
+		assertEquals(0.223144,b4o.resScoreMaxAvg(new int[]{7}, new int[]{8}),0.001);
+		assertTrue(b4o.resScoreMaxAvg(new int[]{7}, new int[]{8}) == b4o.resScoreMaxAvg(new int[]{11}, new int[]{8}));
+
+		/* Lin */
+		assertEquals(0.243529,b4o.linScoreMaxAvg(new int[]{7}, new int[]{8}),0.001);
+		assertEquals(1,b4o.linScoreMaxAvg(new int[]{12}, new int[]{12}),0.001);
+		assertEquals(1,b4o.linScoreMaxAvg(new int[]{0}, new int[]{0}),0.001);
+		
+		/* JC */
+		assertEquals(0.42,b4o.jcScoreMaxAvg(new int[]{7}, new int[]{8}),0.001);
+		assertEquals(1,b4o.jcScoreMaxAvg(new int[]{12}, new int[]{12}),0.001);
+		assertEquals(1,b4o.jcScoreMaxAvg(new int[]{0}, new int[]{0}),0.001);
+		
+		/* The follow to scores represent an example for avoiding similarity measure */
+		
+		/* The terms match the terms of the item */
+		assertEquals(0.9163, b4o.simScoreVsItem(new int[]{3,10}, 2), 0.001);
+		
+		/* The terms don't match the terms of the item */
+		assertEquals(1.26286432, b4o.simScoreVsItem(new int[]{9,10}, 2), 0.001);
+		
+		/* The terms match the terms of the item */
+		assertEquals(1.26286432, b4o.simScoreVsItem(new int[]{12,9}, 0), 0.001);
+		
+		/* Some other values */
+		assertEquals(0.91629073, b4o.simScoreVsItem(new int[]{10}, 0), 0.001);
+		assertEquals(1.14733979, b4o.simScoreVsItem(new int[]{9,10,12}, 0), 0.001);
+	}
+
 	@Test
-	public void test() throws FileNotFoundException
+	public void testB4OOnInternalOntology() throws FileNotFoundException
 	{
 		final InternalDatafiles data = new InternalDatafiles();
 		int terms = data.graph.getNumberOfTerms();
 		assertEquals(15,terms);
 
-		final B4O b4o = new B4O();
-
 		Random rnd = new Random(2);
 
-		b4o.setConsiderFrequenciesOnly(false);
-		b4o.setMaxQuerySizeForCachedDistribution(4);
 
+		final B4O b4o = new B4O();
+		b4o.setConsiderFrequenciesOnly(false);
+		b4o.setPrecalculateItemMaxs(true);
+		b4o.setCacheScoreDistribution(false);
+		b4o.setPrecalculateScoreDistribution(false);
+		b4o.setStoreScoreDistriubtion(false);
+		b4o.setMaxQuerySizeForCachedDistribution(4);
 		b4o.setup(data.graph, data.assoc);
 		
 		/* Write out the graph with ICs */
@@ -122,39 +166,6 @@ public class B4OTest {
 				});
 
 
-		/* Common ancestors */
-		assertEquals(7,b4o.getCommonAncestorWithMaxIC(11,12));
-		assertTrue(b4o.getCommonAncestorWithMaxIC(9,11) == 4 || b4o.getCommonAncestorWithMaxIC(9,11) == 6);
-		
-		/* Resnik */
-		assertEquals(0.223144,b4o.resScoreMaxAvg(new int[]{7}, new int[]{8}),0.001);
-		assertTrue(b4o.resScoreMaxAvg(new int[]{7}, new int[]{8}) == b4o.resScoreMaxAvg(new int[]{11}, new int[]{8}));
-
-		/* Lin */
-		assertEquals(0.243529,b4o.linScoreMaxAvg(new int[]{7}, new int[]{8}),0.001);
-		assertEquals(1,b4o.linScoreMaxAvg(new int[]{12}, new int[]{12}),0.001);
-		assertEquals(1,b4o.linScoreMaxAvg(new int[]{0}, new int[]{0}),0.001);
-		
-		/* JC */
-		assertEquals(0.42,b4o.jcScoreMaxAvg(new int[]{7}, new int[]{8}),0.001);
-		assertEquals(1,b4o.jcScoreMaxAvg(new int[]{12}, new int[]{12}),0.001);
-		assertEquals(1,b4o.jcScoreMaxAvg(new int[]{0}, new int[]{0}),0.001);
-		
-		/* The follow to scores represent an example for avoiding similarity measure */
-		
-		/* The terms match the terms of the item */
-		assertEquals(0.9163, b4o.simScoreVsItem(new int[]{3,10}, 2), 0.001);
-		
-		/* The terms don't match the terms of the item */
-		assertEquals(1.26286432, b4o.simScoreVsItem(new int[]{9,10}, 2), 0.001);
-		
-		/* The terms match the terms of the item */
-		assertEquals(1.26286432, b4o.simScoreVsItem(new int[]{12,9}, 0), 0.001);
-		
-		/* Some other values */
-		assertEquals(0.91629073, b4o.simScoreVsItem(new int[]{10}, 0), 0.001);
-		assertEquals(1.14733979, b4o.simScoreVsItem(new int[]{9,10,12}, 0), 0.001);
-
 		System.out.println("Term Mapping");
 		for (int i=0;i<b4o.slimGraph.getNumberOfVertices();i++)
 			System.out.println(i + " ->  " + b4o.slimGraph.getVertex(i).getIDAsString());
@@ -187,16 +198,28 @@ public class B4OTest {
 		B4O b4oNoPrecalc = new B4O();
 		b4oNoPrecalc.setConsiderFrequenciesOnly(false);
 		b4oNoPrecalc.setPrecalculateItemMaxs(false);
+		b4oNoPrecalc.setCacheScoreDistribution(false);
+		b4oNoPrecalc.setPrecalculateScoreDistribution(false);
+		b4oNoPrecalc.setStoreScoreDistriubtion(false);
 		b4oNoPrecalc.setMaxQuerySizeForCachedDistribution(4);
 		b4oNoPrecalc.setup(data.graph, data.assoc);
 		
-		assertEquals(0.9163, b4oNoPrecalc.simScoreVsItem(new int[]{3,10}, 2), 0.001);
-		assertEquals(1.26286432, b4oNoPrecalc.simScoreVsItem(new int[]{9,10}, 2), 0.001);
-		assertEquals(1.26286432, b4oNoPrecalc.simScoreVsItem(new int[]{12,9}, 0), 0.001);
-		assertEquals(0.91629073, b4oNoPrecalc.simScoreVsItem(new int[]{10}, 0), 0.001);
-		assertEquals(1.14733979, b4oNoPrecalc.simScoreVsItem(new int[]{9,10,12}, 0), 0.001);
+		checkInternalSimValues(b4o);
+		checkInternalSimValues(b4oNoPrecalc);
 	}
-	
+
+	/**
+	 * A helper function to check similarity values for the HPO.
+	 * 
+	 * @param b4o
+	 */
+	private void checkHPOSimValues(final B4O b4o)
+	{
+		assertEquals(0.006997929,b4o.resScoreMaxAvgVsItem(new int[]{10,12},4),0.000001);
+		assertEquals(0.162568779,b4o.resScoreMaxAvgVsItem(new int[]{101,1222,1300,2011},78),0.000001);
+	}
+
+
 	@Test
 	public void testVsOldItemMax() throws InterruptedException, IOException
 	{
@@ -207,6 +230,7 @@ public class B4OTest {
 		b4o.setConsiderFrequenciesOnly(false);
 		b4o.setCacheScoreDistribution(false);
 		b4o.setPrecalculateScoreDistribution(false);
+		b4o.setStoreScoreDistriubtion(false);
 		b4o.setPrecalculateItemMaxs(true);
 		b4o.setup(df.graph, df.assoc);
 
@@ -240,8 +264,7 @@ public class B4OTest {
 			for (int j=0;j<micaForItem[i].length;j++)
 				assertEquals(b4o.terms2IC[micaForItem[i][j]],b4o.resnikTermSim.maxScoreForItem[i][j],0.00001);
 
-		assertEquals(0.006997929,b4o.resScoreMaxAvgVsItem(new int[]{10,12},4),0.000001);
-		assertEquals(0.162568779,b4o.resScoreMaxAvgVsItem(new int[]{101,1222,1300,2011},78),0.000001);
+		checkHPOSimValues(b4o);
 	}
 
 	@Test
