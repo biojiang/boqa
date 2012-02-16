@@ -2372,6 +2372,11 @@ public class B4O
 	public static interface ITermSim
 	{
 		public double termSim(int t1, int t2);
+
+		/**
+		 * @return the name of the method.
+		 */
+		public String name();
 	}
 
 	/**
@@ -2395,6 +2400,12 @@ public class B4O
 		{
 			return terms2IC[commonAncestorWithMaxIC(t1, t2)];
 		}
+
+		@Override
+		public String name()
+		{
+			return "resnik";
+		}
 	};
 	
 	/**
@@ -2409,6 +2420,12 @@ public class B4O
 			double denominator = terms2IC[t1] + terms2IC[t2]; 
 			if (nominator <= 0.0 && denominator <= 0.0) return 1;
 			return nominator / denominator;
+		}
+
+		@Override
+		public String name()
+		{
+			return "lin";
 		};
 	};
 
@@ -2421,6 +2438,12 @@ public class B4O
 		public double termSim(int t1, int t2)
 		{
 			return ((double)1)/(1+terms2IC[t1] + terms2IC[t2] - 2 *terms2IC[commonAncestorWithMaxIC(t1, t2)]);
+		}
+
+		@Override
+		public String name()
+		{
+			return "jc";
 		}
 	};
 	
