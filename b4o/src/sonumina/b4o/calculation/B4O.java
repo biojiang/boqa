@@ -1372,7 +1372,7 @@ public class B4O
 				int [] randomizedTerms = new int[q];
 
 				chooseTerms(rnd, q, randomizedTerms, shuffledTerms);
-				double randomScore = simScoreVsItem(randomizedTerms, i);
+				double randomScore = resScoreVsItem(randomizedTerms, i);
 				out.write(randomScore + " \n");
 			}
 			out.flush();
@@ -2615,7 +2615,7 @@ public class B4O
 	 * @param item
 	 * @return
 	 */
-	public double simScoreVsItem(int [] t1, int item)
+	public double resScoreVsItem(int [] t1, int item)
 	{
 		return resScoreMaxAvgVsItem(t1,item);
 	}
@@ -2672,7 +2672,7 @@ public class B4O
 			}
 
 			/* Determine and remember the plain score */
-			double score = simScoreVsItem(observedTerms,i);
+			double score = resScoreVsItem(observedTerms,i);
 			res.scores[i] = score;
 
 			/* Turn it into a p value by considering the distribution */
@@ -2693,7 +2693,7 @@ public class B4O
 
 					for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
 					{
-						double randomScore = simScoreVsItem(queries[j], i);
+						double randomScore = resScoreVsItem(queries[j], i);
 						if (randomScore >= score) count++;
 					}
 					
@@ -2707,7 +2707,7 @@ public class B4O
 				for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
 				{
 					chooseTerms(rnd, observedTerms.length, randomizedTerms, shuffledTerms);
-					double randomScore = simScoreVsItem(randomizedTerms, i);
+					double randomScore = resScoreVsItem(randomizedTerms, i);
 					if (randomScore >= score) count++;
 				}
 				res.marginals[i] = count / (double)SIZE_OF_SCORE_DISTRIBUTION;
@@ -2745,7 +2745,7 @@ public class B4O
 
 			for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
 			{
-				scores[j] = simScoreVsItem(queries[j], item);
+				scores[j] = resScoreVsItem(queries[j], item);
 				if (scores[j] > maxScore) maxScore = scores[j];
 			}
 
