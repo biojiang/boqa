@@ -2675,47 +2675,65 @@ public class B4O
 			double score = resScoreVsItem(observedTerms,i);
 			res.scores[i] = score;
 
-			/* Turn it into a p value by considering the distribution */
-			if (CACHE_RANDOM_QUERIES)
-			{
-				if (querySize > MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION)
-					querySize = MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION;
-
-				int [][] queries = getRandomizedQueries(rnd, querySize);
-
-				if (CACHE_SCORE_DISTRIBUTION || PRECALCULATE_SCORE_DISTRIBUTION)
-				{
-					ApproximatedEmpiricalDistribution d = getScoreDistribution(querySize, i, queries);
-					res.marginals[i] = 1 - (d.cdf(score,false) - d.prob(score));
-				} else
-				{
-					int count = 0;
-
-					for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
-					{
-						double randomScore = resScoreVsItem(queries[j], i);
-						if (randomScore >= score) count++;
-					}
-					
-					res.marginals[i] = count / (double)SIZE_OF_SCORE_DISTRIBUTION;
-				}
-			} else
-			{
-				int count = 0;
-				int [] shuffledTerms = newShuffledTerms();
-
-				for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
-				{
-					chooseTerms(rnd, observedTerms.length, randomizedTerms, shuffledTerms);
-					double randomScore = resScoreVsItem(randomizedTerms, i);
-					if (randomScore >= score) count++;
-				}
-				res.marginals[i] = count / (double)SIZE_OF_SCORE_DISTRIBUTION;
-			}
+			querySize = resPValue(rnd, observedTerms, randomizedTerms,
+					querySize, res, i, score);
 			
 		}
 		
 		return res;
+	}
+
+	/**
+	 * @param rnd
+	 * @param observedTerms
+	 * @param randomizedTerms
+	 * @param querySize
+	 * @param res
+	 * @param item
+	 * @param score
+	 * @return
+	 */
+	private int resPValue(Random rnd, int[] observedTerms,
+			int[] randomizedTerms, int querySize, Result res, int item,
+			double score) {
+		/* Turn it into a p value by considering the distribution */
+		if (CACHE_RANDOM_QUERIES)
+		{
+			if (querySize > MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION)
+				querySize = MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION;
+
+			int [][] queries = getRandomizedQueries(rnd, querySize);
+
+			if (CACHE_SCORE_DISTRIBUTION || PRECALCULATE_SCORE_DISTRIBUTION)
+			{
+				ApproximatedEmpiricalDistribution d = getScoreDistribution(querySize, item, queries);
+				res.marginals[item] = 1 - (d.cdf(score,false) - d.prob(score));
+			} else
+			{
+				int count = 0;
+
+				for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
+				{
+					double randomScore = resScoreVsItem(queries[j], item);
+					if (randomScore >= score) count++;
+				}
+				
+				res.marginals[item] = count / (double)SIZE_OF_SCORE_DISTRIBUTION;
+			}
+		} else
+		{
+			int count = 0;
+			int [] shuffledTerms = newShuffledTerms();
+
+			for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
+			{
+				chooseTerms(rnd, observedTerms.length, randomizedTerms, shuffledTerms);
+				double randomScore = resScoreVsItem(randomizedTerms, item);
+				if (randomScore >= score) count++;
+			}
+			res.marginals[item] = count / (double)SIZE_OF_SCORE_DISTRIBUTION;
+		}
+		return querySize;
 	}
 
 	/** Lock for the score distribution */
