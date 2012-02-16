@@ -206,8 +206,8 @@ public class B4OTest {
 
 		b4o.setConsiderFrequenciesOnly(false);
 		b4o.setCacheScoreDistribution(false);
-		b4o.setPrecalculateItemMaxs(true);
 		b4o.setPrecalculateScoreDistribution(false);
+		b4o.setPrecalculateItemMaxs(true);
 		b4o.setup(df.graph, df.assoc);
 
 		/* This is older code which we keep for testing here */
@@ -238,7 +238,10 @@ public class B4OTest {
 		/* Now the test */
 		for (int i=0;i<micaForItem.length;i++)
 			for (int j=0;j<micaForItem[i].length;j++)
-				assertEquals(b4o.terms2IC[micaForItem[i][j]],b4o.resnikTermSim.maxScoreForItem[i][j],0.00001); 
+				assertEquals(b4o.terms2IC[micaForItem[i][j]],b4o.resnikTermSim.maxScoreForItem[i][j],0.00001);
+
+		assertEquals(0.006997929,b4o.resScoreMaxAvgVsItem(new int[]{10,12},4),0.000001);
+		assertEquals(0.162568779,b4o.resScoreMaxAvgVsItem(new int[]{101,1222,1300,2011},78),0.000001);
 	}
 
 	@Test
