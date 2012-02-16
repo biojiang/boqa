@@ -271,7 +271,7 @@ public class B4O
 	private boolean PRECALCULATE_SCORE_DISTRIBUTION = true;
 	
 	/** Identifies whether score distribution should be stored */
-	private final boolean STORE_SCORE_DISTRIBUTION = true;
+	private boolean STORE_SCORE_DISTRIBUTION = true;
 
 	/** Defines the maximal query size for the cached distribution */
 	private int MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION = 20;
@@ -341,6 +341,16 @@ public class B4O
 		CACHE_SCORE_DISTRIBUTION = cache;
 	}
 
+	/**
+	 * Set whether we store the score distribution.
+	 * 
+	 * @param store
+	 */
+	public void setStoreScoreDistriubtion(boolean store)
+	{
+		STORE_SCORE_DISTRIBUTION = store;
+	}
+	
 	/**
 	 * Sets whether the matrix that contains the max ic term of two given terms
 	 * shall be precalculated.
@@ -2482,6 +2492,7 @@ public class B4O
 		return scoreMaxAvg(tl1, tl2, jcTermSim);
 	}
 
+	
 	/**
 	 * Sim score avg one list of a term vs an item.
 	 * 
@@ -2489,17 +2500,55 @@ public class B4O
 	 * @param item
 	 * @return
 	 */
-	private double resScoreMaxAvgVsItem(int [] tl1, int item)
+	private double scoreMaxAvgVsItem(int [] tl1, int item, AbstractTermSim termSim)
 	{
-		if (PRECALCULATE_ITEM_MAXS)
+		if (termSim.maxScoreForItem != null)
 		{
 			double score = 0;
 			for (int t1 : tl1)
-				score += resnikTermSim.maxScoreForItem[item][t1];
+				score += termSim.maxScoreForItem[item][t1];
 			score /= tl1.length;
 			return score;
 		}
-		return resScoreMaxAvg(tl1,items2DirectTerms[item]);
+		
+		return scoreMaxAvg(tl1,items2DirectTerms[item], termSim);
+	}
+	
+	/**
+	 * Sim score avg one list of a term vs an item according to Resnik.
+	 * 
+	 * @param tl1
+	 * @param item
+	 * @return
+	 */
+	public double resScoreMaxAvgVsItem(int [] tl1, int item)
+	{
+		return scoreMaxAvgVsItem(tl1, item, resnikTermSim);
+	}
+	
+	/**
+	 * Sim score avg one list of a term vs an item according to Lin.
+	 * 
+	 * @param tl1
+	 * @param item
+	 * @return
+	 */
+	public double linScoreMaxAvgVsItem(int [] tl1, int item)
+	{
+		return scoreMaxAvgVsItem(tl1, item, linTermSim);
+	}
+	
+	/**
+	 * Sim score avg one list of a term vs an item according to Jiang
+	 * and Conrath.
+	 * 
+	 * @param tl1
+	 * @param item
+	 * @return
+	 */
+	public double jcScoreMaxAvgVsItem(int [] tl1, int item)
+	{
+		return scoreMaxAvgVsItem(tl1, item, jcTermSim);
 	}
 	
 	/**
