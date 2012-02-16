@@ -112,6 +112,61 @@ public class B4OTest {
 		assertEquals(0.91629073, b4o.resScoreVsItem(new int[]{10}, 0), 0.001);
 		assertEquals(1.14733979, b4o.resScoreVsItem(new int[]{9,10,12}, 0), 0.001);
 
+
+		/* Now a bigger test */
+		boolean [] obs = new boolean[b4o.getSlimGraph().getNumberOfVertices()];
+		int item = 2;
+		Observations o = new Observations();
+		o.observations = obs;
+
+		for (int i=0;i<b4o.items2DirectTerms[item].length;i++)
+		{
+			int t=b4o.items2DirectTerms[item][i];
+			obs[t] = true;
+			b4o.activateAncestors(t, obs);
+		}
+		
+		System.out.println("Observations");
+		for (int i=0;i<b4o.getSlimGraph().getNumberOfVertices();i++)
+			if (obs[i]) System.out.print(i + " ");
+		System.out.println();
+
+		Result resnikResult = b4o.resnikScore(obs, true, new Random(3));
+		Result fabnResult = b4o.assignMarginals(o, false);
+
+		for (int i=0;i<b4o.allItemList.size();i++)
+			System.out.println(i + "  p=" + resnikResult.getMarginal(i) + " score=" + resnikResult.getScore(i));
+
+		for (int i=0;i<b4o.allItemList.size();i++)
+			System.out.println(i + " marg=" + fabnResult.getMarginal(i) + " score=" + fabnResult.getScore(i));
+
+
+		double [] resnikP = new double[] {
+			0.64384,0.843968,0.15518,0.844376,0.68832
+		};
+		
+		double [] resnikScore = new double[] {
+			0.4581453659370775, 0.2231435513142097, 0.916290731874155, 0.2231435513142097, 0.11157177565710485
+		};
+		
+		double [] fabnScores = new double[] {
+			-0.9724346539489889, -1.3317577761951482, 2.2926928336673593, -0.6160410530454002, -0.6160410530454002
+		};
+		
+		double [] fabnMarginals = new double[] {
+			0.032533088008779756, 0.022712933995512156, 0.8518284456000037, 0.046462766197852126, 0.046462766197852126
+		};
+		
+
+		for (int i=0;i<b4o.allItemList.size();i++)
+		{
+			System.out.println(i);
+			assertEquals(resnikP[i], resnikResult.getMarginal(i), 0.0001);
+			assertEquals(resnikScore[i], resnikResult.getScore(i), 0.0001);
+			assertEquals(fabnScores[i], fabnResult.getScore(i), 0.0001);
+			assertEquals(fabnMarginals[i], fabnResult.getMarginal(i), 0.0001);
+		}
+
 		
 	}
 
@@ -119,11 +174,7 @@ public class B4OTest {
 	public void testB4OOnInternalOntology() throws FileNotFoundException
 	{
 		final InternalDatafiles data = new InternalDatafiles();
-		int terms = data.graph.getNumberOfTerms();
-		assertEquals(15,terms);
-
-		Random rnd = new Random(2);
-
+		assertEquals(15,data.graph.getNumberOfTerms());
 
 		final B4O b4o = new B4O();
 		b4o.setConsiderFrequenciesOnly(false);
@@ -175,27 +226,6 @@ public class B4OTest {
 		System.out.println("Item Mapping");
 		for (int i=0;i<b4o.allItemList.size();i++)
 			System.out.println(i + " -> " +b4o.allItemList.get(i));
-
-		boolean [] obs = new boolean[terms];
-
-		for (int i=0;i<b4o.items2DirectTerms[2].length;i++)
-		{
-			int t=b4o.items2DirectTerms[2][i];
-			obs[t] = true;
-			b4o.activateAncestors(t, obs);
-		}
-
-		Result result = b4o.resnikScore(obs, true, rnd);
-		
-		for (int i=0;i<b4o.allItemList.size();i++)
-			System.out.println(result.getMarginal(i) + " " + result.getScore(i));
-
-		Observations o = new Observations();
-		o.observations = obs;
-		
-		result = b4o.assignMarginals(o, false);
-		for (int i=0;i<b4o.allItemList.size();i++)
-			System.out.println(result.getMarginal(i) + " " + result.getScore(i));
 
 		B4O b4oNoPrecalc = new B4O();
 		b4oNoPrecalc.setConsiderFrequenciesOnly(false);
