@@ -2272,7 +2272,50 @@ public class B4O
 		/** Stores the score distribution */
 		private ApproximatedEmpiricalDistributions scoreDistributions;
 		
-		
+		/** Lock for the score distribution */
+		private ReentrantReadWriteLock scoreDistributionLock = new ReentrantReadWriteLock();
+
+
+		/**
+		 * Returns the score distribution for the given item for the given query size.
+		 * If the score distribution has not been created yet, create it using the supplied
+		 * queries.
+		 * 
+		 * @param querySize
+		 * @param item
+		 * @param queries
+		 * @return
+		 */
+		private ApproximatedEmpiricalDistribution getScoreDistribution(int querySize, int item, int[][] queries)
+		{
+			scoreDistributionLock.readLock().lock();
+			ApproximatedEmpiricalDistribution d = scoreDistributions.getDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize);
+			scoreDistributionLock.readLock().unlock();
+
+			if (d == null)
+			{
+				/* Determine score distribution */
+				double [] scores = new double[SIZE_OF_SCORE_DISTRIBUTION];
+				double maxScore = Double.NEGATIVE_INFINITY;
+
+				for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
+				{
+					scores[j] = resScoreVsItem(queries[j], item);
+					if (scores[j] > maxScore) maxScore = scores[j];
+				}
+
+				ApproximatedEmpiricalDistribution d2 = new ApproximatedEmpiricalDistribution(scores,NUMBER_OF_BINS_IN_APPROXIMATED_SCORE_DISTRIBUTION);
+
+				scoreDistributionLock.writeLock().lock();
+				d = scoreDistributions.getDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize);
+				if (d == null)
+					scoreDistributions.setDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize, d2);
+				scoreDistributionLock.writeLock().unlock();
+			}
+
+			return d;
+		}
+
 		/**
 		 * Sets up the score distribution. At the moment, this must
 		 * be called before maxScoreForItem is setup. 
@@ -2712,7 +2755,7 @@ public class B4O
 
 			if (CACHE_SCORE_DISTRIBUTION || PRECALCULATE_SCORE_DISTRIBUTION)
 			{
-				ApproximatedEmpiricalDistribution d = getScoreDistribution(querySize, item, queries);
+				ApproximatedEmpiricalDistribution d = resnikTermSim.getScoreDistribution(querySize, item, queries);
 				res.marginals[item] = 1 - (d.cdf(score,false) - d.prob(score));
 			} else
 			{
@@ -2740,49 +2783,6 @@ public class B4O
 			res.marginals[item] = count / (double)SIZE_OF_SCORE_DISTRIBUTION;
 		}
 		return querySize;
-	}
-
-	/** Lock for the score distribution */
-	private static ReentrantReadWriteLock scoreDistributionLock = new ReentrantReadWriteLock();
-	
-	/**
-	 * Returns the score distribution for the given item for the given query size.
-	 * If the score distribution has not been created yet, create it using the supplied
-	 * queries.
-	 * 
-	 * @param querySize
-	 * @param item
-	 * @param queries
-	 * @return
-	 */
-	private ApproximatedEmpiricalDistribution getScoreDistribution(int querySize, int item, int[][] queries)
-	{
-		scoreDistributionLock.readLock().lock();
-		ApproximatedEmpiricalDistribution d = resnikTermSim.scoreDistributions.getDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize);
-		scoreDistributionLock.readLock().unlock();
-
-		if (d == null)
-		{
-			/* Determine score distribution */
-			double [] scores = new double[SIZE_OF_SCORE_DISTRIBUTION];
-			double maxScore = Double.NEGATIVE_INFINITY;
-
-			for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
-			{
-				scores[j] = resScoreVsItem(queries[j], item);
-				if (scores[j] > maxScore) maxScore = scores[j];
-			}
-
-			ApproximatedEmpiricalDistribution d2 = new ApproximatedEmpiricalDistribution(scores,NUMBER_OF_BINS_IN_APPROXIMATED_SCORE_DISTRIBUTION);
-
-			scoreDistributionLock.writeLock().lock();
-			d = resnikTermSim.scoreDistributions.getDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize);
-			if (d == null)
-				resnikTermSim.scoreDistributions.setDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize, d2);
-			scoreDistributionLock.writeLock().unlock();
-		}
-
-		return d;
 	}
 
 	/** Lock for randomized querys */
