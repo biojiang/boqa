@@ -270,6 +270,9 @@ public class B4O
 	/** Precalculate score distribution. Always implies CACHE_SCORE_DISTRIBUTION. */
 	private boolean PRECALCULATE_SCORE_DISTRIBUTION = true;
 	
+	/** Tries to load the score distribution */ 
+	private boolean TRY_LOADING_SCORE_DISTRIBUTION = true;
+	
 	/** Identifies whether score distribution should be stored */
 	private boolean STORE_SCORE_DISTRIBUTION = true;
 
@@ -360,6 +363,17 @@ public class B4O
 	public void setPrecalculateItemMaxs(boolean precalc)
 	{
 		PRECALCULATE_ITEM_MAXS = precalc;
+	}
+	
+	/**
+	 * Sets whether score distribution should be loaded.
+	 * 
+	 * @param loading
+	 * @return
+	 */
+	public void setTryLoadingScoreDistribution(boolean loading)
+	{
+		TRY_LOADING_SCORE_DISTRIBUTION = loading; 
 	}
 	
 	/**
@@ -1228,7 +1242,7 @@ public class B4O
 			
 			queryCache = new QuerySets(MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1);
 
-			if (CACHE_SCORE_DISTRIBUTION || PRECALCULATE_SCORE_DISTRIBUTION)
+			if ((CACHE_SCORE_DISTRIBUTION || PRECALCULATE_SCORE_DISTRIBUTION) && TRY_LOADING_SCORE_DISTRIBUTION)
 			{
 				try {
 					File inFile = new File(scoreDistributionsName);
