@@ -161,7 +161,7 @@ public class B4OTest {
 		for (int i=0;i<b4o.allItemList.size();i++)
 		{
 			System.out.println(i);
-			assertEquals(resnikP[i], resnikResult.getMarginal(i), 0.0001);
+			assertEquals(resnikP[i], resnikResult.getMarginal(i), 0.05);
 			assertEquals(resnikScore[i], resnikResult.getScore(i), 0.0001);
 			assertEquals(fabnScores[i], fabnResult.getScore(i), 0.0001);
 			assertEquals(fabnMarginals[i], fabnResult.getMarginal(i), 0.0001);
@@ -179,9 +179,10 @@ public class B4OTest {
 		final B4O b4o = new B4O();
 		b4o.setConsiderFrequenciesOnly(false);
 		b4o.setPrecalculateItemMaxs(true);
-		b4o.setCacheScoreDistribution(false);
-		b4o.setPrecalculateScoreDistribution(false);
+		b4o.setCacheScoreDistribution(true);
+		b4o.setPrecalculateScoreDistribution(true);
 		b4o.setStoreScoreDistriubtion(false);
+		b4o.setTryLoadingScoreDistribution(false);
 		b4o.setMaxQuerySizeForCachedDistribution(4);
 		b4o.setup(data.graph, data.assoc);
 		
@@ -233,6 +234,7 @@ public class B4OTest {
 		b4oNoPrecalc.setCacheScoreDistribution(false);
 		b4oNoPrecalc.setPrecalculateScoreDistribution(false);
 		b4oNoPrecalc.setStoreScoreDistriubtion(false);
+		b4oNoPrecalc.setTryLoadingScoreDistribution(false);
 		b4oNoPrecalc.setMaxQuerySizeForCachedDistribution(4);
 		b4oNoPrecalc.setup(data.graph, data.assoc);
 		
