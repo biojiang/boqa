@@ -2732,19 +2732,10 @@ public class B4O
 		return res;
 	}
 
-	/**
-	 * @param rnd
-	 * @param observedTerms
-	 * @param randomizedTerms
-	 * @param querySize
-	 * @param res
-	 * @param item
-	 * @param score
-	 * @return
-	 */
-	private int resPValue(Random rnd, int[] observedTerms,
+	private int simPValue(Random rnd, int[] observedTerms,
 			int[] randomizedTerms, int querySize, Result res, int item,
-			double score) {
+			double score, AbstractTermSim termSim)
+	{
 		/* Turn it into a p value by considering the distribution */
 		if (CACHE_RANDOM_QUERIES)
 		{
@@ -2755,7 +2746,7 @@ public class B4O
 
 			if (CACHE_SCORE_DISTRIBUTION || PRECALCULATE_SCORE_DISTRIBUTION)
 			{
-				ApproximatedEmpiricalDistribution d = resnikTermSim.getScoreDistribution(querySize, item, queries);
+				ApproximatedEmpiricalDistribution d = termSim.getScoreDistribution(querySize, item, queries);
 				res.marginals[item] = 1 - (d.cdf(score,false) - d.prob(score));
 			} else
 			{
@@ -2783,6 +2774,23 @@ public class B4O
 			res.marginals[item] = count / (double)SIZE_OF_SCORE_DISTRIBUTION;
 		}
 		return querySize;
+	}
+	
+	/**
+	 * @param rnd
+	 * @param observedTerms
+	 * @param randomizedTerms
+	 * @param querySize
+	 * @param res
+	 * @param item
+	 * @param score
+	 * @return
+	 */
+	private int resPValue(Random rnd, int[] observedTerms,
+			int[] randomizedTerms, int querySize, Result res, int item,
+			double score)
+	{
+		return simPValue(rnd, observedTerms, randomizedTerms, querySize, res, item, score, resnikTermSim);
 	}
 
 	/** Lock for randomized querys */
