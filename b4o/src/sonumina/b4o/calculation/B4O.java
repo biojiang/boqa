@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -48,31 +47,6 @@ import ontologizer.types.ByteString;
 import sonumina.algorithms.Algorithms;
 import sonumina.math.distribution.ApproximatedEmpiricalDistribution;
 import sonumina.math.graph.SlimDirectedGraphView;
-
-/**
- * Class representing different sets of queries.
- * 
- * @author Sebastian Bauer
- */
-class QuerySets
-{
-	private int [][][] queries;
-	
-	public QuerySets(int maxSizes)
-	{
-		queries = new int[maxSizes][][];
-	}
-	
-	public int [][] getQueries(int querySize)
-	{
-		return queries[querySize];
-	}
-	
-	public void setQueries(int querySize, int [][] querySets)
-	{
-		queries[querySize] = querySets;
-	}
-}
 
 /**
  * Basic container for distributions.
