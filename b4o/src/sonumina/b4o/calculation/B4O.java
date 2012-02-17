@@ -151,7 +151,7 @@ public class B4O
 	private QuerySets queryCache;
 
 	/** Stores the score distribution */
-	private ApproximatedEmpiricalDistributions scoreDistributions;
+//	private ApproximatedEmpiricalDistributions scoreDistributions;
 
 	/** Used to parse frequency information */
 	public static Pattern frequencyPattern = Pattern.compile("(\\d+)\\.?(\\d*)\\s*%");
@@ -1188,7 +1188,7 @@ public class B4O
 		if (CACHE_RANDOM_QUERIES)
 		{
 			boolean distributionLoaded = false;
-			String scoreDistributionsName = "scoreDistributions-" + allItemList.size() + "-" + CONSIDER_FREQUENCIES_ONLY + "-" + SIZE_OF_SCORE_DISTRIBUTION + ".gz";
+			String scoreDistributionsName = "scoreDistributions-" + resnikTermSim.name() + "-" + allItemList.size() + "-" + CONSIDER_FREQUENCIES_ONLY + "-" + SIZE_OF_SCORE_DISTRIBUTION + ".gz";
 			
 			queryCache = new QuerySets(MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1);
 
@@ -1202,7 +1202,7 @@ public class B4O
 					int fingerprint = ois.readInt();
 					if (fingerprint == fingerprint())
 					{
-						scoreDistributions = (ApproximatedEmpiricalDistributions)ois.readObject();
+						resnikTermSim.scoreDistributions = (ApproximatedEmpiricalDistributions)ois.readObject();
 						distributionLoaded = true;
 						logger.info("Score distribution loaded from \"" + inFile.getAbsolutePath() + "\"");
 					}
@@ -1217,7 +1217,7 @@ public class B4O
 			if (PRECALCULATE_SCORE_DISTRIBUTION)
 			{
 				if (!distributionLoaded)
-					scoreDistributions = new ApproximatedEmpiricalDistributions(allItemList.size() * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1));
+					resnikTermSim.scoreDistributions = new ApproximatedEmpiricalDistributions(allItemList.size() * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1));
 
 				Random rnd = new Random(9);
 				ExecutorService es = null;
@@ -1283,7 +1283,7 @@ public class B4O
 						oos.writeInt(fingerprint());
 						
 						/* Finally, Write store distribution */
-						oos.writeObject(scoreDistributions);
+						oos.writeObject(resnikTermSim.scoreDistributions);
 						underlyingStream.close();
 						
 						logger.info("Score distribution written to \"" + outFile.getAbsolutePath() + "\"");
@@ -2378,6 +2378,9 @@ public class B4O
 	{
 		/** Contains for each item the maximal score for the given term */ 
 		public double [][] maxScoreForItem;
+		
+		/** Stores the score distribution */
+		private ApproximatedEmpiricalDistributions scoreDistributions;
 	}
 	
 	/**
@@ -2742,7 +2745,7 @@ public class B4O
 	private ApproximatedEmpiricalDistribution getScoreDistribution(int querySize, int item, int[][] queries)
 	{
 		scoreDistributionLock.readLock().lock();
-		ApproximatedEmpiricalDistribution d = scoreDistributions.getDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize);
+		ApproximatedEmpiricalDistribution d = resnikTermSim.scoreDistributions.getDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize);
 		scoreDistributionLock.readLock().unlock();
 
 		if (d == null)
@@ -2760,9 +2763,9 @@ public class B4O
 			ApproximatedEmpiricalDistribution d2 = new ApproximatedEmpiricalDistribution(scores,NUMBER_OF_BINS_IN_APPROXIMATED_SCORE_DISTRIBUTION);
 
 			scoreDistributionLock.writeLock().lock();
-			d = scoreDistributions.getDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize);
+			d = resnikTermSim.scoreDistributions.getDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize);
 			if (d == null)
-				scoreDistributions.setDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize, d2);
+				resnikTermSim.scoreDistributions.setDistribution(item * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION+1) + querySize, d2);
 			scoreDistributionLock.writeLock().unlock();
 		}
 
