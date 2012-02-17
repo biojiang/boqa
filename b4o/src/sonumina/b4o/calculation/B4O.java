@@ -48,32 +48,6 @@ import sonumina.algorithms.Algorithms;
 import sonumina.math.distribution.ApproximatedEmpiricalDistribution;
 import sonumina.math.graph.SlimDirectedGraphView;
 
-/**
- * Basic container for distributions.
- * 
- * @author Sebastian Bauer
- */
-class ApproximatedEmpiricalDistributions implements Serializable
-{
-	private static final long serialVersionUID = 1L;
-	
-	private ApproximatedEmpiricalDistribution[] distr;
-	
-	ApproximatedEmpiricalDistributions(int numberOfDistributions)
-	{
-		distr = new ApproximatedEmpiricalDistribution[numberOfDistributions];
-	}
-	
-	public ApproximatedEmpiricalDistribution getDistribution(int i)
-	{
-		return distr[i];
-	}
-	
-	public void setDistribution(int i, ApproximatedEmpiricalDistribution dist)
-	{
-		distr[i] = dist;
-	}
-}
 
 /**
  * This is our class implementing the calculation.
