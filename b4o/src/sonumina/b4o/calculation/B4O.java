@@ -21,8 +21,10 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
@@ -1271,6 +1273,7 @@ public class B4O
 			{
 				Random rnd = new Random(9);
 				ExecutorService es = null;
+				ArrayList<Future<?>> futureList = new ArrayList<Future<?>>();
 
 				if (getNumProcessors() > 1) es = Executors.newFixedThreadPool(getNumProcessors());
 				else es = null;
@@ -1293,8 +1296,7 @@ public class B4O
 						}
 					};
 
-					if (es != null)
-						es.execute(run);
+					if (es != null) futureList.add(es.submit(run));
 					else run.run();
 				}
 
@@ -1302,13 +1304,25 @@ public class B4O
 				if (es != null)
 				{
 					es.shutdown();
+					
+					for (Future<?> f : futureList)
+					{
+						try {
+							System.out.println(f.get());
+						} catch (Exception e) {
+							throw new RuntimeException(e);
+						}
+					}
+					
 					try {
 						while (!es.awaitTermination(10, TimeUnit.SECONDS));
 					} catch (InterruptedException e) {
 						e.printStackTrace();
+						throw new RuntimeException(e);
 					}
 				}
 
+				logger.info("Score distribution has been precalculated");
 
 				if (STORE_SCORE_DISTRIBUTION && !distributionLoaded)
 				{
@@ -2152,6 +2166,8 @@ public class B4O
 		final Configuration previousStat = new Configuration();
 		determineCases(observations.observations, previousHidden, previousStat);
 
+		ArrayList<Future<?>> futureList = new ArrayList<Future<?>>();
+		
 		for (i=0;i<allItemList.size();i++)
 		{
 			final int item = i;
@@ -2191,13 +2207,25 @@ public class B4O
 				}
 			};
 
-			if (es != null) es.execute(run);
-			else run.run();
+			if (es != null)
+				futureList.add(es.submit(run));
+			else
+				run.run();
 		}
 
 		if (es != null)
 		{
 			es.shutdown();
+			
+			for (Future<?> f : futureList)
+			{
+				try {
+					f.get();
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+			
 			try {
 				while (!es.awaitTermination(10, TimeUnit.SECONDS));
 			} catch (InterruptedException e) {
