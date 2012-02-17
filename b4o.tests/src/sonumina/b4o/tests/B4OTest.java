@@ -132,11 +132,23 @@ public class B4OTest {
 		System.out.println();
 
 		Result resnikResult = b4o.resnikScore(obs, true, new Random(3));
+		Result linResult = b4o.linScore(obs, true, new Random(3));
+		Result jcResult = b4o.jcScore(obs, true, new Random(3));
 		Result fabnResult = b4o.assignMarginals(o, false);
 
+		System.out.println("Resnik");
 		for (int i=0;i<b4o.allItemList.size();i++)
 			System.out.println(i + "  p=" + resnikResult.getMarginal(i) + " score=" + resnikResult.getScore(i));
 
+		System.out.println("Lin");
+		for (int i=0;i<b4o.allItemList.size();i++)
+			System.out.println(i + "  p=" + linResult.getMarginal(i) + " score=" + linResult.getScore(i));
+
+		System.out.println("JC");
+		for (int i=0;i<b4o.allItemList.size();i++)
+			System.out.println(i + "  p=" + jcResult.getMarginal(i) + " score=" + jcResult.getScore(i));
+
+		System.out.println("FABN");
 		for (int i=0;i<b4o.allItemList.size();i++)
 			System.out.println(i + " marg=" + fabnResult.getMarginal(i) + " score=" + fabnResult.getScore(i));
 

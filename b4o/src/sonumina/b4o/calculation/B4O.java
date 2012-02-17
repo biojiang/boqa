@@ -2686,52 +2686,18 @@ public class B4O
 	}
 	
 	/**
-	 * Makes the calculation according to Resnik max. We handle the observations as an item
-	 * and compare it to all other items. Also calculates the significance (stored in the 
-	 * marginal attribute).
+	 * Determined the pvalue of the given score for the given item.
 	 * 
-	 * @param observations
-	 * @param pval to be set to true if significance should be determined
-	 * @param rnd the random source
-	 * 
+	 * @param rnd
+	 * @param observedTerms
+	 * @param randomizedTerms
+	 * @param querySize
+	 * @param res
+	 * @param item
+	 * @param score
+	 * @param termSim
 	 * @return
 	 */
-	public Result resnikScore(boolean [] observations, boolean pval, Random rnd)
-	{
-		int [] observedTerms = getMostSpecificTermsSparse(observations);
-		int [] randomizedTerms = new int[observedTerms.length];
-		
-		int querySize = observedTerms.length;
-		
-		Result res = new Result();
-		res.scores = new double[allItemList.size()];
-		res.marginals = new double[allItemList.size()];
-
-		long startTime = System.currentTimeMillis();
-		long lastTime = startTime;
-		
-		for (int i = 0;i<allItemList.size();i++)
-		{
-			long time = System.currentTimeMillis();
-
-			if (time - lastTime > 5000)
-			{
-				System.out.println((time - startTime) + "ms " + i / (double)allItemList.size());
-				lastTime = time;
-			}
-
-			/* Determine and remember the plain score */
-			double score = resScoreVsItem(observedTerms,i);
-			res.scores[i] = score;
-
-			querySize = resPValue(rnd, observedTerms, randomizedTerms,
-					querySize, res, i, score);
-			
-		}
-		
-		return res;
-	}
-
 	private int simPValue(Random rnd, int[] observedTerms,
 			int[] randomizedTerms, int querySize, Result res, int item,
 			double score, AbstractTermSim termSim)
@@ -2775,7 +2741,7 @@ public class B4O
 		}
 		return querySize;
 	}
-	
+
 	/**
 	 * @param rnd
 	 * @param observedTerms
@@ -2791,6 +2757,78 @@ public class B4O
 			double score)
 	{
 		return simPValue(rnd, observedTerms, randomizedTerms, querySize, res, item, score, resnikTermSim);
+	}
+	
+	/**
+	 * Makes the calculation according to a sim score avg max. We handle the observations as an item
+	 * and compare it to all other items. Also calculates the significance (stored in the 
+	 * marginal attribute).
+	 * 
+	 * @param observations
+	 * @param pval to be set to true if significance should be determined
+	 * @param rnd the random source
+	 * 
+	 * @return
+	 */
+	public Result simScore(boolean [] observations, boolean pval, AbstractTermSim termSim, Random rnd)
+	{
+		int [] observedTerms = getMostSpecificTermsSparse(observations);
+		int [] randomizedTerms = new int[observedTerms.length];
+		
+		int querySize = observedTerms.length;
+		
+		Result res = new Result();
+		res.scores = new double[allItemList.size()];
+		res.marginals = new double[allItemList.size()];
+
+		long startTime = System.currentTimeMillis();
+		long lastTime = startTime;
+		
+		for (int i = 0;i<allItemList.size();i++)
+		{
+			long time = System.currentTimeMillis();
+
+			if (time - lastTime > 5000)
+			{
+				System.out.println((time - startTime) + "ms " + i / (double)allItemList.size());
+				lastTime = time;
+			}
+
+			/* Determine and remember the plain score */
+			double score = scoreMaxAvgVsItem(observedTerms,i,termSim);
+			res.scores[i] = score;
+
+			querySize = simPValue(rnd, observedTerms, randomizedTerms, querySize, res, i, score, termSim);
+			
+		}
+		
+		return res;
+	}
+
+	/**
+	 * Makes the calculation according to Resnik max. We handle the observations as an item
+	 * and compare it to all other items. Also calculates the significance (stored in the 
+	 * marginal attribute).
+	 * 
+	 * @param observations
+	 * @param pval to be set to true if significance should be determined
+	 * @param rnd the random source
+	 * 
+	 * @return
+	 */
+	public Result resnikScore(boolean [] observations, boolean pval, Random rnd)
+	{
+		return simScore(observations, pval, resnikTermSim, rnd);
+	}
+
+	public Result linScore(boolean [] observations, boolean pval, Random rnd)
+	{
+		return simScore(observations, pval, linTermSim, rnd);
+	}
+
+	public Result jcScore(boolean [] observations, boolean pval, Random rnd)
+	{
+		return simScore(observations, pval, jcTermSim, rnd);
 	}
 
 	/** Lock for randomized querys */
