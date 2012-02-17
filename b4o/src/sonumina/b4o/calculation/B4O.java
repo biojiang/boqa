@@ -1264,13 +1264,13 @@ public class B4O
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
 				}
-
-				if (!distributionLoaded)
-					scoreDistributions = new ApproximatedEmpiricalDistributions(allItemList.size() * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1));
 			}
 
 			if (PRECALCULATE_SCORE_DISTRIBUTION)
 			{
+				if (!distributionLoaded)
+					scoreDistributions = new ApproximatedEmpiricalDistributions(allItemList.size() * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1));
+
 				Random rnd = new Random(9);
 				ExecutorService es = null;
 				ArrayList<Future<?>> futureList = new ArrayList<Future<?>>();
