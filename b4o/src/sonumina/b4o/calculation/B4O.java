@@ -1184,120 +1184,10 @@ public class B4O
 			logger.info("Calculated item maxs");
 		}
 		
-		/** Instantiates the query cache */
-		if (CACHE_RANDOM_QUERIES)
-		{
-			boolean distributionLoaded = false;
-			String scoreDistributionsName = "scoreDistributions-" + resnikTermSim.name() + "-" + allItemList.size() + "-" + CONSIDER_FREQUENCIES_ONLY + "-" + SIZE_OF_SCORE_DISTRIBUTION + ".gz";
-			
-			queryCache = new QuerySets(MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1);
+		resnikTermSim.setupDistribution();
+		linTermSim.setupDistribution();
+		jcTermSim.setupDistribution();
 
-			if ((CACHE_SCORE_DISTRIBUTION || PRECALCULATE_SCORE_DISTRIBUTION) && TRY_LOADING_SCORE_DISTRIBUTION)
-			{
-				try {
-					File inFile = new File(scoreDistributionsName);
-					InputStream underlyingStream = new GZIPInputStream(new FileInputStream(inFile));
-					ObjectInputStream ois = new ObjectInputStream(underlyingStream);
-					
-					int fingerprint = ois.readInt();
-					if (fingerprint == fingerprint())
-					{
-						resnikTermSim.scoreDistributions = (ApproximatedEmpiricalDistributions)ois.readObject();
-						distributionLoaded = true;
-						logger.info("Score distribution loaded from \"" + inFile.getAbsolutePath() + "\"");
-					}
-				} catch (FileNotFoundException e) {
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				}
-			}
-
-			if (PRECALCULATE_SCORE_DISTRIBUTION)
-			{
-				if (!distributionLoaded)
-					resnikTermSim.scoreDistributions = new ApproximatedEmpiricalDistributions(allItemList.size() * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1));
-
-				Random rnd = new Random(9);
-				ExecutorService es = null;
-				ArrayList<Future<?>> futureList = new ArrayList<Future<?>>();
-
-				if (getNumProcessors() > 1) es = Executors.newFixedThreadPool(getNumProcessors());
-				else es = null;
-				
-				for (int i=0;i<allItemList.size();i++)
-				{
-					final long seed = rnd.nextLong();
-					final int item = i;
-					
-					Runnable run = new Runnable() {
-						@Override
-						public void run() {
-							Random rnd = new Random(seed);
-
-							for (int qs=1;qs <= MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION; qs++)
-							{
-								int [][] queries = getRandomizedQueries(rnd, qs);
-								getScoreDistribution(qs, item, queries);
-							}
-						}
-					};
-
-					if (es != null) futureList.add(es.submit(run));
-					else run.run();
-				}
-
-				/* Cleanup */
-				if (es != null)
-				{
-					es.shutdown();
-					
-					for (Future<?> f : futureList)
-					{
-						try {
-							System.out.println(f.get());
-						} catch (Exception e) {
-							throw new RuntimeException(e);
-						}
-					}
-					
-					try {
-						while (!es.awaitTermination(10, TimeUnit.SECONDS));
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						throw new RuntimeException(e);
-					}
-				}
-
-				logger.info("Score distribution has been precalculated");
-
-				if (STORE_SCORE_DISTRIBUTION && !distributionLoaded)
-				{
-					try {
-						File outFile = new File(scoreDistributionsName);
-						OutputStream underlyingStream = new GZIPOutputStream(new FileOutputStream(outFile));
-						ObjectOutputStream oos = new ObjectOutputStream(underlyingStream);
-						
-						/* The fingerprint shall ensure that the score distribution and ontology/associations are compatible */
-						oos.writeInt(fingerprint());
-						
-						/* Finally, Write store distribution */
-						oos.writeObject(resnikTermSim.scoreDistributions);
-						underlyingStream.close();
-						
-						logger.info("Score distribution written to \"" + outFile.getAbsolutePath() + "\"");
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-		
 		/* Choose appropriate values */
 		double numOfTerms = getSlimGraph().getNumberOfVertices();
 		
@@ -2374,13 +2264,136 @@ public class B4O
 	 *  
 	 * @author Sebastian Bauer
 	 */
-	public static abstract class AbstractTermSim implements ITermSim
+	public abstract class AbstractTermSim implements ITermSim
 	{
 		/** Contains for each item the maximal score for the given term */ 
 		public double [][] maxScoreForItem;
 		
 		/** Stores the score distribution */
 		private ApproximatedEmpiricalDistributions scoreDistributions;
+		
+		
+		/**
+		 * Sets up the score distribution. At the moment, this must
+		 * be called before maxScoreForItem is setup. 
+		 */
+		public void setupDistribution()
+		{
+			/** Instantiates the query cache */
+			if (CACHE_RANDOM_QUERIES)
+			{
+				boolean distributionLoaded = false;
+				String scoreDistributionsName = "scoreDistributions-" + name() + "-" + allItemList.size() + "-" + CONSIDER_FREQUENCIES_ONLY + "-" + SIZE_OF_SCORE_DISTRIBUTION + ".gz";
+				
+				queryCache = new QuerySets(MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1);
+
+				if ((CACHE_SCORE_DISTRIBUTION || PRECALCULATE_SCORE_DISTRIBUTION) && TRY_LOADING_SCORE_DISTRIBUTION)
+				{
+					try {
+						File inFile = new File(scoreDistributionsName);
+						InputStream underlyingStream = new GZIPInputStream(new FileInputStream(inFile));
+						ObjectInputStream ois = new ObjectInputStream(underlyingStream);
+						
+						int fingerprint = ois.readInt();
+						if (fingerprint == fingerprint())
+						{
+							scoreDistributions = (ApproximatedEmpiricalDistributions)ois.readObject();
+							distributionLoaded = true;
+							logger.info("Score distribution loaded from \"" + inFile.getAbsolutePath() + "\"");
+						}
+					} catch (FileNotFoundException e) {
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					}
+				}
+
+				if (PRECALCULATE_SCORE_DISTRIBUTION)
+				{
+					if (!distributionLoaded)
+						scoreDistributions = new ApproximatedEmpiricalDistributions(allItemList.size() * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1));
+
+					Random rnd = new Random(9);
+					ExecutorService es = null;
+					ArrayList<Future<?>> futureList = new ArrayList<Future<?>>();
+
+					if (getNumProcessors() > 1) es = Executors.newFixedThreadPool(getNumProcessors());
+					else es = null;
+					
+					for (int i=0;i<allItemList.size();i++)
+					{
+						final long seed = rnd.nextLong();
+						final int item = i;
+						
+						Runnable run = new Runnable() {
+							@Override
+							public void run() {
+								Random rnd = new Random(seed);
+
+								for (int qs=1;qs <= MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION; qs++)
+								{
+									int [][] queries = getRandomizedQueries(rnd, qs);
+									getScoreDistribution(qs, item, queries);
+								}
+							}
+						};
+
+						if (es != null) futureList.add(es.submit(run));
+						else run.run();
+					}
+
+					/* Cleanup */
+					if (es != null)
+					{
+						es.shutdown();
+						
+						for (Future<?> f : futureList)
+						{
+							try {
+								f.get();
+							} catch (Exception e) {
+								throw new RuntimeException(e);
+							}
+						}
+						
+						try {
+							while (!es.awaitTermination(10, TimeUnit.SECONDS));
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+							throw new RuntimeException(e);
+						}
+					}
+
+					logger.info("Score distribution has been precalculated");
+
+					if (STORE_SCORE_DISTRIBUTION && !distributionLoaded)
+					{
+						try {
+							File outFile = new File(scoreDistributionsName);
+							OutputStream underlyingStream = new GZIPOutputStream(new FileOutputStream(outFile));
+							ObjectOutputStream oos = new ObjectOutputStream(underlyingStream);
+							
+							/* The fingerprint shall ensure that the score distribution and ontology/associations are compatible */
+							oos.writeInt(fingerprint());
+							
+							/* Finally, Write store distribution */
+							oos.writeObject(scoreDistributions);
+							underlyingStream.close();
+							
+							logger.info("Score distribution written to \"" + outFile.getAbsolutePath() + "\"");
+						} catch (FileNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+
+		}
 	}
 	
 	/**
