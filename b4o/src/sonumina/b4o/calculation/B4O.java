@@ -337,6 +337,16 @@ public class B4O
 	}
 	
 	/**
+	 * Returns the size of the score distribution.
+	 * @return
+	 */
+	public int getSizeOfScoreDistribution()
+	{
+		return SIZE_OF_SCORE_DISTRIBUTION;
+	}
+
+	
+	/**
 	 * Returns whether false negatives are propagated in a
 	 * top-down fashion.
 	 * 
@@ -1437,7 +1447,7 @@ public class B4O
 	/**
 	 * @return
 	 */
-	private static int getNumProcessors()
+	public static int getNumProcessors()
 	{
 		int numProcessors = MEASURE_TIME?1:Runtime.getRuntime().availableProcessors();
 		return numProcessors;
@@ -2891,7 +2901,7 @@ public class B4O
 	 * @param chosen
 	 * @param storage
 	 */
-	private void chooseTerms(Random rnd, int size, int[] chosen, int[] storage)
+	public void chooseTerms(Random rnd, int size, int[] chosen, int[] storage)
 	{
 		if (FORBID_ILLEGAL_QUERIES)
 		{
