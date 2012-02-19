@@ -325,7 +325,7 @@ public class B4O
 	{
 		TRY_LOADING_SCORE_DISTRIBUTION = loading; 
 	}
-	
+		
 	/**
 	 * Returns whether false negatives are propagated in a
 	 * top-down fashion.
@@ -1134,6 +1134,8 @@ public class B4O
 				if (itemHasFrequencies[i])
 					itemsToBeConsidered.add(allItemList.get(i));
 			}
+			if (itemsToBeConsidered.size() == 0)
+				throw new RuntimeException("No items left after frequency filtering");
 			provideGlobals(itemsToBeConsidered);
 			
 			System.out.println("There were " + oldSize + " items but we consider only " + allItemList.size() + " of them with frequencies.");
@@ -1425,7 +1427,8 @@ public class B4O
 	/**
 	 * @return
 	 */
-	private static int getNumProcessors() {
+	private static int getNumProcessors()
+	{
 		int numProcessors = MEASURE_TIME?1:Runtime.getRuntime().availableProcessors();
 		return numProcessors;
 	}
