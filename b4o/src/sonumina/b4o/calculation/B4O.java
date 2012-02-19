@@ -177,7 +177,7 @@ public class B4O
 	private boolean CONSIDER_FREQUENCIES_ONLY = true;
 	private final String RESULT_NAME = "fnd-freq-only.txt";
 	private final String [] evidenceCodes = null;//new String[]{"PCS","ICE"};
-	private final int SIZE_OF_SCORE_DISTRIBUTION = 250000;
+	private int SIZE_OF_SCORE_DISTRIBUTION = 250000;
 	private final int NUMBER_OF_BINS_IN_APPROXIMATED_SCORE_DISTRIBUTION = 10000;
 	public int maxTerms = -1;						/* Defines the maximal number of terms a query can have */
 	
@@ -325,7 +325,17 @@ public class B4O
 	{
 		TRY_LOADING_SCORE_DISTRIBUTION = loading; 
 	}
-		
+
+	/**
+	 * Sets the size of the score distribution.
+	 * 
+	 * @param size
+	 */
+	public void setSizeOfScoreDistribution(int size)
+	{
+		SIZE_OF_SCORE_DISTRIBUTION = size;
+	}
+	
 	/**
 	 * Returns whether false negatives are propagated in a
 	 * top-down fashion.
@@ -2359,6 +2369,8 @@ public class B4O
 				{
 					if (!distributionLoaded)
 						scoreDistributions = new ApproximatedEmpiricalDistributions(allItemList.size() * (MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION + 1));
+
+					logger.info("Precaculating score distribution for " + name());
 
 					Random rnd = new Random(9);
 					ExecutorService es = null;
