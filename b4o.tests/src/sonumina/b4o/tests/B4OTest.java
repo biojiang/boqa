@@ -178,10 +178,8 @@ public class B4OTest {
 			assertEquals(fabnScores[i], fabnResult.getScore(i), 0.0001);
 			assertEquals(fabnMarginals[i], fabnResult.getMarginal(i), 0.0001);
 		}
-
-		
 	}
-
+	
 	@Test
 	public void testB4OOnInternalOntology() throws FileNotFoundException
 	{
@@ -253,6 +251,19 @@ public class B4OTest {
 		checkInternalSimValues(b4o);
 		checkInternalSimValues(b4oNoPrecalc);
 	}
+
+	@Test
+	public void testBenchmarkOnInternalOntology() throws InterruptedException, IOException
+	{
+		final InternalDatafiles data = new InternalDatafiles();
+		final B4O b4o = new B4O();
+		b4o.setConsiderFrequenciesOnly(false);
+		b4o.setSizeOfScoreDistribution(1000);
+		b4o.setTryLoadingScoreDistribution(false);
+		b4o.setMaxQuerySizeForCachedDistribution(5);
+		b4o.benchmark(data.graph, data.assoc);
+	}
+
 
 	/**
 	 * A helper function to check similarity values for the HPO.
