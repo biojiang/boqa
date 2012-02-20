@@ -1252,38 +1252,7 @@ public class B4O
 		hpoTerms.add(new TermID("HP:0000875")); /* Episodic Hypertension */
 		hpoTerms.add(new TermID("HP:0002621")); /* Atherosclerosis */
 
-		/* Basically, this defines a new command \maxbox whose text width as given by the second argument is not wider than
-		 * the first argument. The text which is then displayed in the box is used from the third argument.
-		 */
-		String preamble = "d2tfigpreamble=\"\\ifthenelse{\\isundefined{\\myboxlen}}{\\newlength{\\myboxlen}}{}"+
-						  "\\newcommand*{\\maxbox}[3]{\\settowidth{\\myboxlen}{#2}"+
-						  "\\ifdim#1<\\myboxlen" +
-						  "\\parbox{#1}{\\centering#3}"+
-						  "\\else"+
-						  "\\parbox{\\myboxlen}{\\centering#3}"+
-						  "\\fi}\"";
-
-		try
-		{
-			GODOTWriter.writeDOT(graph.getInducedGraph(termEnumerator.getAllAnnotatedTermsAsList()), new File("hpo-example.dot"), null, hpoTerms, new AbstractDotAttributesProvider() {
-				public String getDotNodeAttributes(TermID id) {
-					String termName;
-					Term term = graph.getTerm(id);
-					if (graph.isRootTerm(id)) termName = "Human Phenotype";
-					else  termName = term.getName();
-					String name = "\\emph{" + termName + "}";
-					int termIdx = slimGraph.getVertexIndex(graph.getTerm(id));
-					int numberOfItems = termEnumerator.getAnnotatedGenes(id).totalAnnotatedCount();
-					
-					String label = "\\small" + name + "\\\\\\ " + numberOfItems + " \\\\\\ IC=" + String.format("%.4f", terms2IC[termIdx]);
-					return "margin=\"0\" shape=\"box\"" + " label=\"\\maxbox{4.5cm}{"+name+"}{"+ label + "}\" " +
-							"style=\"rounded corners,top color=white,bottom color=black!10,draw=black!50,very thick\"";
-				}
-			},"nodesep=0.2; ranksep=0.1;" + preamble,false,false, null);
-		} catch (IllegalArgumentException ex)
-		{
-			System.err.println("Failed to write graphics due to: " + ex.getLocalizedMessage());
-		}
+		writeDOTExample(new File("hpo-example.dot"), hpoTerms);
 
 		/**************************************************************************************************************************/
 
@@ -1414,6 +1383,48 @@ public class B4O
 		
 		synchronized (summary) {
 			summary.close();
+		}
+	}
+
+	/**
+	 * Writes a dot suitable for tikz.
+	 * 
+	 * @param out
+	 * @param hpoTerms
+	 */
+	public void writeDOTExample(File out, HashSet<TermID> hpoTerms)
+	{
+		/* Basically, this defines a new command \maxbox whose text width as given by the second argument is not wider than
+		 * the first argument. The text which is then displayed in the box is used from the third argument.
+		 */
+		String preamble = "d2tfigpreamble=\"\\ifthenelse{\\isundefined{\\myboxlen}}{\\newlength{\\myboxlen}}{}"+
+						  "\\newcommand*{\\maxbox}[3]{\\settowidth{\\myboxlen}{#2}"+
+						  "\\ifdim#1<\\myboxlen" +
+						  "\\parbox{#1}{\\centering#3}"+
+						  "\\else"+
+						  "\\parbox{\\myboxlen}{\\centering#3}"+
+						  "\\fi}\"";
+
+		try
+		{
+			GODOTWriter.writeDOT(graph.getInducedGraph(termEnumerator.getAllAnnotatedTermsAsList()), out, null, hpoTerms, new AbstractDotAttributesProvider() {
+				public String getDotNodeAttributes(TermID id) {
+					String termName;
+					Term term = graph.getTerm(id);
+					if (graph.isRootTerm(id)) termName = "Human Phenotype";
+					else  termName = term.getName();
+					String name = "\\emph{" + termName + "}";
+					int termIdx = slimGraph.getVertexIndex(graph.getTerm(id));
+					int numberOfItems = termEnumerator.getAnnotatedGenes(id).totalAnnotatedCount();
+					
+					String label = "\\small" + name + "\\\\\\ " + numberOfItems + " \\\\\\ IC=" + String.format("%.4f", terms2IC[termIdx]);
+					return "margin=\"0\" shape=\"box\"" + " label=\"\\maxbox{4.5cm}{"+name+"}{"+ label + "}\" " +
+							"style=\"rounded corners,top color=white,bottom color=black!10,draw=black!50,very thick\"";
+				}
+			},"nodesep=0.2; ranksep=0.1;" + preamble,false,false, null);
+		} catch (IllegalArgumentException ex)
+		{
+			System.err.println("Failed to write graphics due to: " + ex.getLocalizedMessage());
 		}
 	}
 
