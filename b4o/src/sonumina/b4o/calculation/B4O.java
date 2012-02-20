@@ -1241,7 +1241,7 @@ public class B4O
 		/* Write score distribution */
 		
 		if (false)
-			writeScoreDistribution(0);
+			writeScoreDistribution(new File("score-0.txt"),0);
 		
 		/**************************************************************************************************************************/
 
@@ -1433,7 +1433,7 @@ public class B4O
 	 * 
 	 * @throws IOException
 	 */
-	public void writeScoreDistribution(int item) throws IOException
+	public void writeScoreDistribution(File f, int item) throws IOException
 	{
 		int [] shuffledTerms = new int[slimGraph.getNumberOfVertices()];
 
@@ -1441,7 +1441,7 @@ public class B4O
 		for (item=0;item<shuffledTerms.length;item++)
 			shuffledTerms[item] = item;
 
-		FileWriter out = new FileWriter("score.txt");
+		FileWriter out = new FileWriter(f);
 		
 		Random rnd = new Random();
 
