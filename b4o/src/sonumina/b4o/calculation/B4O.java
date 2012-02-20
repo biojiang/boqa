@@ -1274,6 +1274,7 @@ public class B4O
 		/**************************************************************************************************************************/
 		
 		String evidenceString = "All";
+		String [] evidenceCodes = getEvidenceCodes();
 		if (evidenceCodes != null && evidenceCodes.length > 0)
 		{
 			StringBuilder evidenceBuilder = new StringBuilder();
@@ -1989,6 +1990,11 @@ public class B4O
 			return marginalsIdeal[i];
 		}
 		
+		public Configuration getStats(int i)
+		{
+			return stats[i];
+		}
+
 		public int size()
 		{
 			return marginals.length;
@@ -3265,5 +3271,15 @@ public class B4O
 	public double getTermIC(int t)
 	{
 		return terms2IC[t];
+	}
+	
+	/**
+	 * Returns the number of items.
+	 * 
+	 * @return
+	 */
+	public int getNumberOfItems()
+	{
+		return allItemList.size();
 	}
 }
