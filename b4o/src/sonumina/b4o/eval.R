@@ -121,117 +121,66 @@ rank2.def<-function(c)
 }
 
 v<-matrix(c("marg","Marg. Prob.", T,
-		    "marg.ideal", "Marg. Prob. (Ideal)", T,
-		    "marg.freq","Marg. Prob. (Freq)", T,
-		    "marg.freq.ideal", "Marg. Prob. (Freq,Ideal)", T,
-            "resnick.avg", "Resnik",T,
+      "marg.ideal", "Marg. Prob. (Ideal)", T,
+		  "marg.freq","Marg. Prob. (Freq)", T,
+		  "marg.freq.ideal", "Marg. Prob. (Freq,Ideal)", T,
+      "resnick.avg", "Resnik",T,
 			"resnick.avg.rank", "Resnik (rank)",F,
 			"resnick.avg.p", "Resnik P",F,
 			"resnick.avg.p.opt", "Resnik P*",F),ncol=3,byrow=T)
 
-if (file.exists("fnd.txt"))
+b4o.name.robj<-paste(b4o.name,"RObj",sep=".")
+b4o.name.result.robj<-paste(b4o.name,"_result.RObj",sep="")
+
+# only freq vs freq
+if ((!file.exists(b4o.name.robj)) || (file.info(b4o.name.robj)$mtime < file.info(b4o.name)$mtime))
 {
-	if ((!file.exists("d.RObj")) || (file.info("d.RObj")$mtime < file.info("fnd.txt")$mtime))
-	{
-		d<-read.table("fnd.txt",h=F,stringsAsFactors=F,colClasses=c("integer","integer","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric"))
-		colnames(d)<-c("run","label","score","marg","marg.ideal", "score.freq","marg.freq", "marg.freq.ideal", "resnick.avg", "resnick.avg.p","freq")
-		save(d,file="d.RObj");
-	} else
-	{
-		load("d.RObj")
-	}
-	message("Data read")
+	d<-b4o.load.data()
+
 	d<-d[order(d$run),]
 
-    # As below
 	resnick.avg.rank<-unlist(tapply(d$resnick.avg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
 	d<-cbind(d,resnick.avg.rank)
-
+		
 	marg.ideal.rank<-unlist(tapply(d$marg.ideal,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
 	d<-cbind(d,marg.ideal.rank)
-
+		
 	marg.rank<-unlist(tapply(d$marg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
 	d<-cbind(d,marg.rank)
-
-
-#	resnick.avg.p.rank<-unlist(tapply(d$resnick.avg.p, d$run,function(x) {r<-rank(x);return (max(r) - r + 1)})) 
+		
+	marg.freq.rank<-unlist(tapply(d$marg.freq,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
+	d<-cbind(d,marg.freq.rank)
+		
+	marg.freq.ideal.rank<-unlist(tapply(d$marg.freq.ideal,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
+	d<-cbind(d,marg.freq.ideal.rank)
+		
+	resnick.avg.p.rank <- unlist(tapply(d$resnick.avg.p,d$run,function(x) {r<-rank(-x);return (max(r) - r + 1)})) 
+	d<-cbind(d,resnick.avg.p.rank)
+		
 	f<-data.frame(p=d$resnick.avg.p,s=d$resnick.avg)
 	resnick.avg.p.rank<-unsplit(lapply(split(f,d$run),function (x)
 	{
-		o<-order(x$p,-x$s)						# determine the order
-#		xs<-x[o,]								# sort
+		o<-order(x$p,-x$s)
+		r<-1:length(o)
 		r[o]<-1:length(o)
-#		r<-1:length(o)
-#		r[o]<-ave(1:length(o),xs$p,xs$s)		# for each rank, the mean of the factor group, filled at the correct order
 		return (r)
 	}),d$run)
 	d<-cbind(d,resnick.avg.p.rank)
 
-	message("Data prepared")
-	
-	# all vs all
-	res.list<-evaluate(d,v)
-	res.list.complete<-res.list
-	save(res.list.complete,file="b4o_res.list.complete.RObj")
-	message("all vs. all done");
-	
-	# only freq vs all. the freq column is 1 if the item in question has frequencies
-	d2<-subset(d,d$freq==T)
-	res.list.freq.vs.all<-evaluate(d2,v)
-	save(res.list.freq.vs.all,file="b4o_res.list.freq.vs.all.RObj")
+	save(d,file=b4o.name.robj);
+	message("Data loaded, preprocessed, and stored");
 } else
 {
-	# only freq vs freq
-	if ((!file.exists("d-freq-only.RObj")) || (file.info("d-freq-only.RObj")$mtime < file.info("fnd-freq-only.txt")$mtime))
-	{
-		d<-read.table("fnd-freq-only.txt",h=F,stringsAsFactors=F)
-		colnames(d)<-c("run","label","score","marg","marg.ideal", "score.freq","marg.freq", "marg.freq.ideal", "resnick.avg", "resnick.avg.p","freq")
-
-		d<-d[order(d$run),]
-
-		resnick.avg.rank<-unlist(tapply(d$resnick.avg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
-		d<-cbind(d,resnick.avg.rank)
-		
-		marg.ideal.rank<-unlist(tapply(d$marg.ideal,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
-		d<-cbind(d,marg.ideal.rank)
-		
-		marg.rank<-unlist(tapply(d$marg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
-		d<-cbind(d,marg.rank)
-		
-		marg.freq.rank<-unlist(tapply(d$marg.freq,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
-		d<-cbind(d,marg.freq.rank)
-		
-		marg.freq.ideal.rank<-unlist(tapply(d$marg.freq.ideal,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
-		d<-cbind(d,marg.freq.ideal.rank)
-		
-		resnick.avg.p.rank <- unlist(tapply(d$resnick.avg.p,d$run,function(x) {r<-rank(-x);return (max(r) - r + 1)})) 
-		d<-cbind(d,resnick.avg.p.rank)
-		
-		f<-data.frame(p=d$resnick.avg.p,s=d$resnick.avg)
-		resnick.avg.p.rank<-unsplit(lapply(split(f,d$run),function (x)
-		{
-			o<-order(x$p,-x$s)
-			r<-1:length(o)
-			r[o]<-1:length(o)
-			return (r)
-		}),d$run)
-		d<-cbind(d,resnick.avg.p.rank)
-
-		save(d,file="d-freq-only.RObj");
-		message("Data loaded, preprocessed, and stored");
-	} else
-	{
-		load("d-freq-only.RObj")
-		message("Data loaded form storage")
-	}
-
-	# Calculate avg ranks
-	d.label.idx<-which(d$label==1)
-
-	res.list<-evaluate(d,v)
-	res.list.freq.vs.freq<-res.list
-	save(res.list.freq.vs.freq,file="b4o_res.list.freq.vs.freq.RObj",compress=T)
+	load("d-freq-only.RObj")
+	message("Data loaded from storage")
 }
+
+# Calculate avg ranks
+d.label.idx<-which(d$label==1)
+
+res.list<-evaluate(d,v)
+res.list.freq.vs.freq<-res.list
+save(res.list.freq.vs.freq,file=b4o.name.result.robj,compress=T)
 
 # values for the table (freq)
 freq.important<-which(d$marg.freq > 0.5)

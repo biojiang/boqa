@@ -309,14 +309,14 @@ public class Benchmark
 		/* Write out r code to load matrix in */
 		BufferedWriter load = new BufferedWriter(new FileWriter(RESULT_NAME.split("\\.")[0]+ "_load.R"));
 		load.append("b4o.load.data<-function() {\n d<-read.table(");
-		load.append("\"" + RESULT_NAME + "\", ");
+		load.append("\"" + new File(RESULT_NAME).getAbsolutePath() + "\", ");
 		load.append("colClasses=c(\"integer\",\"integer\",rep(\"numeric\",12),\"integer\"),h=F");
 		load.append(")");
 		load.append("\n colnames(d)<-c(\"run\",\"label\",\"score\",\"marg\",\"marg.ideal\", \"score.freq\",\"marg.freq\", \"marg.freq.ideal\", \"resnick.avg\", \"resnick.avg.p\", \"lin.avg\", \"lin.avg.p\", \"jc.avg\", \"jc.avg.p\", \"freq\");");
 		load.append("\n return (d);");
 		load.append("\n}\n");
 		load.append("b4o.name<-\"");
-		load.append(RESULT_NAME);
+		load.append(new File(RESULT_NAME).getAbsolutePath());
 		load.append("\";\n");
 		load.flush();
 		load.close();
