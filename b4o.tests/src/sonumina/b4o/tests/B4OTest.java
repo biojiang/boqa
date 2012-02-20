@@ -21,6 +21,7 @@ import ontologizer.types.ByteString;
 import org.junit.Test;
 
 import sonumina.b4o.InternalDatafiles;
+import sonumina.b4o.benchmark.Benchmark;
 import sonumina.b4o.calculation.B4O;
 import sonumina.b4o.calculation.B4O.Result;
 import sonumina.b4o.calculation.Observations;
@@ -256,12 +257,15 @@ public class B4OTest {
 	public void testBenchmarkOnInternalOntology() throws InterruptedException, IOException
 	{
 		final InternalDatafiles data = new InternalDatafiles();
-		final B4O b4o = new B4O();
+		B4O b4o = new B4O();
 		b4o.setConsiderFrequenciesOnly(false);
 		b4o.setSizeOfScoreDistribution(1000);
 		b4o.setTryLoadingScoreDistribution(false);
 		b4o.setMaxQuerySizeForCachedDistribution(5);
 		b4o.benchmark(data.graph, data.assoc);
+		
+		Benchmark benchmark = new Benchmark();
+		benchmark.benchmark(b4o);
 	}
 
 
