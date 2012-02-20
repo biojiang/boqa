@@ -265,6 +265,7 @@ public class B4OTest {
 		b4o.benchmark(data.graph, data.assoc);
 		
 		Benchmark benchmark = new Benchmark();
+		benchmark.setResultBaseName("internal");
 		benchmark.benchmark(b4o);
 	}
 
