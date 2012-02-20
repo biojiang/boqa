@@ -3246,6 +3246,17 @@ public class B4O
 	}
 	
 	/**
+	 * Returns the evidence codes that should be respected.
+	 * May be null in case all evidence codes are respected.
+	 * 
+	 * @return
+	 */
+	public String [] getEvidenceCodes()
+	{
+		return evidenceCodes;
+	}
+	
+	/**
 	 * Returns the ic of the given term.
 	 * 
 	 * @param t
