@@ -41,7 +41,7 @@ public class Benchmark
 	
 	private final int MAX_SAMPLES = 5;
 	private boolean CONSIDER_FREQUENCIES_ONLY = true;
-	private final String RESULT_NAME = "fnd-freq-only2.txt";
+	private String RESULT_NAME = "fnd-freq-only2.txt";
 	private final String [] evidenceCodes = null;//new String[]{"PCS","ICE"};
 	private int SIZE_OF_SCORE_DISTRIBUTION = 250000;
 	private final int NUMBER_OF_BINS_IN_APPROXIMATED_SCORE_DISTRIBUTION = 10000;
@@ -55,6 +55,16 @@ public class Benchmark
 		Result modelWithoutFrequencies;
 		Result modelWithFrequencies;
 		Result resnik;
+		Result lin;
+		Result jc;
+	}
+	
+	/**
+	 * Sets the base name of the results to be written.
+	 */
+	public void setResultBaseName(String name)
+	{
+		RESULT_NAME = name + ".txt";
 	}
 	
 	/**
@@ -75,22 +85,19 @@ public class Benchmark
 		
 		boolean [] observations = obs.observations;
 
-		System.out.println("Item " + b4o.allItemList.get(item));
-
 		/* First, without taking frequencies into account */
 		Result modelWithoutFrequencies = b4o.assignMarginals(obs, false);
 		
 		/* Second, with taking frequencies into account */
 		Result modelWithFrequencies = b4o.assignMarginals(obs, true);
 
-		/* Third, we apply the resnick sim measure */
-		Result resnick = b4o.resnikScore(obs.observations, true, rnd);
-		
 		ExperimentStore id = new ExperimentStore();
 		id.obs = obs;
 		id.modelWithoutFrequencies = modelWithoutFrequencies;
 		id.modelWithFrequencies = modelWithFrequencies;
-		id.resnik = resnick;
+		id.resnik = b4o.resnikScore(obs.observations, true, rnd);
+		id.lin = b4o.linScore(obs.observations, true, rnd);
+		id.jc = b4o.jcScore(obs.observations, true, rnd);
 		
 		/******** The rest is for debugging purposes ********/
 		if (VERBOSE || provideGraph)
@@ -292,10 +299,22 @@ public class Benchmark
 			evidenceString = evidenceBuilder.toString();
 		}
 
-		final BufferedWriter param = new BufferedWriter(new FileWriter(RESULT_NAME.split("\\.")[0]+ "_param.txt"));
+		/* Remember the parameter */
+		BufferedWriter param = new BufferedWriter(new FileWriter(RESULT_NAME.split("\\.")[0]+ "_param.txt"));
 		param.write("alpha\tbeta\tconsider.freqs.only\titems\tterms\tmax.terms\tmax.samples\tevidences\n");
 		param.write(String.format("%g\t%g\t%b\t%d\t%d\t%d\t%d\t%s\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY,b4o.getNumberOfItems(),slimGraph.getNumberOfVertices(),maxTerms,MAX_SAMPLES,evidenceString));
 		param.flush();
+		param.close();
+
+		/* Write out r code to load matrix in */
+		BufferedWriter load = new BufferedWriter(new FileWriter(RESULT_NAME.split("\\.")[0]+ "_load.R"));
+		load.append("d<-read.table(");
+		load.append("\"" + RESULT_NAME + "\", ");
+		load.append("colClasses=c(\"integer\",\"integer\",rep(\"numeric\",12),\"integer\"),h=F");
+		load.append(")\n");
+		load.append("colnames(d)<-c(\"run\",\"label\",\"score\",\"marg\",\"marg.ideal\", \"score.freq\",\"marg.freq\", \"marg.freq.ideal\", \"resnick.avg\", \"resnick.avg.p\", \"lin.avg\", \"lin.avg.p\", \"jc.avg\", \"jc.avg.p\", \"freq\");");
+		load.flush();
+		load.close();
 		
 		final BufferedWriter out = new BufferedWriter(new FileWriter(RESULT_NAME));
 		final BufferedWriter summary = new BufferedWriter(new FileWriter(RESULT_NAME.split("\\.")[0]+ "_summary.txt"));
@@ -310,11 +329,7 @@ public class Benchmark
 		{
 			for (i=0;i<b4o.getNumberOfItems();i++)
 			{
-//				if (i != firstItemWithFrequencies) continue;
-//				if (!itemHasFrequencies[i]) continue;
-//				if (i != 24) continue;
-
-				final long seed = /*2905060951719767123l;//*/rnd.nextLong();
+				final long seed = rnd.nextLong();
 				final int item = i;
 				final int fixedRun = run++;
 
@@ -349,6 +364,14 @@ public class Benchmark
 							resultBuilder.append(store.resnik.getScore(j));
 							resultBuilder.append("\t");
 							resultBuilder.append(store.resnik.getMarginal(j));
+							resultBuilder.append("\t");
+							resultBuilder.append(store.lin.getScore(j));
+							resultBuilder.append("\t");
+							resultBuilder.append(store.lin.getMarginal(j));
+							resultBuilder.append("\t");
+							resultBuilder.append(store.jc.getScore(j));
+							resultBuilder.append("\t");
+							resultBuilder.append(store.jc.getMarginal(j));
 							resultBuilder.append("\t");
 							resultBuilder.append(Benchmark.this.b4o.hasItemFrequencies(item)?1:0);
 							resultBuilder.append("\n");
