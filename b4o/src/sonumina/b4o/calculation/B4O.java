@@ -1231,7 +1231,7 @@ public class B4O
 		int i;
 		int numProcessors = getNumProcessors();
 
-		/* TODO: Get rid of this uglyness */
+		/* TODO: Get rid of this ugliness */
 		graph = newOntology;
 		assoc = newAssociations;
 		
@@ -1241,34 +1241,7 @@ public class B4O
 		/* Write score distribution */
 		
 		if (false)
-		{
-			int [] shuffledTerms = new int[slimGraph.getNumberOfVertices()];
-
-			/* Initialize shuffling */
-			for (i=0;i<shuffledTerms.length;i++)
-				shuffledTerms[i] = i;
-
-			i = 0;
-
-			FileWriter out = new FileWriter("score.txt");
-			
-			Random rnd = new Random();
-
-			for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
-			{
-				int q = 10;
-				int [] randomizedTerms = new int[q];
-
-				chooseTerms(rnd, q, randomizedTerms, shuffledTerms);
-				double randomScore = resScoreVsItem(randomizedTerms, i);
-				out.write(randomScore + " \n");
-			}
-			out.flush();
-			out.close();
-
-			System.out.println("Score distribution for item " + allItemList.get(i) + "  " + items2DirectTerms[i].length);
-			System.exit(-1);
-		}
+			writeScoreDistribution(0);
 		
 		/**************************************************************************************************************************/
 
@@ -1442,6 +1415,38 @@ public class B4O
 		synchronized (summary) {
 			summary.close();
 		}
+	}
+
+	/**
+	 * Write score distribution.
+	 * 
+	 * @throws IOException
+	 */
+	public void writeScoreDistribution(int item) throws IOException
+	{
+		int [] shuffledTerms = new int[slimGraph.getNumberOfVertices()];
+
+		/* Initialize shuffling */
+		for (item=0;item<shuffledTerms.length;item++)
+			shuffledTerms[item] = item;
+
+		FileWriter out = new FileWriter("score.txt");
+		
+		Random rnd = new Random();
+
+		for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
+		{
+			int q = 10;
+			int [] randomizedTerms = new int[q];
+
+			chooseTerms(rnd, q, randomizedTerms, shuffledTerms);
+			double randomScore = resScoreVsItem(randomizedTerms, item);
+			out.write(randomScore + " \n");
+		}
+		out.flush();
+		out.close();
+
+		logger.info("Score distribution for item " + allItemList.get(item) + " with " + items2DirectTerms[item].length + " annotations written");
 	}
 
 	/**
@@ -3140,7 +3145,7 @@ public class B4O
 
 		return id;
 	}
-	
+		
 	/**
 	 * Returns the mica of term, i.e., the a common ancestor of the
 	 * given terms whose information content is maximal.
@@ -3216,5 +3221,27 @@ public class B4O
 	public int[] getParents(int t)
 	{
 		return term2Parents[t];
+	}
+	
+	/**
+	 * Returns whether the item has associated frequencies. 
+	 * 
+	 * @param item
+	 * @return
+	 */
+	public boolean hasItemFrequencies(int item)
+	{
+		return itemHasFrequencies[item];
+	}
+	
+	/**
+	 * Returns the ic of the given term.
+	 * 
+	 * @param t
+	 * @return
+	 */
+	public double getTermIC(int t)
+	{
+		return terms2IC[t];
 	}
 }
