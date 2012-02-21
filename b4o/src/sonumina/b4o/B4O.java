@@ -44,7 +44,7 @@ public class B4O
 	   opt.addOption("a", "annotations", true, "Path or URL to files containing annotations.");
 	   opt.addOption("c", "considerFreqOnly", false, "If specified, only items with frequencies are considered.");
 	   opt.addOption("m", "maxTerms", true, "Defines the maximal number of terms a random query can have. Default is " + MAX_TERMS);
-	   opt.addOption("s", "samplesPerItem", true, "Define the number of samples per item.");
+	   opt.addOption("s", "samplesPerItem", true, "Define the number of samples per item. Defaults to " + SAMPLES_PER_ITEM + ".");
 	   opt.addOption(null, "alpha", true, "Specifies alpha (false-positive rate) during simulation. Default is " + ALPHA + ".");
 	   opt.addOption(null, "beta", true, "Specifies beta (false-negative rate) during simulation. Default is " + BETA + ".");
 	   opt.addOption("h", "help", false, "Shows this help");
