@@ -1,6 +1,5 @@
 package sonumina.b4o.calculation;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,7 +10,6 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -886,7 +884,7 @@ public class B4O
 	{
 		int retry = 0;
 
-		Observations o = null;;
+		Observations o = null;
 		
 		do
 		{
@@ -1418,7 +1416,7 @@ public class B4O
 	 * 
 	 * @author Sebastian Bauer
 	 */
-	private static class IntArray
+	public static class IntArray
 	{
 		private int [] array;
 		private int length;
@@ -2132,27 +2130,6 @@ public class B4O
 		
 		for (Term t : termGraph.getLeafTerms())
 			specifcTerms[i++] = slimGraph.getVertexIndex(t);
-		
-		if (DEBUG)
-		{
-			boolean [] observations1 = new boolean[term2Ancestors.length];
-			for (int t : specifcTerms)
-			{
-				for (i = 0;i<term2Ancestors[t].length;i++)
-					observations1[term2Ancestors[t][i]] = true;
-			}
-			
-			boolean [] observations2 = new boolean[term2Ancestors.length];
-			for (int t : terms)
-			{
-				for (i = 0;i<term2Ancestors[t].length;i++)
-					observations2[term2Ancestors[t][i]] = true;
-			}
-
-			for (i=0;i<observations1.length;i++)
-				if (observations1[i] != observations2[i])
-					throw new RuntimeException("Observations didn't match!");
-		}
 		
 		return specifcTerms;
 	}

@@ -20,17 +20,27 @@ import ontologizer.go.Term;
 import ontologizer.go.TermContainer;
 import ontologizer.types.ByteString;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import sonumina.b4o.InternalDatafiles;
 import sonumina.b4o.benchmark.Benchmark;
 import sonumina.b4o.calculation.B4O;
+import sonumina.b4o.calculation.B4O.IntArray;
 import sonumina.b4o.calculation.B4O.Result;
 import sonumina.b4o.calculation.Observations;
 import sonumina.math.graph.AbstractGraph.DotAttributesProvider;
 import sonumina.math.graph.SlimDirectedGraphView;
 
-public class B4OTest {
+public class B4OTest
+{
+	private static Datafiles hpo;
+	
+	@BeforeClass
+	public static void loadHPO() throws InterruptedException, IOException
+	{
+		hpo = new Datafiles("../b4o/data/human-phenotype-ontology.obo.gz","../b4o/data/phenotype_annotation.omim.gz");
+	}
 
 	/**
 	 * Tests the choose function.
@@ -92,12 +102,12 @@ public class B4OTest {
 			expectedSet.add(e);
 		
 		for (int a : actual)
-			expectedSet.add(a);
+			actualSet.add(a);
 		
 		assertTrue(expectedSet.containsAll(actualSet));
 		assertTrue(actualSet.containsAll(expectedSet));
 	}
-	
+		
 	@Test
 	public void testMostSpecificTerms()
 	{
@@ -109,8 +119,8 @@ public class B4OTest {
 		b4o.setPrecalculateScoreDistribution(false);
 		b4o.setup(data.graph, data.assoc);
 		
-		int [] mst = b4o.mostSpecificTerms(new int[]{0,1,2});
-		assertEquals(2,mst.length);
+		checkIntArrayContentsUnordered(new int[]{1,2},b4o.mostSpecificTerms(new int[]{0,1,2}));
+		checkIntArrayContentsUnordered(new int[]{9,10,11,12,13,14},b4o.mostSpecificTerms(new int[]{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}));
 	}
 	
 	/**
@@ -329,7 +339,7 @@ public class B4OTest {
 	{
 		final B4O b4o = new B4O();
 
-		Datafiles df = new Datafiles("../b4o/data/human-phenotype-ontology.obo.gz","../b4o/data/phenotype_annotation.omim.gz");
+		Datafiles df = hpo;
 
 		b4o.setConsiderFrequenciesOnly(false);
 		b4o.setCacheScoreDistribution(false);
@@ -369,6 +379,51 @@ public class B4OTest {
 				assertEquals(b4o.terms2IC[micaForItem[i][j]],b4o.resnikTermSim.maxScoreForItem[i][j],0.00001);
 
 		checkHPOSimValues(b4o);
+	}
+	
+	@Test
+	public void testMostSpecificOnHPO() throws InterruptedException, IOException
+	{
+		final B4O b4o = new B4O();
+
+		b4o.setConsiderFrequenciesOnly(false);
+		b4o.setCacheScoreDistribution(false);
+		b4o.setPrecalculateScoreDistribution(false);
+		b4o.setStoreScoreDistriubtion(false);
+		b4o.setPrecalculateItemMaxs(false);
+		b4o.setSimulationMaxTerms(-1);		
+		b4o.setup(hpo.graph, hpo.assoc);
+
+		/* Check, mostSpecifc function */
+		for (int i=0;i<5000;i++)
+		{
+			Random rnd = new Random(System.currentTimeMillis());
+			
+			int item = rnd.nextInt(b4o.allItemList.size());
+			
+			Observations obs = b4o.generateObservations(item, rnd);
+			B4O.IntArray sparse = new B4O.IntArray(obs.observations);
+			int [] mst = b4o.mostSpecificTerms(sparse.get());
+
+			/* Get full observation according to mostSpecificTerms() */
+			boolean [] actualObservations = new boolean[b4o.getSlimGraph().getNumberOfVertices()];
+			for (int t : mst)
+			{
+				for (i = 0;i<b4o.term2Ancestors[t].length;i++)
+					actualObservations[b4o.term2Ancestors[t][i]] = true;
+			}
+			
+			/* Get full observations according to source array */
+			boolean [] expectedObservations = new boolean[b4o.getSlimGraph().getNumberOfVertices()];
+			for (int t : sparse.get())
+			{
+				for (i = 0;i<b4o.term2Ancestors[t].length;i++)
+					expectedObservations[b4o.term2Ancestors[t][i]] = true;
+			}
+
+			for (i=0;i<actualObservations.length;i++)
+				assertEquals(expectedObservations[i],actualObservations[i]);
+		}
 	}
 
 	@Test
