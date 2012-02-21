@@ -340,6 +340,9 @@ public class Benchmark
 		load.append("b4o.name<-\"");
 		load.append(new File(RESULT_NAME).getAbsolutePath());
 		load.append("\";\n");
+		load.append("b4o.base.name<-\"");
+		load.append(new File(RESULT_NAME.split("\\.")[0]).getAbsolutePath());
+		load.append("\";\n");
 		load.flush();
 		load.close();
 		
