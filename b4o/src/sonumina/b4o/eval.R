@@ -21,19 +21,27 @@ evaluate.def<-function(d,v)
 	{
 		# get the type
 		type<-v[i,1]
+    
+    if (VERBOSE) {message(type);}
 
 		# get primary and optional secondary values
-		if (type == "resnick.avg.p.opt")
+		if (type == "resnik.avg.p.opt")
 		{
-			primary.values<-d$resnick.avg.p
+			primary.values<-d$resnik.avg.p
 			secondary.values<-1-d$label
 		} else
 		{
 		    primary.values<-d[,type]
 		    
-		    if (type == "resnick.avg.p")
+		    if (type == "resnik.avg.p")
+        {
+		    	secondary.values<- -d$resnik.avg
+		    } else if (type == "lin.avg.p")
 		    {
-		    	secondary.values<- -d$resnick.avg
+		      secondary.values<- -d$lin.avg
+		    } else if (type == "jc.avg.p")
+		    {
+		      secondary.values<- -d$lin.avg.p
 		    } else
 		    {
 		    	secondary.values<-NA
@@ -97,7 +105,7 @@ evaluate<-cmpfun(evaluate.def)
 
 
 
-c<-data.frame(a=c(1,1,1,2,2),b=c(1,1,2,2,2))
+#c<-data.frame(a=c(1,1,1,2,2),b=c(1,1,2,2,2))
 
 #
 # 
@@ -124,10 +132,14 @@ v<-matrix(c("marg","Marg. Prob.", T,
       "marg.ideal", "Marg. Prob. (Ideal)", T,
 		  "marg.freq","Marg. Prob. (Freq)", T,
 		  "marg.freq.ideal", "Marg. Prob. (Freq,Ideal)", T,
-      "resnick.avg", "Resnik",T,
-			"resnick.avg.rank", "Resnik (rank)",F,
-			"resnick.avg.p", "Resnik P",F,
-			"resnick.avg.p.opt", "Resnik P*",F),ncol=3,byrow=T)
+      "resnik.avg", "Resnik",T,
+			"resnik.avg.rank", "Resnik (rank)",F,
+			"resnik.avg.p", "Resnik P",F,
+			"resnik.avg.p.opt", "Resnik P*",F,
+      "lin.avg", "Lin", T,
+      "lin.avg.p", "Lin P", T,
+      "jc.avg", "JC",T,
+      "jc.avg.p", "JC P", T),ncol=3,byrow=T)
 
 b4o.name.robj<-paste(b4o.name,"RObj",sep=".")
 b4o.name.result.robj<-paste(b4o.name,"_result.RObj",sep="")
@@ -139,8 +151,8 @@ if ((!file.exists(b4o.name.robj)) || (file.info(b4o.name.robj)$mtime < file.info
 
 	d<-d[order(d$run),]
 
-	resnick.avg.rank<-unlist(tapply(d$resnick.avg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
-	d<-cbind(d,resnick.avg.rank)
+	resnik.avg.rank<-unlist(tapply(d$resnik.avg,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
+	d<-cbind(d,resnik.avg.rank)
 		
 	marg.ideal.rank<-unlist(tapply(d$marg.ideal,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
 	d<-cbind(d,marg.ideal.rank)
@@ -154,24 +166,24 @@ if ((!file.exists(b4o.name.robj)) || (file.info(b4o.name.robj)$mtime < file.info
 	marg.freq.ideal.rank<-unlist(tapply(d$marg.freq.ideal,d$run,function(x) {r<-rank(x);return (max(r) - r + 1)}))
 	d<-cbind(d,marg.freq.ideal.rank)
 		
-	resnick.avg.p.rank <- unlist(tapply(d$resnick.avg.p,d$run,function(x) {r<-rank(-x);return (max(r) - r + 1)})) 
-	d<-cbind(d,resnick.avg.p.rank)
+	resnik.avg.p.rank <- unlist(tapply(d$resnik.avg.p,d$run,function(x) {r<-rank(-x);return (max(r) - r + 1)})) 
+	d<-cbind(d,resnik.avg.p.rank)
 		
-	f<-data.frame(p=d$resnick.avg.p,s=d$resnick.avg)
-	resnick.avg.p.rank<-unsplit(lapply(split(f,d$run),function (x)
+	f<-data.frame(p=d$resnik.avg.p,s=d$resnik.avg)
+	resnik.avg.p.rank<-unsplit(lapply(split(f,d$run),function (x)
 	{
 		o<-order(x$p,-x$s)
 		r<-1:length(o)
 		r[o]<-1:length(o)
 		return (r)
 	}),d$run)
-	d<-cbind(d,resnick.avg.p.rank)
+	d<-cbind(d,resnik.avg.p.rank)
 
 	save(d,file=b4o.name.robj);
 	message("Data loaded, preprocessed, and stored");
 } else
 {
-	load("d-freq-only.RObj")
+	load(b4o.name.robj)
 	message("Data loaded from storage")
 }
 
@@ -193,7 +205,7 @@ freq.ideal.positives<-length(freq.ideal.important)
 freq.ideal.tp<-sum(d$label[freq.ideal.important])
 print(sprintf("tp=%d tp+fp=%d ppv=%g",freq.ideal.tp,freq.ideal.positives,freq.ideal.tp/freq.ideal.positives))
 
-avg.p.important<-which(d$resnick.avg.p<0.05/2368)
+avg.p.important<-which(d$resnik.avg.p<0.05/2368)
 avg.p.positives<-length(avg.p.important)
 avg.p.tp<-sum(d$label[avg.p.important])
 print(sprintf("tp=%d tp+fp=%d ppv=%g",avg.p.tp,avg.p.positives,avg.p.tp/avg.p.positives))
