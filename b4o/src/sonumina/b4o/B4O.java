@@ -26,7 +26,7 @@ public class B4O
 
 	static private double ALPHA = 0.002;
 	static private double BETA = 0.1;
-	static private int MAX_TERMS = 6;
+	static private int MAX_TERMS = -1;
 	static private int SAMPLES_PER_ITEM = 5;
 	static private boolean CONSIDER_FREQUENCIES_ONLY = false;
 	static private int SIZE_OF_SCORE_DISTRIBUTION = 250000;
@@ -88,6 +88,8 @@ public class B4O
 		   b4o.setSimulationBeta(BETA);
 		   b4o.setConsiderFrequenciesOnly(CONSIDER_FREQUENCIES_ONLY);
 		   b4o.setSimulationMaxTerms(MAX_TERMS);
+		   if (MAX_TERMS != -1)
+			   b4o.setMaxQuerySizeForCachedDistribution(MAX_TERMS);
 		   b4o.setSizeOfScoreDistribution(SIZE_OF_SCORE_DISTRIBUTION);
 	   } catch (ParseException e)
 	   {
