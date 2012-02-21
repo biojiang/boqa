@@ -1044,9 +1044,12 @@ public class B4O
 			for (i=0;i<hidden.length;i++)
 				if (hidden[i]) numHidden++;
 	
-			System.out.println("Number of terms that were missed in hidden: " + numMissedInHidden);
-			System.out.println("Number of hidden positives:" + numPositive);
-			System.out.println("Number of hidden negatives: " + numHidden);
+			if (VERBOSE)
+			{
+				System.out.println("Number of terms that were missed in hidden: " + numMissedInHidden);
+				System.out.println("Number of hidden positives:" + numPositive);
+				System.out.println("Number of hidden negatives: " + numHidden);
+			}
 			
 			numPositive = 0;
 			numFalseNegative = 0;
@@ -1063,9 +1066,12 @@ public class B4O
 				}
 			}
 	
-			System.out.println("Number of observed positives:" + numPositive);
-			System.out.println("Raw number of false positives: " + numFalsePositive);
-			System.out.println("Raw number of false negatives " + numFalseNegative);
+			if (VERBOSE)
+			{
+				System.out.println("Number of observed positives:" + numPositive);
+				System.out.println("Raw number of false positives: " + numFalsePositive);
+				System.out.println("Raw number of false negatives " + numFalseNegative);
+			}
 	
 			if (numPositive == 0 && !ALLOW_EMPTY_OBSERVATIONS)
 			{
@@ -1076,8 +1082,12 @@ public class B4O
 			
 			Configuration stats = new Configuration();
 			determineCases(observations, hidden, stats);
-			System.out.println("Number of modelled false postives " + stats.getCases(Configuration.NodeCase.FALSE_POSITIVE) + " (alpha=" +  stats.falsePositiveRate() + "%)");
-			System.out.println("Number of modelled false negatives " + stats.getCases(Configuration.NodeCase.FALSE_NEGATIVE) + " (beta=" +  stats.falseNegativeRate() + "%)");
+			
+			if (VERBOSE)
+			{
+				System.out.println("Number of modelled false postives " + stats.getCases(Configuration.NodeCase.FALSE_POSITIVE) + " (alpha=" +  stats.falsePositiveRate() + "%)");
+				System.out.println("Number of modelled false negatives " + stats.getCases(Configuration.NodeCase.FALSE_NEGATIVE) + " (beta=" +  stats.falseNegativeRate() + "%)");
+			}
 		
 			o = new Observations();
 			o.item = item;
