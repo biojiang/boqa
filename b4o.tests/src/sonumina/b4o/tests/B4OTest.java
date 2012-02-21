@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Random;
 
 import ontologizer.association.Association;
@@ -70,9 +72,47 @@ public class B4OTest {
 				}
 			}
 		}
-		
 	}
+	
+	/**
+	 * Checks whether all elements of expected are contained in actual and
+	 * vice versa.
+	 * 
+	 * @param expected
+	 * @param actual
+	 */
+	private void checkIntArrayContentsUnordered(int [] expected, int [] actual)
+	{
+		HashSet<Integer> expectedSet = new HashSet<Integer>();
+		HashSet<Integer> actualSet = new HashSet<Integer>();
+		
+		assertEquals(expected.length, actual.length);
 
+		for (int e : expected)
+			expectedSet.add(e);
+		
+		for (int a : actual)
+			expectedSet.add(a);
+		
+		assertTrue(expectedSet.containsAll(actualSet));
+		assertTrue(actualSet.containsAll(expectedSet));
+	}
+	
+	@Test
+	public void testMostSpecificTerms()
+	{
+		InternalDatafiles data = new InternalDatafiles();
+		B4O b4o = new B4O();
+		b4o.setConsiderFrequenciesOnly(false);
+		b4o.setCacheScoreDistribution(false);
+		b4o.setPrecalculateItemMaxs(false);
+		b4o.setPrecalculateScoreDistribution(false);
+		b4o.setup(data.graph, data.assoc);
+		
+		int [] mst = b4o.mostSpecificTerms(new int[]{0,1,2});
+		assertEquals(2,mst.length);
+	}
+	
 	/**
 	 * A helper function to test similarity values of the internal ontology.
 	 * 
