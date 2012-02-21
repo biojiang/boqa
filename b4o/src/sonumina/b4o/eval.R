@@ -130,21 +130,21 @@ rank2.def<-function(c)
 	}
 }
 
-v<-matrix(c("marg","Marg. Prob.", T,
-	"marg.ideal", "Marg. Prob. (Ideal)", T,
-	"marg.freq","Marg. Prob. (Freq)", T,
-	"marg.freq.ideal", "Marg. Prob. (Freq,Ideal)", T,
+v<-matrix(c("marg","BN", T,
+	"marg.ideal", "BN'", T,
+	"marg.freq","FABN", T,
+	"marg.freq.ideal", "FABN'", T,
 	"resnik.avg", "Resnik",T,
 	"resnik.avg.rank", "Resnik (rank)",F,
 	"resnik.avg.p", "Resnik P",F,
 	"resnik.avg.p.opt", "Resnik P*",F,
 	"lin.avg", "Lin", T,
-	"lin.avg.p", "Lin P", T,
+	"lin.avg.p", "Lin P", F,
 	"jc.avg", "JC",T,
-	"jc.avg.p", "JC P", T),ncol=3,byrow=T)
+	"jc.avg.p", "JC P", F),ncol=3,byrow=T)
 
-b4o.name.robj<-paste(b4o.name,"RObj",sep=".")
-b4o.name.result.robj<-paste(b4o.name,"_result.RObj",sep="")
+b4o.name.robj<-paste(b4o.base.name,"RObj",sep=".")
+b4o.name.result.robj<-paste(b4o.base.name,"_result.RObj",sep="")
 
 # only freq vs freq
 if ((!file.exists(b4o.name.robj)) || (file.info(b4o.name.robj)$mtime < file.info(b4o.name)$mtime))
@@ -196,8 +196,7 @@ d.label.idx<-which(d$label==1)
 message("Evaluating")
 
 res.list<-evaluate(d,v)
-res.list.freq.vs.freq<-res.list
-save(res.list.freq.vs.freq,file=b4o.name.result.robj,compress=T)
+save(res.list,file=b4o.name.result.robj,compress=T)
 
 # values for the table (freq)
 freq.important<-which(d$marg.freq > 0.5)
@@ -215,19 +214,22 @@ avg.p.positives<-length(avg.p.important)
 avg.p.tp<-sum(d$label[avg.p.important])
 print(sprintf("tp=%d tp+fp=%d ppv=%g",avg.p.tp,avg.p.positives,avg.p.tp/avg.p.positives))
 
-col<-c("red","blue","cyan","green","gray","orange","magenta", "black")
+#col<-c("red","blue","cyan","green","gray","orange","magenta", "black")
+col<-rainbow(length(res.list))
 
-pdf("benchmark-precall.pdf")
+pdf(paste(b4o.base.name,"-precall.pdf",sep=""))
 
-plot(ylim=c(0,1),res.list[[1]]$recall.lines,res.list[[1]]$prec.lines,type="l",col=col[1],xlab="Recall",ylab="Precision")
-lines(res.list[[2]]$recall.lines,res.list[[2]]$prec.lines,type="l",col=col[2])
-lines(res.list[[3]]$recall.lines,res.list[[3]]$prec.lines,type="l",col=col[3])
-lines(res.list[[4]]$recall.lines,res.list[[4]]$prec.lines,type="l",col=col[4])
-lines(res.list[[5]]$recall.lines,res.list[[5]]$prec.lines,type="l",col=col[5])
-lines(res.list[[6]]$recall.lines,res.list[[6]]$prec.lines,type="l",col=col[6])
-lines(res.list[[7]]$recall.lines,res.list[[7]]$prec.lines,type="l",col=col[7])
-lines(res.list[[8]]$recall.lines,res.list[[8]]$prec.lines,type="l",col=col[8])
+plot.new()
+plot.window(xlim=c(0,1),ylim=c(0,1),xlab="Precision")
+axis(1)
+axis(2)
+box()
+for (i in 1:length(res.list))
+{
+	lines(res.list[[i]]$recall.lines,res.list[[i]]$prec.lines,type="l",col=col[i])
+	points(res.list[[i]]$recall.dots,res.list[[i]]$prec.dots,pch=i,col=col[i])
+}
 
-legend(x="topright",as.character(lapply(res.list,function(x) x$name)),col=col,lty=1)
+legend(x="bottomleft",as.character(lapply(res.list,function(x) x$name)),col=col,lty=1,pch=1:length(res.list),cex=0.9)
 
 dev.off()
