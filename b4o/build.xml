@@ -7,6 +7,7 @@
 <project basedir="." default="build" name="b4o">
     <property environment="env"/>
     <property name="b4o.tests.location" value="../b4o.tests"/>
+    <property name="ECLIPSE_HOME" value="../../eclipse-3.6"/>
     <property name="workspace_loc" value="../"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.6"/>
@@ -57,12 +58,29 @@
     </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects">
         <ant antfile="build.xml" dir="${b4o.tests.location}" inheritAll="false" target="clean"/>
-        <ant antfile="build.xml" dir="${b4o.tests.location}" inheritAll="false" target="build"/>
+        <ant antfile="build.xml" dir="${b4o.tests.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
     </target>
-    <target name="B4O with Max 6">
-        <java classname="sonumina.b4o.B4O" failonerror="true" fork="yes">
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+    <target name="B4OBenchmark with Max 6">
+        <java classname="sonumina.b4o.B4OBenchmark" failonerror="true" fork="yes">
             <jvmarg line="-Xmx1G"/>
-            <arg line="-o ${workspace_loc}/b4o/data/human-phenotype-ontology.obo.gz -a ${workspace_loc}/b4o/data/phenotype_annotation.omim.orphanet.gz -m 6 -c --help"/>
+            <arg line="-o ${workspace_loc}/b4o/data/human-phenotype-ontology.obo.gz -a ${workspace_loc}/b4o/data/phenotype_annotation.omim.orphanet.gz -m 6 -c"/>
             <classpath refid="b4o.classpath"/>
         </java>
     </target>

@@ -1,7 +1,7 @@
 #
 # Primitive makefile
 #
-BENCHMARK=java -Xmx2G -cp bin:jars/commons-cli-1.2.jar sonumina.b4o.B4O
+B4OBENCHMARK=java -Xmx2G -cp bin:jars/commons-cli-1.2.jar sonumina.b4o.B4OBenchmark
 
 .PHONY: all
 all: evaluate
@@ -15,7 +15,7 @@ evaluate-only:
 
 .PHONY: benchmark
 benchmark: build
-	$(BENCHMARK) -o data/human-phenotype-ontology.obo.gz -a data/phenotype_annotation.omim.gz -c -m 6 --sizeOfScoreDistribution 50000
+	$(B4OBENCHMARK) -o data/human-phenotype-ontology.obo.gz -a data/phenotype_annotation.omim.gz -c -m 6 --sizeOfScoreDistribution 50000
 
 .PHONY: build
 build: 
