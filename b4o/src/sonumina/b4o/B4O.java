@@ -37,8 +37,8 @@ public class B4O
 	public static void parseCommandLine(String [] args)
 	{
 	   Options opt = new Options();
-	   opt.addOption("o", "ontology", true, "Path or URL to the ontology file. Default is \"" + ontologyPath + "\"");
-	   opt.addOption("a", "annotations", true, "Path or URL to files containing annotations. Default is \"" + annotationPath + "\"");
+	   opt.addOption("o", "ontology", true, "Path or URL to the ontology file.");
+	   opt.addOption("a", "annotations", true, "Path or URL to files containing annotations.");
 	   opt.addOption("c", "considerFreqOnly", false, "If specified, only items with frequencies are considered.");
 	   opt.addOption("m", "maxTerms", true, "Defines the maximal number of terms a random query can have. Default is " + MAX_TERMS);
 	   opt.addOption(null, "alpha", true, "Specifies alpha (false-positive rate) during simulation. Default is " + ALPHA + ".");
