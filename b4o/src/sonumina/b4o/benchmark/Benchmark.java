@@ -39,16 +39,21 @@ public class Benchmark
 
 	/* TOBEREMOVED */
 	
-	private final int MAX_SAMPLES = 5;
-	private boolean CONSIDER_FREQUENCIES_ONLY = true;
-	private String RESULT_NAME = "fnd-freq-only2.txt";
-	private final String [] evidenceCodes = null;//new String[]{"PCS","ICE"};
-	private int SIZE_OF_SCORE_DISTRIBUTION = 250000;
-	private final int NUMBER_OF_BINS_IN_APPROXIMATED_SCORE_DISTRIBUTION = 10000;
-	public int maxTerms = -1;						/* Defines the maximal number of terms a query can have */
-	private double ALPHA = 0.002;
-	private double BETA = 0.10;   // 0.1
+//	private final int MAX_SAMPLES = 5;
+//	private boolean CONSIDER_FREQUENCIES_ONLY = true;
+	private String RESULT_NAME = "benchmark.txt";
+//	private final String [] evidenceCodes = null;//new String[]{"PCS","ICE"};
+//	private int SIZE_OF_SCORE_DISTRIBUTION = 250000;
+//	private final int NUMBER_OF_BINS_IN_APPROXIMATED_SCORE_DISTRIBUTION = 10000;
+//	private int maxTerms = -1;						/* Defines the maximal number of terms a query can have */
+//	private double ALPHA = 0.002;
+//	private double BETA = 0.10;   // 0.1
 
+//	private double ALPHA;
+//	private double BETA;
+	
+	private int samplesPerItem = 5;
+	
 	static class ExperimentStore
 	{
 		Observations obs;
@@ -67,6 +72,17 @@ public class Benchmark
 		RESULT_NAME = name + ".txt";
 	}
 	
+	/**
+	 * Sets the samples that are generated for each item during
+	 * the simulation.
+	 * 
+	 * @param samplesPerItem
+	 */
+	public void setSamplesPerItem(int samplesPerItem)
+	{
+		this.samplesPerItem = samplesPerItem;
+	}
+
 	/**
 	 * Processes the simulation and evaluation for the given item.
 	 * 
@@ -247,6 +263,12 @@ public class Benchmark
 
 		/* TODO: Get rid of this ugliness */
 		this.b4o = b4o;
+		
+		double ALPHA = b4o.getSimulationAlpha();
+		double BETA = b4o.getSimulationBeta();
+		int maxTerms = b4o.getSimulationMaxTerms();
+		boolean CONSIDER_FREQUENCIES_ONLY = b4o.getConsiderFrequenciesOnly();
+		
 		graph = b4o.getOntology();
 		slimGraph = b4o.getSlimGraph();
 		
@@ -302,7 +324,7 @@ public class Benchmark
 		/* Remember the parameter */
 		BufferedWriter param = new BufferedWriter(new FileWriter(RESULT_NAME.split("\\.")[0]+ "_param.txt"));
 		param.write("alpha\tbeta\tconsider.freqs.only\titems\tterms\tmax.terms\tmax.samples\tevidences\n");
-		param.write(String.format("%g\t%g\t%b\t%d\t%d\t%d\t%d\t%s\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY,b4o.getNumberOfItems(),slimGraph.getNumberOfVertices(),maxTerms,MAX_SAMPLES,evidenceString));
+		param.write(String.format("%g\t%g\t%b\t%d\t%d\t%d\t%d\t%s\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY,b4o.getNumberOfItems(),slimGraph.getNumberOfVertices(),maxTerms,samplesPerItem,evidenceString));
 		param.flush();
 		param.close();
 
@@ -330,7 +352,7 @@ public class Benchmark
 
 		int run = 0;
 
-		for (int sample = 0; sample < MAX_SAMPLES; sample++)
+		for (int sample = 0; sample < samplesPerItem; sample++)
 		{
 			for (i=0;i<b4o.getNumberOfItems();i++)
 			{
@@ -420,5 +442,4 @@ public class Benchmark
 			summary.close();
 		}
 	}
-
 }

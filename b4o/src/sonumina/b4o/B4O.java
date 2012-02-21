@@ -27,6 +27,7 @@ public class B4O
 	static private double ALPHA = 0.002;
 	static private double BETA = 0.1;
 	static private int MAX_TERMS = 6;
+	static private int SAMPLES_PER_ITEM = 5;
 	static private boolean CONSIDER_FREQUENCIES_ONLY = false;
 	
 	static sonumina.b4o.calculation.B4O b4o = new sonumina.b4o.calculation.B4O();
@@ -43,6 +44,7 @@ public class B4O
 	   opt.addOption("a", "annotations", true, "Path or URL to files containing annotations.");
 	   opt.addOption("c", "considerFreqOnly", false, "If specified, only items with frequencies are considered.");
 	   opt.addOption("m", "maxTerms", true, "Defines the maximal number of terms a random query can have. Default is " + MAX_TERMS);
+	   opt.addOption("s", "samplesPerItem", true, "Define the number of samples per item.");
 	   opt.addOption(null, "alpha", true, "Specifies alpha (false-positive rate) during simulation. Default is " + ALPHA + ".");
 	   opt.addOption(null, "beta", true, "Specifies beta (false-negative rate) during simulation. Default is " + BETA + ".");
 	   opt.addOption("h", "help", false, "Shows this help");
@@ -65,7 +67,10 @@ public class B4O
 
 		   if (cl.hasOption('c'))
 			   CONSIDER_FREQUENCIES_ONLY = true;
-		   
+
+		   if (cl.hasOption('s'))
+			   SAMPLES_PER_ITEM = Integer.parseInt(cl.getOptionValue('s'));
+
 		   if (cl.hasOption("alpha"))
 			   ALPHA = Double.parseDouble(cl.getOptionValue("alpha"));
 
@@ -106,6 +111,7 @@ public class B4O
 		b4o.setup(df.graph, df.assoc);
 		
 		Benchmark benchmark = new Benchmark();
+		benchmark.setSamplesPerItem(SAMPLES_PER_ITEM);
 		benchmark.benchmark(b4o);
 
 		OntologizerThreadGroups.workerThreadGroup.interrupt();

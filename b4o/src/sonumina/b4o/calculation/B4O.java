@@ -301,7 +301,7 @@ public class B4O
 	
 	
 	/**
-	 * Sets, whether only frequencies should be considered.
+	 * Sets, whether only items with frequencies should be considered.
 	 * 
 	 * @param frequencies
 	 */
@@ -309,6 +309,17 @@ public class B4O
 	{
 		CONSIDER_FREQUENCIES_ONLY = frequencies;
 	}
+	
+	/**
+	 * Returns, whether only items with frequencies should be considered.
+	 * 
+	 * @return
+	 */
+	public boolean getConsiderFrequenciesOnly()
+	{
+		return CONSIDER_FREQUENCIES_ONLY;
+	}
+	
 	
 	/**
 	 * Sets the maximum query size of for a cached distribution.
