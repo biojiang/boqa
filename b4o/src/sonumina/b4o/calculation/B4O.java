@@ -179,7 +179,7 @@ public class B4O
 	private final String [] evidenceCodes = null;//new String[]{"PCS","ICE"};
 	private int SIZE_OF_SCORE_DISTRIBUTION = 250000;
 	private final int NUMBER_OF_BINS_IN_APPROXIMATED_SCORE_DISTRIBUTION = 10000;
-	public int maxTerms = -1;						/* Defines the maximal number of terms a query can have */
+	private int maxTerms = -1;						/* Defines the maximal number of terms a query can have */
 	
 	/** False positives can be explained via inheritance */
 	private static int VARIANT_INHERITANCE_POSITIVES = 1<<0;
@@ -235,6 +235,28 @@ public class B4O
 	/* Some configuration stuff */
 	
 	/**
+	 * Sets the number of terms that can be selected to be
+	 * on during the simulation.
+	 * 
+	 * @param maxTerms
+	 */
+	public void setSimulationMaxTerms(int maxTerms)
+	{
+		this.maxTerms = maxTerms;
+	}
+	
+	/**
+	 * Returns the number of terms that can be selected to
+	 * be on during the simulation.
+	 * 
+	 * @return
+	 */
+	public int getSimulationMaxTerms()
+	{
+		return maxTerms;
+	}
+	
+	/**
 	 * Set alpha value used for generateObservations() and 
 	 * used for the ideal FABN scoring.
 	 * 
@@ -245,6 +267,17 @@ public class B4O
 		ALPHA = alpha;
 	}
 
+	
+	/**
+	 * Returns the simulation alpha.
+	 * 
+	 * @return
+	 */
+	public double getSimulationAlpha()
+	{
+		return ALPHA;
+	}
+	
 	/**
 	 * Set beta value used for generateObservations() and 
 	 * used for the ideal FABN scoring.
@@ -255,6 +288,17 @@ public class B4O
 	{
 		BETA = beta;
 	}
+	
+	/**
+	 * Returns the simulation beta.
+	 * 
+	 * @return
+	 */
+	public double getSimulationBeta()
+	{
+		return BETA;
+	}
+	
 	
 	/**
 	 * Sets, whether only frequencies should be considered.

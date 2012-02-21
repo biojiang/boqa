@@ -12,6 +12,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import sonumina.b4o.benchmark.Benchmark;
+
 /**
  * Main entry point of the B4O benchmark.
  * 
@@ -76,7 +78,7 @@ public class B4O
 		   b4o.setSimulationAlpha(ALPHA);
 		   b4o.setSimulationBeta(BETA);
 		   b4o.setConsiderFrequenciesOnly(CONSIDER_FREQUENCIES_ONLY);
-		   b4o.maxTerms = MAX_TERMS;
+		   b4o.setSimulationMaxTerms(MAX_TERMS);
 		   
 	   } catch (ParseException e)
 	   {
@@ -101,7 +103,10 @@ public class B4O
 		GlobalPreferences.setProxyHost("realproxy.charite.de");
 
 		Datafiles df = new Datafiles(ontologyPath,annotationPath);
-		b4o.benchmark(df.graph, df.assoc);
+		b4o.setup(df.graph, df.assoc);
+		
+		Benchmark benchmark = new Benchmark();
+		benchmark.benchmark(b4o);
 
 		OntologizerThreadGroups.workerThreadGroup.interrupt();
 	}
