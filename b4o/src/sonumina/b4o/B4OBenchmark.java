@@ -30,6 +30,7 @@ public class B4OBenchmark
 	static private int SAMPLES_PER_ITEM = 5;
 	static private boolean CONSIDER_FREQUENCIES_ONLY = false;
 	static private int SIZE_OF_SCORE_DISTRIBUTION = 250000;
+	static private String RESULT_BASE_NAME = "benchmark";
 	
 	static sonumina.b4o.calculation.B4O b4o = new sonumina.b4o.calculation.B4O();
 
@@ -46,6 +47,7 @@ public class B4OBenchmark
 	   opt.addOption("c", "considerFreqOnly", false, "If specified, only items with frequencies are considered.");
 	   opt.addOption("m", "maxTerms", true, "Defines the maximal number of terms a random query can have. Default is " + MAX_TERMS);
 	   opt.addOption("s", "samplesPerItem", true, "Define the number of samples per item. Defaults to " + SAMPLES_PER_ITEM + ".");
+	   opt.addOption("r", "resultBaseName", true, "Defines the base name of the result files that are created during the benchmark. Defaults to \"" + RESULT_BASE_NAME + "\".");
 	   opt.addOption(null, "alpha", true, "Specifies alpha (false-positive rate) during simulation. Default is " + ALPHA + ".");
 	   opt.addOption(null, "beta", true, "Specifies beta (false-negative rate) during simulation. Default is " + BETA + ".");
 	   opt.addOption(null, "sizeOfScoreDistribution", true, "Specifies the size of the score distribution. Default is " + SIZE_OF_SCORE_DISTRIBUTION + ".");
@@ -118,6 +120,7 @@ public class B4OBenchmark
 		
 		Benchmark benchmark = new Benchmark();
 		benchmark.setSamplesPerItem(SAMPLES_PER_ITEM);
+		benchmark.setResultBaseName(RESULT_BASE_NAME);
 		benchmark.benchmark(b4o);
 
 		OntologizerThreadGroups.workerThreadGroup.interrupt();
