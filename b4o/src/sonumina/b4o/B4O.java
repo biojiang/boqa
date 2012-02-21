@@ -22,6 +22,11 @@ public class B4O
 	static private String ontologyPath;
 	static private String annotationPath;
 
+	static private double ALPHA = 0.002;
+	static private double BETA = 0.1;
+	static private int MAX_TERMS = 6;
+	static private boolean CONSIDER_FREQUENCIES_ONLY = false;
+	
 	static sonumina.b4o.calculation.B4O b4o = new sonumina.b4o.calculation.B4O();
 
 	/**
@@ -35,7 +40,9 @@ public class B4O
 	   opt.addOption("o", "ontology", true, "Path or URL to the ontology file. Default is \"" + ontologyPath + "\"");
 	   opt.addOption("a", "annotations", true, "Path or URL to files containing annotations. Default is \"" + annotationPath + "\"");
 	   opt.addOption("c", "considerFreqOnly", false, "If specified, only items with frequencies are considered.");
-	   opt.addOption("m", "maxTerms", true, "Defines the maximal number of terms a random query can have. Default is " + b4o.maxTerms);
+	   opt.addOption("m", "maxTerms", true, "Defines the maximal number of terms a random query can have. Default is " + MAX_TERMS);
+	   opt.addOption(null, "alpha", true, "Specifies alpha (false-positive rate) during simulation. Default is " + ALPHA + ".");
+	   opt.addOption(null, "beta", true, "Specifies beta (false-negative rate) during simulation. Default is " + BETA + ".");
 	   opt.addOption("h", "help", false, "Shows this help");
 
 	   try
@@ -52,15 +59,25 @@ public class B4O
 		   }
 		   
 		   if (cl.hasOption('m'))
-		   {
-			   b4o.maxTerms = Integer.parseInt(cl.getOptionValue('m'));
-		   }
+			   MAX_TERMS = Integer.parseInt(cl.getOptionValue('m'));
 
 		   if (cl.hasOption('c'))
-			   b4o.setConsiderFrequenciesOnly(true);
+			   CONSIDER_FREQUENCIES_ONLY = true;
 		   
+		   if (cl.hasOption("alpha"))
+			   ALPHA = Double.parseDouble(cl.getOptionValue("alpha"));
+
+		   if (cl.hasOption("beta"))
+			   BETA = Double.parseDouble(cl.getOptionValue("beta"));
+
 		   ontologyPath = cl.getOptionValue('o',ontologyPath);
 		   annotationPath = cl.getOptionValue('a', annotationPath);
+		   
+		   b4o.setSimulationAlpha(ALPHA);
+		   b4o.setSimulationBeta(BETA);
+		   b4o.setConsiderFrequenciesOnly(CONSIDER_FREQUENCIES_ONLY);
+		   b4o.maxTerms = MAX_TERMS;
+		   
 	   } catch (ParseException e)
 	   {
 		   System.err.println("Faield to parse commandline: " + e.getLocalizedMessage());
