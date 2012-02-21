@@ -29,6 +29,7 @@ public class B4O
 	static private int MAX_TERMS = 6;
 	static private int SAMPLES_PER_ITEM = 5;
 	static private boolean CONSIDER_FREQUENCIES_ONLY = false;
+	static private int SIZE_OF_SCORE_DISTRIBUTION = 250000;
 	
 	static sonumina.b4o.calculation.B4O b4o = new sonumina.b4o.calculation.B4O();
 
@@ -47,6 +48,7 @@ public class B4O
 	   opt.addOption("s", "samplesPerItem", true, "Define the number of samples per item. Defaults to " + SAMPLES_PER_ITEM + ".");
 	   opt.addOption(null, "alpha", true, "Specifies alpha (false-positive rate) during simulation. Default is " + ALPHA + ".");
 	   opt.addOption(null, "beta", true, "Specifies beta (false-negative rate) during simulation. Default is " + BETA + ".");
+	   opt.addOption(null, "sizeOfScoreDistribution", true, "Specifies the size of the score distribution. Default is " + SIZE_OF_SCORE_DISTRIBUTION + ".");
 	   opt.addOption("h", "help", false, "Shows this help");
 
 	   try
@@ -71,6 +73,8 @@ public class B4O
 		   if (cl.hasOption('s'))
 			   SAMPLES_PER_ITEM = Integer.parseInt(cl.getOptionValue('s'));
 
+		   SIZE_OF_SCORE_DISTRIBUTION = Integer.parseInt(cl.getOptionValue("sizeOfScoreDistribution", "250000"));
+		   
 		   if (cl.hasOption("alpha"))
 			   ALPHA = Double.parseDouble(cl.getOptionValue("alpha"));
 
@@ -84,7 +88,7 @@ public class B4O
 		   b4o.setSimulationBeta(BETA);
 		   b4o.setConsiderFrequenciesOnly(CONSIDER_FREQUENCIES_ONLY);
 		   b4o.setSimulationMaxTerms(MAX_TERMS);
-		   
+		   b4o.setSizeOfScoreDistribution(SIZE_OF_SCORE_DISTRIBUTION);
 	   } catch (ParseException e)
 	   {
 		   System.err.println("Faield to parse commandline: " + e.getLocalizedMessage());
