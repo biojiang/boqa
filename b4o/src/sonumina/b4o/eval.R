@@ -1,5 +1,7 @@
 library(compiler)
 
+VERBOSE<-F
+
 #' Evaluates a given data frame for classification performance
 #' 
 #' @param d represents a frame, from which date is gathered
@@ -129,17 +131,17 @@ rank2.def<-function(c)
 }
 
 v<-matrix(c("marg","Marg. Prob.", T,
-      "marg.ideal", "Marg. Prob. (Ideal)", T,
-		  "marg.freq","Marg. Prob. (Freq)", T,
-		  "marg.freq.ideal", "Marg. Prob. (Freq,Ideal)", T,
-      "resnik.avg", "Resnik",T,
-			"resnik.avg.rank", "Resnik (rank)",F,
-			"resnik.avg.p", "Resnik P",F,
-			"resnik.avg.p.opt", "Resnik P*",F,
-      "lin.avg", "Lin", T,
-      "lin.avg.p", "Lin P", T,
-      "jc.avg", "JC",T,
-      "jc.avg.p", "JC P", T),ncol=3,byrow=T)
+	"marg.ideal", "Marg. Prob. (Ideal)", T,
+	"marg.freq","Marg. Prob. (Freq)", T,
+	"marg.freq.ideal", "Marg. Prob. (Freq,Ideal)", T,
+	"resnik.avg", "Resnik",T,
+	"resnik.avg.rank", "Resnik (rank)",F,
+	"resnik.avg.p", "Resnik P",F,
+	"resnik.avg.p.opt", "Resnik P*",F,
+	"lin.avg", "Lin", T,
+	"lin.avg.p", "Lin P", T,
+	"jc.avg", "JC",T,
+	"jc.avg.p", "JC P", T),ncol=3,byrow=T)
 
 b4o.name.robj<-paste(b4o.name,"RObj",sep=".")
 b4o.name.result.robj<-paste(b4o.name,"_result.RObj",sep="")
@@ -147,6 +149,7 @@ b4o.name.result.robj<-paste(b4o.name,"_result.RObj",sep="")
 # only freq vs freq
 if ((!file.exists(b4o.name.robj)) || (file.info(b4o.name.robj)$mtime < file.info(b4o.name)$mtime))
 {
+	message("Loading data");
 	d<-b4o.load.data()
 
 	d<-d[order(d$run),]
@@ -190,6 +193,8 @@ if ((!file.exists(b4o.name.robj)) || (file.info(b4o.name.robj)$mtime < file.info
 # Calculate avg ranks
 d.label.idx<-which(d$label==1)
 
+message("Evaluating")
+
 res.list<-evaluate(d,v)
 res.list.freq.vs.freq<-res.list
 save(res.list.freq.vs.freq,file=b4o.name.result.robj,compress=T)
@@ -212,7 +217,7 @@ print(sprintf("tp=%d tp+fp=%d ppv=%g",avg.p.tp,avg.p.positives,avg.p.tp/avg.p.po
 
 col<-c("red","blue","cyan","green","gray","orange","magenta", "black")
 
-pdf("b4o-precall.pdf")
+pdf("benchmark-precall.pdf")
 
 plot(ylim=c(0,1),res.list[[1]]$recall.lines,res.list[[1]]$prec.lines,type="l",col=col[1],xlab="Recall",ylab="Precision")
 lines(res.list[[2]]$recall.lines,res.list[[2]]$prec.lines,type="l",col=col[2])
