@@ -13,7 +13,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import ontologizer.association.AssociationContainer;
 import ontologizer.dotwriter.AbstractDotAttributesProvider;
 import ontologizer.dotwriter.GODOTWriter;
 import ontologizer.go.Ontology;
@@ -36,22 +35,10 @@ public class Benchmark
 	/** Use threading */
 	private final boolean THREADING_IN_SIMULATION = true;
 
-
-	/* TOBEREMOVED */
-	
-//	private final int MAX_SAMPLES = 5;
-//	private boolean CONSIDER_FREQUENCIES_ONLY = true;
+	/** The full name (including txt suffix) of the results to be written */
 	private String RESULT_NAME = "benchmark.txt";
-//	private final String [] evidenceCodes = null;//new String[]{"PCS","ICE"};
-//	private int SIZE_OF_SCORE_DISTRIBUTION = 250000;
-//	private final int NUMBER_OF_BINS_IN_APPROXIMATED_SCORE_DISTRIBUTION = 10000;
-//	private int maxTerms = -1;						/* Defines the maximal number of terms a query can have */
-//	private double ALPHA = 0.002;
-//	private double BETA = 0.10;   // 0.1
-
-//	private double ALPHA;
-//	private double BETA;
 	
+	/** Number of samples taken per item */
 	private int samplesPerItem = 5;
 	
 	static class ExperimentStore
