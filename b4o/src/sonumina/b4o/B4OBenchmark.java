@@ -76,6 +76,7 @@ public class B4OBenchmark
 			   SAMPLES_PER_ITEM = Integer.parseInt(cl.getOptionValue('s'));
 
 		   SIZE_OF_SCORE_DISTRIBUTION = Integer.parseInt(cl.getOptionValue("sizeOfScoreDistribution", "250000"));
+		   RESULT_BASE_NAME = cl.getOptionValue('r', RESULT_BASE_NAME);
 		   
 		   if (cl.hasOption("alpha"))
 			   ALPHA = Double.parseDouble(cl.getOptionValue("alpha"));
