@@ -15,7 +15,7 @@ evaluate-only:
 
 .PHONY: benchmark
 benchmark: build
-	$(B4OBENCHMARK) -o data/human-phenotype-ontology.obo.gz -a data/phenotype_annotation.omim.gz -c -m 6 --sizeOfScoreDistribution 50000
+	$(B4OBENCHMARK) -r benchmark -o data/human-phenotype-ontology.obo.gz -a data/phenotype_annotation.omim.gz -c -m 6 --sizeOfScoreDistribution 250000
 
 .PHONY: build
 build: 
