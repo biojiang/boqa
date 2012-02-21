@@ -196,9 +196,6 @@ public class B4O
 	/** Activate debugging */
 	private final boolean DEBUG = false;
 	
-	/** Use threading */
-	private final boolean THREADING_IN_SIMULATION = true;
-	
 	/** Use cached MaxIC terms. Speeds up Resnik */
 	private final boolean PRECALCULATE_MAXICS = true;
 	
