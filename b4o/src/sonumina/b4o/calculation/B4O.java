@@ -235,7 +235,8 @@ public class B4O
 	/* Some configuration stuff */
 	
 	/**
-	 * Set alpha value used in the simulation.
+	 * Set alpha value used for generateObservations() and 
+	 * used for the ideal FABN scoring.
 	 * 
 	 * @param alpha
 	 */
@@ -245,7 +246,8 @@ public class B4O
 	}
 
 	/**
-	 * Set alpha value used in the simulation.
+	 * Set beta value used for generateObservations() and 
+	 * used for the ideal FABN scoring.
 	 * 
 	 * @param alpha
 	 */
