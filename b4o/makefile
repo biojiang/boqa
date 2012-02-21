@@ -3,6 +3,12 @@
 #
 B4OBENCHMARK=java -Xmx2G -cp bin:jars/commons-cli-1.2.jar sonumina.b4o.B4OBenchmark
 
+ifeq ($(ORPHANET),yes)
+ANNOTATIONSFILE=data/phenotype_annotation.omim.orphanet.gz
+else
+ANNOTATIONSFILE=data/phenotype_annotation.omim.gz
+endif
+
 .PHONY: all
 all: evaluate
 
@@ -15,7 +21,7 @@ evaluate-only:
 
 .PHONY: benchmark
 benchmark: build
-	$(B4OBENCHMARK) -r benchmark -o data/human-phenotype-ontology.obo.gz -a data/phenotype_annotation.omim.gz -c -m 6 --sizeOfScoreDistribution 250000
+	$(B4OBENCHMARK) -r benchmark -o data/human-phenotype-ontology.obo.gz -a $(ANNOTATIONSFILE) -c -m 6 --sizeOfScoreDistribution 250000
 
 .PHONY: build
 build: 
