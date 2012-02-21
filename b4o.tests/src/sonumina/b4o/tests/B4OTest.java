@@ -261,8 +261,10 @@ public class B4OTest {
 		b4o.setConsiderFrequenciesOnly(false);
 		b4o.setSizeOfScoreDistribution(1000);
 		b4o.setTryLoadingScoreDistribution(false);
-		b4o.setMaxQuerySizeForCachedDistribution(5);
-		b4o.benchmark(data.graph, data.assoc);
+		b4o.setSimulationMaxTerms(3);
+		b4o.setMaxQuerySizeForCachedDistribution(6);
+
+		b4o.setup(data.graph, data.assoc);
 		
 		Benchmark benchmark = new Benchmark();
 		benchmark.setResultBaseName("internal");
