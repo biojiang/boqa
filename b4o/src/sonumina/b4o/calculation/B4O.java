@@ -907,7 +907,8 @@ public class B4O
 	
 			if (CONSIDER_ONLY_DIRECT_ASSOCIATIONS)
 			{
-				System.out.println("Item " + item + " has " + items2DirectTerms[item].length + " annotations");
+				if (VERBOSE)
+					System.out.println("Item " + item + " has " + items2DirectTerms[item].length + " annotations");
 				for (i=0;i<items2DirectTerms[item].length;i++)
 				{
 					boolean state = true;
@@ -2116,7 +2117,7 @@ public class B4O
 	 * @param terms
 	 * @return
 	 */
-	private int [] mostSpecificTerms(int [] terms)
+	public int [] mostSpecificTerms(int [] terms)
 	{
 		ArrayList<TermID> termList = new ArrayList<TermID>(terms.length);
 		for (int i = 0;i<terms.length;i++)
