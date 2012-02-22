@@ -105,28 +105,6 @@ evaluate.def<-function(d,v)
 
 evaluate<-cmpfun(evaluate.def)
 
-
-#
-# 
-#
-rank2.def<-function(c)
-{
-	t<-c(rowSums(c[-nrow(c),]==c[-1,])!=ncol(c),T)
-	rank<-numeric(nrow(c))
-	r<-1
-	for (i in 1:length(t))
-	{
-		if (t[i] == T)
-		{
-			diff<- i - r + 1
-			val <- r + (diff - 1) / 2
-			rank[r:i]<-val
-			print(paste(r,i,val))
-			r <- i + 1;
-		}
-	}
-}
-
 v<-matrix(c("marg","BN", T,
 	"marg.ideal", "BN'", T,
 	"marg.freq","FABN", T,
