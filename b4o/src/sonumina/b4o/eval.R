@@ -5,7 +5,7 @@ VERBOSE<-F
 
 #' Evaluates a given data frame for classification performance
 #' 
-#' @param d represents a frame, from which date is gathered
+#' @param d represents a frame, from which data is gathered
 #' @param v represents a column matrix, in which the name of the slots 
 #'        that are used for the plots of the data frame can be specified. The last
 #'        column represents whether high values are good or not.
