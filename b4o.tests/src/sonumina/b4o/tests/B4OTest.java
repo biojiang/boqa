@@ -208,10 +208,10 @@ public class B4OTest
 
 		double [] resnikP = new double[] { 0.64384, 0.843968, 0.15518, 0.844376, 0.68832 };
 		double [] resnikScore = new double[] { 0.4581453659370775, 0.2231435513142097, 0.916290731874155, 0.2231435513142097, 0.11157177565710485 };
-		double [] linScore;
-		double [] linP;
-		double [] jcScore;
-		double [] jcP;
+		double [] linScore = new double[] {0.28466172096330344, 0.2841853289422175, 1.0, 0.24352920263396993, 0.19583714006727046};
+		double [] linP = new double[] {0.64384,0.754716,0.02238,0.823132,0.577072};
+		double [] jcScore = new double[] {0.44323653311493805, 0.4576751569317141, 0.9999999999999998,0.5552427170907795, 0.6003949092992065};
+		double [] jcP = new double[]{0.755548,0.866124,0.02238,0.667388,0.622036};
 		double [] fabnScores = new double[] { -0.9724346539489889, -1.3317577761951482, 2.2926928336673593, -0.6160410530454002, -0.6160410530454002 };
 		double [] fabnMarginals = new double[] { 0.032533088008779756, 0.022712933995512156, 0.8518284456000037, 0.046462766197852126, 0.046462766197852126 };
 
@@ -220,6 +220,10 @@ public class B4OTest
 			System.out.println(i);
 			assertEquals(resnikP[i], resnikResult.getMarginal(i), 0.05);
 			assertEquals(resnikScore[i], resnikResult.getScore(i), 0.0001);
+			assertEquals(linP[i], linResult.getMarginal(i), 0.05);
+			assertEquals(linScore[i], linResult.getScore(i), 0.0001);
+			assertEquals(jcP[i], jcResult.getMarginal(i), 0.05);
+			assertEquals(jcScore[i], jcResult.getScore(i), 0.0001);
 			assertEquals(fabnScores[i], fabnResult.getScore(i), 0.0001);
 			assertEquals(fabnMarginals[i], fabnResult.getMarginal(i), 0.0001);
 		}
