@@ -99,7 +99,7 @@ evaluate.def<-function(d,v)
     	return(l)
 	}
 
-	res<-mclapply(1:nrow(v),eval.single,mc.cores=detectCores());
+	res<-mclapply(1:nrow(v),eval.single,mc.cores=min(4,detectCores()));
 	return(res)
 }
 
