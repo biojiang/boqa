@@ -2,6 +2,8 @@
 # Primitive makefile
 #
 B4OBENCHMARK=java -Xmx2G -cp bin:jars/commons-cli-1.2.jar sonumina.b4o.B4OBenchmark
+SIZE_OF_SCORE_DISTRIBUTION=500000
+
 
 ifeq ($(ORPHANET),yes)
 ANNOTATIONSFILE=data/phenotype_annotation.omim.orphanet.gz
@@ -17,11 +19,17 @@ evaluate: benchmark evaluate-only
 
 .PHONY: evaluate-only
 evaluate-only:
-	echo 'source("benchmark_load.R");source("src/sonumina/b4o/eval.R")' | R --vanilla
+	echo 'source("benchmark-low-noise-s6_load.R");source("src/sonumina/b4o/eval.R")' | R --vanilla
+	echo 'source("benchmark-normal-noise-s6_load.R");source("src/sonumina/b4o/eval.R")' | R --vanilla
+	echo 'source("benchmark-low-noise-s3_load.R");source("src/sonumina/b4o/eval.R")' | R --vanilla
+	echo 'source("benchmark-normal-noise-s3_load.R");source("src/sonumina/b4o/eval.R")' | R --vanilla
 
 .PHONY: benchmark
 benchmark: build
-	$(B4OBENCHMARK) -r benchmark -o data/human-phenotype-ontology.obo.gz -a $(ANNOTATIONSFILE) -c -m 6 --sizeOfScoreDistribution 250000
+	$(B4OBENCHMARK) --alpha 0.001 -r benchmark-low-noise-s6    -o data/human-phenotype-ontology.obo.gz -a $(ANNOTATIONSFILE) -c -m 6 --sizeOfScoreDistribution $(SIZE_OF_SCORE_DISTRIBUTION)
+	$(B4OBENCHMARK) --alpha 0.002 -r benchmark-normal-noise-s6 -o data/human-phenotype-ontology.obo.gz -a $(ANNOTATIONSFILE) -c -m 6 --sizeOfScoreDistribution $(SIZE_OF_SCORE_DISTRIBUTION)
+	$(B4OBENCHMARK) --alpha 0.001 -r benchmark-low-noise-s3    -o data/human-phenotype-ontology.obo.gz -a $(ANNOTATIONSFILE) -c -m 3 --sizeOfScoreDistribution $(SIZE_OF_SCORE_DISTRIBUTION)
+	$(B4OBENCHMARK) --alpha 0.002 -r benchmark-normal-noise-s3 -o data/human-phenotype-ontology.obo.gz -a $(ANNOTATIONSFILE) -c -m 3 --sizeOfScoreDistribution $(SIZE_OF_SCORE_DISTRIBUTION)
 
 .PHONY: build
 build: 
