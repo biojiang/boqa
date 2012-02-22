@@ -2214,7 +2214,7 @@ public class B4O
 
 				for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
 				{
-					scores[j] = resScoreVsItem(queries[j], item);
+					scores[j] = scoreVsItem(queries[j], item, this);
 					if (scores[j] > maxScore) maxScore = scores[j];
 				}
 
@@ -2573,16 +2573,31 @@ public class B4O
 		return resScoreMaxAvg(t1,t2);
 	}
 	
+	
 	/**
-	 * Score one list of terms vs an item.
+	 * Score one list of terms vs. an item using the default method
+	 * and using the supplied term similarity measure.
 	 * 
-	 * @param t1
+	 * @param tl1
+	 * @param item
+	 * @param termSim
+	 * @return
+	 */
+	private double scoreVsItem(int [] tl1, int item, AbstractTermSim termSim)
+	{
+		return scoreMaxAvgVsItem(tl1, item, termSim);
+	}
+
+	/**
+	 * Score one list of terms vs an item using the default method..
+	 * 
+	 * @param tl1
 	 * @param item
 	 * @return
 	 */
-	public double resScoreVsItem(int [] t1, int item)
+	public double resScoreVsItem(int [] tl1, int item)
 	{
-		return resScoreMaxAvgVsItem(t1,item);
+		return scoreVsItem(tl1, item, resnikTermSim);
 	}
 
 	/**
@@ -2604,7 +2619,7 @@ public class B4O
 	/**
 	 * Determined the pvalue of the given score for the given item.
 	 * 
-	 * @param rnd
+	 * @param rnd defines the random number to be used
 	 * @param observedTerms
 	 * @param randomizedTerms
 	 * @param querySize
@@ -2636,7 +2651,7 @@ public class B4O
 
 				for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
 				{
-					double randomScore = resScoreVsItem(queries[j], item);
+					double randomScore = scoreVsItem(queries[j], item, termSim);
 					if (randomScore >= score) count++;
 				}
 				
@@ -2650,7 +2665,7 @@ public class B4O
 			for (int j=0;j<SIZE_OF_SCORE_DISTRIBUTION;j++)
 			{
 				chooseTerms(rnd, observedTerms.length, randomizedTerms, shuffledTerms);
-				double randomScore = resScoreVsItem(randomizedTerms, item);
+				double randomScore = scoreVsItem(randomizedTerms, item, termSim);
 				if (randomScore >= score) count++;
 			}
 			res.marginals[item] = count / (double)SIZE_OF_SCORE_DISTRIBUTION;
@@ -2658,23 +2673,6 @@ public class B4O
 		return querySize;
 	}
 
-	/**
-	 * @param rnd
-	 * @param observedTerms
-	 * @param randomizedTerms
-	 * @param querySize
-	 * @param res
-	 * @param item
-	 * @param score
-	 * @return
-	 */
-	private int resPValue(Random rnd, int[] observedTerms,
-			int[] randomizedTerms, int querySize, Result res, int item,
-			double score)
-	{
-		return simPValue(rnd, observedTerms, randomizedTerms, querySize, res, item, score, resnikTermSim);
-	}
-	
 	/**
 	 * Makes the calculation according to a sim score avg max. We handle the observations as an item
 	 * and compare it to all other items. Also calculates the significance (stored in the 
@@ -2722,11 +2720,11 @@ public class B4O
 	}
 
 	/**
-	 * Makes the calculation according to Resnik max. We handle the observations as an item
-	 * and compare it to all other items. Also calculates the significance (stored in the 
+	 * Makes the calculation according to Resnik avg max. We handle the observations as an
+	 * item and compare it to all other items. Also calculates the significance (stored in the 
 	 * marginal attribute).
 	 * 
-	 * @param observations
+	 * @param observations the input observations.
 	 * @param pval to be set to true if significance should be determined
 	 * @param rnd the random source
 	 * 
@@ -2737,17 +2735,39 @@ public class B4O
 		return simScore(observations, pval, resnikTermSim, rnd);
 	}
 
+	/**
+	 * Makes the calculation according to Lin avg max. We handle the observations as an
+	 * item and compare it to all other items. Also calculates the significance (stored in the 
+	 * marginal attribute).
+	 * 
+	 * @param observations the input observations.
+	 * @param pval to be set to true if significance should be determined
+	 * @param rnd the random source
+	 * 
+	 * @return
+	 */
 	public Result linScore(boolean [] observations, boolean pval, Random rnd)
 	{
 		return simScore(observations, pval, linTermSim, rnd);
 	}
 
+	/**
+	 * Makes the calculation according to JC avg max. We handle the observations as an
+	 * item and compare it to all other items. Also calculates the significance (stored in the 
+	 * marginal attribute).
+	 * 
+	 * @param observations the input observations.
+	 * @param pval to be set to true if significance should be determined
+	 * @param rnd the random source
+	 * 
+	 * @return
+	 */
 	public Result jcScore(boolean [] observations, boolean pval, Random rnd)
 	{
 		return simScore(observations, pval, jcTermSim, rnd);
 	}
 
-	/** Lock for randomized querys */
+	/** Lock for randomized queries */
 	private ReentrantReadWriteLock queriesLock = new ReentrantReadWriteLock();
 
 	/**
