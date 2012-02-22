@@ -1,4 +1,5 @@
 library(compiler)
+library(parallel)
 
 VERBOSE<-F
 
@@ -15,99 +16,95 @@ evaluate.def<-function(d,v)
 		return()
 	}
 	
-	res<-list();
-	
 	colnames(v)<-c("short","full","high.is.good")
 
-	for (i in (1:nrow(v)))
-	{
-		# get the type
-		type<-v[i,1]
+  	eval.single<-function(i)
+  	{
+    	# get the type
+    	type<-v[i,1]
     
-		if (VERBOSE) {message(type);}
-
-		# get primary and optional secondary values
-		if (type == "resnik.avg.p.opt")
-		{
-			primary.values<-d$resnik.avg.p
-			secondary.values<-1-d$label
-		} else
-		{
-		    primary.values<-d[,type]
-		    
-			if (type == "resnik.avg.p")
-			{
-		    	secondary.values<- -d$resnik.avg
-		    } else if (type == "lin.avg.p")
-		    {
-		      secondary.values<- -d$lin.avg
-		    } else if (type == "jc.avg.p")
-		    {
-		      secondary.values<- -d$jc.avg.p
-		    } else
-		    {
-		    	secondary.values<-NA
-		    }
-		}
-
-		# get the order
-		if (is.na(secondary.values[1]))
-		{
-			ord<-order(primary.values,decreasing=as.logical(v[i,3]))
-		} else
-		{
-			ord<-order(primary.values,secondary.values,decreasing=as.logical(v[i,3]))
-		}
-
-		# data is ordered. Threshold is such that the values
-		# above an element are flagged as positive (inclusive)
-		# and values below an element as negative.
-		values<-primary.values[ord]
-		labels<-d[ord,]$label
-		
-		tps<-cumsum(labels)					# true positives
-		fps<-(1:length(labels)) - tps		# false positives
-		
-		tpr<-tps / tps[length(tps)]			# true positives rate
-		fpr<-fps / fps[length(fps)]			# false positives rate
-		prec<-tps/(1:length(values))		# number of true positives / (number of all positives = (true positives + false negatives))
-		recall<-tps/sum(labels)      		# number of true positives / (true positives + false negatives = all positive samples)
-		
-		l<-list(name=v[i,2],short=v[i,1])
-		
-		# precision/recall values
-		idx.dots<-cumsum(hist(recall,plot=F,breaks=15)$counts)
-		idx.lines<-cumsum(hist(recall,plot=F,breaks=300)$counts)
-		l<-c(l,prec.lines=list(prec[idx.lines]),recall.lines=list(recall[idx.lines]))
-		l<-c(l,prec.dots =list(prec[idx.dots]), recall.dots =list(recall[idx.dots]))
-		
-		#
-		# true positive / false postive
-		#
-		idx.dots<-cumsum(hist(fpr,plot=F,breaks=25)$counts)
-		idx.lines<-c(1,cumsum(hist(fpr,plot=F,breaks=300)$counts))
-		
-		# For AUROC scores we request a higher resolution 
-		idx.auroc<-c(1,cumsum(hist(fpr,plot=F,breaks=1000)$counts))
-		
-		# calculate the AUROC. Note that diff() returns the difference of
-		# consecutive elements. We calculate the lower bound of the area.
-		auroc<-sum(c(diff(fpr[idx.lines]),0) * tpr[idx.lines])
-		
-		l<-c(l,fpr.lines=list(fpr[idx.lines]), tpr.lines=list(tpr[idx.lines]))
-		l<-c(l,fpr.dots= list(fpr[idx.dots]),  tpr.dots= list(tpr[idx.dots]))
-		l<-c(l,auroc=auroc)
-		
-		res<-c(res,list(l));
+    	if (VERBOSE) {message(type);}
+    
+    	# get primary and optional secondary values
+    	if (type == "resnik.avg.p.opt")
+    	{
+    	  primary.values<-d$resnik.avg.p
+    	  secondary.values<-1-d$label
+    	} else
+    	{
+      	primary.values<-d[,type]
+      
+      	if (type == "resnik.avg.p")
+      	{
+      	  secondary.values<- -d$resnik.avg
+      	} else if (type == "lin.avg.p")
+      	{
+      	  secondary.values<- -d$lin.avg
+      	} else if (type == "jc.avg.p")
+      	{
+      	  secondary.values<- -d$jc.avg.p
+      	} else
+      	{
+        	secondary.values<-NA
+    	  }
+    	}
+    
+    	# get the order
+    	if (is.na(secondary.values[1]))
+    	{
+    	  ord<-order(primary.values,decreasing=as.logical(v[i,3]))
+    	} else
+    	{
+    	  ord<-order(primary.values,secondary.values,decreasing=as.logical(v[i,3]))
+    	}
+    
+    	# data is ordered. Threshold is such that the values
+    	# above an element are flagged as positive (inclusive)
+    	# and values below an element as negative.
+    	values<-primary.values[ord]
+    	labels<-d[ord,]$label
+    
+    	tps<-cumsum(labels)					# true positives
+    	fps<-(1:length(labels)) - tps		# false positives
+    
+    	tpr<-tps / tps[length(tps)]			# true positives rate
+    	fpr<-fps / fps[length(fps)]			# false positives rate
+    	prec<-tps/(1:length(values))		# number of true positives / (number of all positives = (true positives + false negatives))
+    	recall<-tps/sum(labels)      		# number of true positives / (true positives + false negatives = all positive samples)
+    
+    	l<-list(name=v[i,2],short=v[i,1])
+    
+    	# precision/recall values
+    	idx.dots<-cumsum(hist(recall,plot=F,breaks=15)$counts)
+    	idx.lines<-cumsum(hist(recall,plot=F,breaks=300)$counts)
+    	l<-c(l,prec.lines=list(prec[idx.lines]),recall.lines=list(recall[idx.lines]))
+    	l<-c(l,prec.dots =list(prec[idx.dots]), recall.dots =list(recall[idx.dots]))
+    
+    	#
+    	# true positive / false postive
+    	#
+    	idx.dots<-cumsum(hist(fpr,plot=F,breaks=25)$counts)
+    	idx.lines<-c(1,cumsum(hist(fpr,plot=F,breaks=300)$counts))
+    
+    	# For AUROC scores we request a higher resolution 
+    	idx.auroc<-c(1,cumsum(hist(fpr,plot=F,breaks=1000)$counts))
+    
+    	# calculate the AUROC. Note that diff() returns the difference of
+    	# consecutive elements. We calculate the lower bound of the area.
+    	auroc<-sum(c(diff(fpr[idx.lines]),0) * tpr[idx.lines])
+    
+    	l<-c(l,fpr.lines=list(fpr[idx.lines]), tpr.lines=list(tpr[idx.lines]))
+    	l<-c(l,fpr.dots= list(fpr[idx.dots]),  tpr.dots= list(tpr[idx.dots]))
+    	l<-c(l,auroc=auroc)
+    	return(l)
 	}
+
+	res<-lapply(1:nrow(v),eval.single);
 	return(res)
 }
 
 evaluate<-cmpfun(evaluate.def)
 
-
-
-#c<-data.frame(a=c(1,1,1,2,2),b=c(1,1,2,2,2))
 
 #
 # 
