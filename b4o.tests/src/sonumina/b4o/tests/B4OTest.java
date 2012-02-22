@@ -165,10 +165,13 @@ public class B4OTest
 
 
 		/* Now a bigger test */
+		
+		/* Item 2 */
 		boolean [] obs = new boolean[b4o.getSlimGraph().getNumberOfVertices()];
 		int item = 2;
 		Observations o = new Observations();
 		o.observations = obs;
+		System.out.println("Testing item " + item);
 
 		for (int i=0;i<b4o.items2DirectTerms[item].length;i++)
 		{
@@ -203,29 +206,78 @@ public class B4OTest
 		for (int i=0;i<b4o.allItemList.size();i++)
 			System.out.println(i + " marg=" + fabnResult.getMarginal(i) + " score=" + fabnResult.getScore(i));
 
-
-		double [] resnikP = new double[] {
-			0.64384,0.843968,0.15518,0.844376,0.68832
-		};
-		
-		double [] resnikScore = new double[] {
-			0.4581453659370775, 0.2231435513142097, 0.916290731874155, 0.2231435513142097, 0.11157177565710485
-		};
-		
-		double [] fabnScores = new double[] {
-			-0.9724346539489889, -1.3317577761951482, 2.2926928336673593, -0.6160410530454002, -0.6160410530454002
-		};
-		
-		double [] fabnMarginals = new double[] {
-			0.032533088008779756, 0.022712933995512156, 0.8518284456000037, 0.046462766197852126, 0.046462766197852126
-		};
-		
+		double [] resnikP = new double[] { 0.64384, 0.843968, 0.15518, 0.844376, 0.68832 };
+		double [] resnikScore = new double[] { 0.4581453659370775, 0.2231435513142097, 0.916290731874155, 0.2231435513142097, 0.11157177565710485 };
+		double [] linScore;
+		double [] linP;
+		double [] jcScore;
+		double [] jcP;
+		double [] fabnScores = new double[] { -0.9724346539489889, -1.3317577761951482, 2.2926928336673593, -0.6160410530454002, -0.6160410530454002 };
+		double [] fabnMarginals = new double[] { 0.032533088008779756, 0.022712933995512156, 0.8518284456000037, 0.046462766197852126, 0.046462766197852126 };
 
 		for (int i=0;i<b4o.allItemList.size();i++)
 		{
 			System.out.println(i);
 			assertEquals(resnikP[i], resnikResult.getMarginal(i), 0.05);
 			assertEquals(resnikScore[i], resnikResult.getScore(i), 0.0001);
+			assertEquals(fabnScores[i], fabnResult.getScore(i), 0.0001);
+			assertEquals(fabnMarginals[i], fabnResult.getMarginal(i), 0.0001);
+		}
+
+		/* Item 3 */
+		obs = new boolean[b4o.getSlimGraph().getNumberOfVertices()];
+		item = 3;
+		o = new Observations();
+		o.observations = obs;
+
+		System.out.println("Testing item " + item);
+
+		for (int i=0;i<b4o.items2DirectTerms[item].length;i++)
+		{
+			int t=b4o.items2DirectTerms[item][i];
+			obs[t] = true;
+			b4o.activateAncestors(t, obs);
+		}
+		
+		resnikResult = b4o.resnikScore(obs, true, new Random(3));
+		linResult = b4o.linScore(obs, true, new Random(3));
+		jcResult = b4o.jcScore(obs, true, new Random(3));
+		fabnResult = b4o.assignMarginals(o, false);
+		
+		System.out.println("Resnik");
+		for (int i=0;i<b4o.allItemList.size();i++)
+			System.out.println(i + "  p=" + resnikResult.getMarginal(i) + " score=" + resnikResult.getScore(i));
+
+		System.out.println("Lin");
+		for (int i=0;i<b4o.allItemList.size();i++)
+			System.out.println(i + "  p=" + linResult.getMarginal(i) + " score=" + linResult.getScore(i));
+
+		System.out.println("JC");
+		for (int i=0;i<b4o.allItemList.size();i++)
+			System.out.println(i + "  p=" + jcResult.getMarginal(i) + " score=" + jcResult.getScore(i));
+
+		System.out.println("FABN");
+		for (int i=0;i<b4o.allItemList.size();i++)
+			System.out.println(i + " marg=" + fabnResult.getMarginal(i) + " score=" + fabnResult.getScore(i));
+
+		resnikScore = new double[]{0.11157177565710485,0.2231435513142097,0.2231435513142097,0.916290731874155,0.11157177565710485};
+		resnikP = new double[]{0.821472,0.843968,0.799752,0.200844,0.68832};
+		linScore = new double[]{0.19583714006727046,0.2841853289422175,0.24352920263396993,1.0,0.08834818887494705};
+		linP = new double[]{0.821472,0.754716,0.755148,0.044964,0.755296};
+		jcScore = new double[]{0.43712271203780284,0.4576751569317141,0.5552427170907795,0.9999999999999998,0.6003949092992065};
+		jcP = new double[]{0.889184,0.866124,0.6225,0.044964,0.622036};
+		fabnScores = new double[]{-1.633587994564142,-1.633587994564142,-1.3091882336053455,2.196264120323024,-1.3063742210362417};
+		fabnMarginals = new double[]{0.019674959868555657,0.019674959868555657,0.027214407363261438,0.9061445759999325,0.027291096899695524};
+
+		for (int i=0;i<b4o.allItemList.size();i++)
+		{
+			System.out.println(i);
+			assertEquals(resnikP[i], resnikResult.getMarginal(i), 0.05);
+			assertEquals(resnikScore[i], resnikResult.getScore(i), 0.0001);
+			assertEquals(linP[i], linResult.getMarginal(i), 0.05);
+			assertEquals(linScore[i], linResult.getScore(i), 0.0001);
+			assertEquals(jcP[i], jcResult.getMarginal(i), 0.05);
+			assertEquals(jcScore[i], jcResult.getScore(i), 0.0001);
 			assertEquals(fabnScores[i], fabnResult.getScore(i), 0.0001);
 			assertEquals(fabnMarginals[i], fabnResult.getMarginal(i), 0.0001);
 		}
