@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 
@@ -26,7 +25,6 @@ import org.junit.Test;
 import sonumina.b4o.InternalDatafiles;
 import sonumina.b4o.benchmark.Benchmark;
 import sonumina.b4o.calculation.B4O;
-import sonumina.b4o.calculation.B4O.IntArray;
 import sonumina.b4o.calculation.B4O.Result;
 import sonumina.b4o.calculation.Observations;
 import sonumina.math.graph.AbstractGraph.DotAttributesProvider;
