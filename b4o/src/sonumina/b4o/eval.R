@@ -24,7 +24,7 @@ evaluate.def<-function(d,v)
 		# get the type
 		type<-v[i,1]
     
-    if (VERBOSE) {message(type);}
+		if (VERBOSE) {message(type);}
 
 		# get primary and optional secondary values
 		if (type == "resnik.avg.p.opt")
@@ -35,15 +35,15 @@ evaluate.def<-function(d,v)
 		{
 		    primary.values<-d[,type]
 		    
-		    if (type == "resnik.avg.p")
-        {
+			if (type == "resnik.avg.p")
+			{
 		    	secondary.values<- -d$resnik.avg
 		    } else if (type == "lin.avg.p")
 		    {
 		      secondary.values<- -d$lin.avg
 		    } else if (type == "jc.avg.p")
 		    {
-		      secondary.values<- -d$lin.avg.p
+		      secondary.values<- -d$jc.avg.p
 		    } else
 		    {
 		    	secondary.values<-NA
