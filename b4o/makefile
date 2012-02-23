@@ -3,7 +3,7 @@
 #
 B4OBENCHMARK=java -Xmx2G -cp bin:jars/commons-cli-1.2.jar sonumina.b4o.B4OBenchmark
 SIZE_OF_SCORE_DISTRIBUTION=500000
-
+DESTDIR ?= /home/sba/workspace/fabn-manuscript/data
 
 ifeq ($(ORPHANET),yes)
 ANNOTATIONSFILE=data/phenotype_annotation.omim.orphanet.gz
@@ -35,3 +35,7 @@ benchmark: build
 build: 
 	ant clean
 	ant build
+
+.PHONY: install
+install:
+	cp *_result.RObj $(DESTDIR)
