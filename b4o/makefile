@@ -38,4 +38,4 @@ build:
 
 .PHONY: install
 install:
-	cp *_result.RObj $(DESTDIR)
+	cp *_result.RObj *_param.txt *_summary.txt $(DESTDIR)
