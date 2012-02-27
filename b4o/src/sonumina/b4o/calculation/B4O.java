@@ -195,7 +195,7 @@ public class B4O
 	private final boolean DEBUG = false;
 	
 	/** Use cached MaxIC terms. Speeds up Resnik */
-	private final boolean PRECALCULATE_MAXICS = true;
+	private boolean PRECALCULATE_MAXICS = true;
 	
 	/** Use precalculated max items. Speeds up Resnik */
 	private boolean PRECALCULATE_ITEM_MAXS = true;
@@ -331,6 +331,16 @@ public class B4O
 	public void setPrecalculateScoreDistribution(boolean precalc)
 	{
 		PRECALCULATE_SCORE_DISTRIBUTION = precalc;
+	}
+	
+	/**
+	 * Sets, whether maxICs should be precalculated.
+	 * 
+	 * @param precalc
+	 */
+	public void setPrecalculateMaxICs(boolean precalc)
+	{
+		this.PRECALCULATE_MAXICS = precalc;
 	}
 	
 	/**
