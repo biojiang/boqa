@@ -10,5 +10,5 @@ do
 	NEWFULLNAME=`find plugins -name "$BASENAME\_*"`
 	NEWNAME=`basename $NEWFULLNAME`
 	svn mv $OLDNAME $NEWNAME
-	cp $NEWFULLNAME NEWNAME 
+	cp $NEWFULLNAME $NEWNAME 
 done
