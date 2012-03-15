@@ -633,7 +633,7 @@ public class B4O
 				for (int i=0;i<diffOff.length;i++)
 					stats.increment(getNodeCase(diffOff[i],hidden,observed));
 
-				/* Old */
+				/* Old TODO: Move this into a test */
 				if (false)
 				{
 					boolean [] oldHidden = new boolean[numTerms];
@@ -693,6 +693,7 @@ public class B4O
 			}
 		} else
 		{
+			/* TODO: Move this into a test */
 			int numTermsWithExplicitFrequencies = 0;
 			if (takeFrequenciesIntoAccount)
 			{
