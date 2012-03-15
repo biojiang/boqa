@@ -1740,7 +1740,7 @@ public class B4O
 			/* Determine the number of terms that have non-1.0 frequency. We restrict them
 			 * to the top 6 (the less probable) due to complexity issues and hope that this
 			 * a good enough approximation. */
-			for (i=0;i<numTerms && i<6;i++)
+			for (i=0;i<numTerms && i<7;i++)
 			{
 				if (items2TermFrequencies[item][item2TermFrequenciesOrder[item][i]] >= 1.0)
 					break;
