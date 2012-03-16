@@ -1740,7 +1740,7 @@ public class B4O
 			/* Determine the number of terms that have non-1.0 frequency. We restrict them
 			 * to the top 6 (the less probable) due to complexity issues and hope that this
 			 * a good enough approximation. */
-			for (i=0;i<numTerms && i<8;i++)
+			for (i=0;i<numTerms && i<10;i++)
 			{
 				if (items2TermFrequencies[item][item2TermFrequenciesOrder[item][i]] >= 1.0)
 					break;
@@ -1754,8 +1754,6 @@ public class B4O
 			/* First, determine the number of configs (could calculate binomial coefficient of course) */
 			while ((s = sg.next()) != null)
 				numConfigs++;
-
-			System.out.println(numConfigs);
 
 			diffOnTermsFreqs[item] = new int[numConfigs][];  
 			diffOffTermsFreqs[item] = new int[numConfigs][];
