@@ -175,6 +175,7 @@ public class B4O
 	private int SIZE_OF_SCORE_DISTRIBUTION = 250000;
 	private final int NUMBER_OF_BINS_IN_APPROXIMATED_SCORE_DISTRIBUTION = 10000;
 	private int maxTerms = -1;						/* Defines the maximal number of terms a query can have */
+	private int maxFrequencyTerms = 10;             /* Maximal number of frequency terms (k in the paper) */
 	
 	/** False positives can be explained via inheritance */
 	private static int VARIANT_INHERITANCE_POSITIVES = 1<<0;
@@ -1740,7 +1741,7 @@ public class B4O
 			/* Determine the number of terms that have non-1.0 frequency. We restrict them
 			 * to the top 6 (the less probable) due to complexity issues and hope that this
 			 * a good enough approximation. */
-			for (i=0;i<numTerms && i<10;i++)
+			for (i=0;i<numTerms && i<maxFrequencyTerms;i++)
 			{
 				if (items2TermFrequencies[item][item2TermFrequenciesOrder[item][i]] >= 1.0)
 					break;
