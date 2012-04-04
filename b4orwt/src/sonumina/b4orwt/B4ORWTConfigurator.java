@@ -31,7 +31,7 @@ public class B4ORWTConfigurator implements ApplicationConfigurator
 		config.addStyleSheet("org.eclipse.rap.rwt.theme.Default", "b4o.css");
 		
 		/* Add the entry point of our application */
-		config.addEntryPoint("/main", B4ORWT.class);
+		config.addEntryPoint("/main", B4ORWT.class, null);
 //		config.addEntryPoint("default", TestRWT.class);
 	}
 }

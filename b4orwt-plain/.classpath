@@ -6,10 +6,10 @@
 	<classpathentry kind="src" path="src.grappa"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.core.commands_3.6.0.v20111007-1312.jar" sourcepath="lib/org.eclipse.core.commands.source_3.6.0.v20111007-1312.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.equinox.common_3.6.100.v20120120-1540.jar" sourcepath="lib/org.eclipse.equinox.common.source_3.6.100.v20120120-1540.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.rap.jface_1.5.0.20120227-0212.jar" sourcepath="lib/org.eclipse.rap.jface.source_1.5.0.20120227-0212.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.rap.ui.forms_1.5.0.20120227-0212.jar" sourcepath="lib/org.eclipse.rap.ui.forms.source_1.5.0.20120227-0212.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.rap.rwt_1.5.0.20120227-0212.jar" sourcepath="lib/org.eclipse.rap.rwt.source_1.5.0.20120227-0212.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.equinox.common_3.6.100.v20120209-1951.jar" sourcepath="lib/org.eclipse.equinox.common.source_3.6.100.v20120209-1951.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.rap.jface_1.5.0.20120320-1638.jar" sourcepath="lib/org.eclipse.rap.jface.source_1.5.0.20120320-1638.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.rap.ui.forms_1.5.0.20120320-1638.jar" sourcepath="lib/org.eclipse.rap.ui.forms.source_1.5.0.20120320-1638.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.rap.rwt_1.5.0.20120320-1638.jar" sourcepath="lib/org.eclipse.rap.rwt.source_1.5.0.20120320-1638.jar"/>
 	<classpathentry kind="lib" path="lib/com.ibm.icu.base_4.4.2.v20110831.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
