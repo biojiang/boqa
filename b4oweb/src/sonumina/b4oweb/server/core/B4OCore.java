@@ -63,6 +63,8 @@ public class B4OCore
 	static
 	{
 		logger.info("Starting " + B4OCore.class.getName());
+		
+		long start = System.currentTimeMillis();
 
 		OBOParser oboParser = new OBOParser(DEFINITIONS_PATH,OBOParser.PARSE_DEFINITIONS);
 		try {
@@ -98,7 +100,7 @@ public class B4OCore
 		associations = b4o.getAssociations();
 		slimGraph = b4o.getSlimGraph();
 
-		logger.info("Got ontology, associations and slim graph");
+		logger.info("Got ontology, associations and slim graph after " + (System.currentTimeMillis() - start)/1000d + "s");
 
 		/* Sort the term according to the alphabet */
 		class TermName
