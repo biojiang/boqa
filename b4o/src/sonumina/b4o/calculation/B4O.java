@@ -1556,7 +1556,7 @@ public class B4O
 			i++;
 		}
 		
-		System.out.println(i + " items passed criterias");
+		logger.info(i + " items passed criterias (supplied evidence codes)");
 
 		/* Fill item matrix */
 		items2Terms = new int[allItemList.size()][];
@@ -1599,7 +1599,7 @@ public class B4O
 				}
 			}
 			
-			System.out.println(item.toString());
+//			System.out.println(item.toString());
 			items2DirectTerms[i] = new int[tids.size()];
 
 			for (TermID tid : tids)
