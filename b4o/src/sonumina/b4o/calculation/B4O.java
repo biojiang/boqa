@@ -24,6 +24,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1494,21 +1495,28 @@ public class B4O
 				}
 			}
 		}
-		
-		System.out.println(allItemsToBeConsidered.size() + " items so far");
-		
-		System.out.println("Available evidences:");
-		for (Entry<ByteString,Integer> ev : evidences.entrySet())
-			System.out.println(ev.getKey().toString() + "->" + ev.getValue());
 
+		if (logger.isLoggable(Level.INFO))
+		{
+			logger.info(allItemsToBeConsidered.size() + " items so far");
+			StringBuilder builder = new StringBuilder("Available Evidences: ");
+			for (Entry<ByteString,Integer> ev : evidences.entrySet())
+				builder.append(ev.getKey().toString() + "->" + ev.getValue() + ",");
+			logger.info(builder.toString());
+		}
+			
 		if (evidenceCodes != null)
 		{
-			System.out.println("Requested evidences: ");
 			evidences.clear();
 			for (String ev : evidenceCodes)
-			{
-				System.out.println(ev);
 				evidences.put(new ByteString(ev),1);
+
+			if (logger.isLoggable(Level.INFO))
+			{
+				StringBuilder builder = new StringBuilder("Requested evidences: ");
+				for (ByteString ev : evidences.keySet())
+					builder.append(ev.toString());
+				logger.info(builder.toString());
 			}
 		} else
 		{
