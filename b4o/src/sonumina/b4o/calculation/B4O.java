@@ -1498,8 +1498,8 @@ public class B4O
 
 		if (logger.isLoggable(Level.INFO))
 		{
-			logger.info(allItemsToBeConsidered.size() + " items so far");
-			StringBuilder builder = new StringBuilder("Available Evidences: ");
+			logger.info(allItemsToBeConsidered.size() + " items shall be considered");
+			StringBuilder builder = new StringBuilder("Available evidences: ");
 			for (Entry<ByteString,Integer> ev : evidences.entrySet())
 				builder.append(ev.getKey().toString() + "->" + ev.getValue() + ",");
 			logger.info(builder.toString());
