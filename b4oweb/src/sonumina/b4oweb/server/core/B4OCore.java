@@ -91,6 +91,7 @@ public class B4OCore
 		}
 		
 		b4o.setConsiderFrequenciesOnly(false);
+		b4o.setMaxFrequencyTerms(5);
 		b4o.setPrecalculateScoreDistribution(false);
 		b4o.setPrecalculateItemMaxs(false);
 		b4o.setPrecalculateMaxICs(false);
@@ -294,6 +295,8 @@ public class B4OCore
 	 */
 	public static List<ItemResultEntry> score(List<Integer> serverIds, boolean multiThreading)
 	{
+		long start = System.currentTimeMillis();
+		
 		boolean [] observations = new boolean[slimGraph.getNumberOfVertices()];
 		for (int id : serverIds)
 		{
@@ -322,6 +325,9 @@ public class B4OCore
 				return 0;
 			}
 		});
+		
+		long diff = System.currentTimeMillis() - start;
+		logger.info("Calculation took " + (diff)/1000 + "." + (diff)%1000 + " seconds");
 		
 		return resultList;
 	}
