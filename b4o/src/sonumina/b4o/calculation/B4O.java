@@ -408,6 +408,28 @@ public class B4O
 
 	
 	/**
+	 * Returns the number of terms considered in for frequency
+	 * analysis.
+	 *  
+	 * @return
+	 */
+	public int getMaxFrequencyTerms()
+	{
+		return maxFrequencyTerms;
+	}
+	
+	/**
+	 * Sets the number of terms considered in for frequency
+	 * analysis.
+	 * 
+	 * @param newMaxFrequencyTerms
+	 */
+	public void setMaxFrequencyTerms(int newMaxFrequencyTerms)
+	{
+		maxFrequencyTerms = newMaxFrequencyTerms;
+	}
+	
+	/**
 	 * Returns whether false negatives are propagated in a
 	 * top-down fashion.
 	 * 
