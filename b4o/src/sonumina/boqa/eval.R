@@ -118,14 +118,14 @@ v<-matrix(c("marg","BN", T,
 	"jc.avg", "JC",T,
 	"jc.avg.p", "JC P", F),ncol=3,byrow=T)
 
-b4o.name.robj<-paste(b4o.base.name,"RObj",sep=".")
-b4o.name.result.robj<-paste(b4o.base.name,"_result.RObj",sep="")
+boqa.name.robj<-paste(boqa.base.name,"RObj",sep=".")
+boqa.name.result.robj<-paste(boqa.base.name,"_result.RObj",sep="")
 
 # only freq vs freq
-if ((!file.exists(b4o.name.robj)) || (file.info(b4o.name.robj)$mtime < file.info(b4o.name)$mtime))
+if ((!file.exists(boqa.name.robj)) || (file.info(boqa.name.robj)$mtime < file.info(boqa.name)$mtime))
 {
 	message("Loading data");
-	d<-b4o.load.data()
+	d<-boqa.load.data()
 
 	d<-d[order(d$run),]
 
@@ -157,11 +157,11 @@ if ((!file.exists(b4o.name.robj)) || (file.info(b4o.name.robj)$mtime < file.info
 	}),d$run)
 	d<-cbind(d,resnik.avg.p.rank)
 
-	save(d,file=b4o.name.robj);
+	save(d,file=boqa.name.robj);
 	message("Data loaded, preprocessed, and stored");
 } else
 {
-	load(b4o.name.robj)
+	load(boqa.name.robj)
 	message("Data loaded from storage")
 }
 
@@ -171,7 +171,7 @@ d.label.idx<-which(d$label==1)
 message("Evaluating")
 
 res.list<-evaluate(d,v)
-save(res.list,file=b4o.name.result.robj,compress=T)
+save(res.list,file=boqa.name.result.robj,compress=T)
 
 # values for the table (freq)
 freq.important<-which(d$marg.freq > 0.5)
@@ -192,7 +192,7 @@ print(sprintf("tp=%d tp+fp=%d ppv=%g",avg.p.tp,avg.p.positives,avg.p.tp/avg.p.po
 #col<-c("red","blue","cyan","green","gray","orange","magenta", "black")
 col<-rainbow(length(res.list))
 
-pdf(paste(b4o.base.name,"-precall.pdf",sep=""))
+pdf(paste(boqa.base.name,"-precall.pdf",sep=""))
 
 plot.new()
 plot.window(xlim=c(0,1),ylim=c(0,1),xlab="Precision")
