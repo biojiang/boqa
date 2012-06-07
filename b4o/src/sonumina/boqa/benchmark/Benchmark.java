@@ -322,8 +322,8 @@ public class Benchmark
 
 		/* Remember the parameter */
 		BufferedWriter param = new BufferedWriter(new FileWriter(RESULT_NAME.split("\\.")[0]+ "_param.txt"));
-		param.write("alpha\tbeta\tconsider.freqs.only\titems\tterms\tmax.terms\tmax.samples\tevidences\n");
-		param.write(String.format("%g\t%g\t%b\t%d\t%d\t%d\t%d\t%s\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY,boqa.getNumberOfItems(),slimGraph.getNumberOfVertices(),maxTerms,samplesPerItem,evidenceString));
+		param.write("alpha\tbeta\tconsider.freqs.only\titems\tterms\tmax.terms\tmax.samples\tevidences\tmax.freq.terms\n");
+		param.write(String.format("%g\t%g\t%b\t%d\t%d\t%d\t%d\t%s\t%d\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY,boqa.getNumberOfItems(),slimGraph.getNumberOfVertices(),maxTerms,samplesPerItem,evidenceString,boqa.getMaxFrequencyTerms()));
 		param.flush();
 		param.close();
 
