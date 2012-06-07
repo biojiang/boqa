@@ -33,7 +33,7 @@ public class Benchmark
 {
 	private Ontology graph;
 	private SlimDirectedGraphView<Term> slimGraph;
-	private BOQA b4o;
+	private BOQA boqa;
 
 	/** Verbose output */
 	private boolean VERBOSE;
@@ -94,23 +94,23 @@ public class Benchmark
 	{
 		int i;
 	
-		Observations obs = b4o.generateObservations(item, rnd);
+		Observations obs = boqa.generateObservations(item, rnd);
 		
 		boolean [] observations = obs.observations;
 
 		/* First, without taking frequencies into account */
-		Result modelWithoutFrequencies = b4o.assignMarginals(obs, false);
+		Result modelWithoutFrequencies = boqa.assignMarginals(obs, false);
 		
 		/* Second, with taking frequencies into account */
-		Result modelWithFrequencies = b4o.assignMarginals(obs, true);
+		Result modelWithFrequencies = boqa.assignMarginals(obs, true);
 
 		ExperimentStore id = new ExperimentStore();
 		id.obs = obs;
 		id.modelWithoutFrequencies = modelWithoutFrequencies;
 		id.modelWithFrequencies = modelWithFrequencies;
-		id.resnik = b4o.resnikScore(obs.observations, true, rnd);
-		id.lin = b4o.linScore(obs.observations, true, rnd);
-		id.jc = b4o.jcScore(obs.observations, true, rnd);
+		id.resnik = boqa.resnikScore(obs.observations, true, rnd);
+		id.lin = boqa.linScore(obs.observations, true, rnd);
+		id.jc = boqa.jcScore(obs.observations, true, rnd);
 		
 		/******** The rest is for debugging purposes ********/
 		if (VERBOSE || provideGraph)
@@ -133,9 +133,9 @@ public class Benchmark
 				
 			};
 	
-			ArrayList<Pair> scoreList = new ArrayList<Pair>(b4o.allItemList.size());
-			ArrayList<Pair> idealList = new ArrayList<Pair>(b4o.allItemList.size());
-			for (i=0;i<b4o.allItemList.size();i++)
+			ArrayList<Pair> scoreList = new ArrayList<Pair>(boqa.allItemList.size());
+			ArrayList<Pair> idealList = new ArrayList<Pair>(boqa.allItemList.size());
+			for (i=0;i<boqa.allItemList.size();i++)
 			{
 				scoreList.add(new Pair(i,modelWithoutFrequencies.getScore(i)));
 				idealList.add(new Pair(i,modelWithoutFrequencies.getMarginalIdeal(i)));
@@ -156,7 +156,7 @@ public class Benchmark
 			{
 				Pair p = scoreList.get(i);
 				boolean itIs = p.idx == item;
-				System.out.println((i+1) + (itIs?"(*)":"") + ": " + b4o.allItemList.get(p.idx) + ": " +  p.score + " " + modelWithoutFrequencies.getMarginal(p.idx));
+				System.out.println((i+1) + (itIs?"(*)":"") + ": " + boqa.allItemList.get(p.idx) + ": " +  p.score + " " + modelWithoutFrequencies.getMarginal(p.idx));
 			}
 	
 			int scoreRank  = 0;
@@ -203,8 +203,8 @@ public class Benchmark
 			{
 				/* Output the graph */
 				final HashSet<TermID> hiddenSet = new HashSet<TermID>();
-				for (i=0;i<b4o.getTermsDirectlyAnnotatedTo(item).length;i++)
-					hiddenSet.add(slimGraph.getVertex(b4o.getTermsDirectlyAnnotatedTo(item)[i]).getID());
+				for (i=0;i<boqa.getTermsDirectlyAnnotatedTo(item).length;i++)
+					hiddenSet.add(slimGraph.getVertex(boqa.getTermsDirectlyAnnotatedTo(item)[i]).getID());
 				final HashSet<TermID> observedSet = new HashSet<TermID>();
 				for (i = 0;i<observations.length;i++)
 				{
@@ -213,8 +213,8 @@ public class Benchmark
 				}
 				int topRankIdx = scoreList.get(0).idx;
 				final HashSet<TermID> topRankSet = new HashSet<TermID>();
-				for (i=0;i<b4o.getTermsDirectlyAnnotatedTo(topRankIdx).length;i++)
-					topRankSet.add(slimGraph.getVertex(b4o.getTermsDirectlyAnnotatedTo(topRankIdx)[i]).getID());
+				for (i=0;i<boqa.getTermsDirectlyAnnotatedTo(topRankIdx).length;i++)
+					topRankSet.add(slimGraph.getVertex(boqa.getTermsDirectlyAnnotatedTo(topRankIdx)[i]).getID());
 		
 				HashSet<TermID> allSet = new HashSet<TermID>();
 				allSet.addAll(hiddenSet);
@@ -261,7 +261,7 @@ public class Benchmark
 		int numProcessors = BOQA.getNumProcessors();
 
 		/* TODO: Get rid of this ugliness */
-		this.b4o = b4o;
+		this.boqa = b4o;
 		
 		double ALPHA = b4o.getSimulationAlpha();
 		double BETA = b4o.getSimulationBeta();
@@ -329,17 +329,17 @@ public class Benchmark
 
 		/* Write out r code to load matrix in */
 		BufferedWriter load = new BufferedWriter(new FileWriter(RESULT_NAME.split("\\.")[0]+ "_load.R"));
-		load.append("b4o.load.data<-function() {\n d<-read.table(");
+		load.append("boqa.load.data<-function() {\n d<-read.table(");
 		load.append("\"" + new File(RESULT_NAME).getAbsolutePath() + "\", ");
 		load.append("colClasses=c(\"integer\",\"integer\",rep(\"numeric\",12),\"integer\"),h=F");
 		load.append(")");
 		load.append("\n colnames(d)<-c(\"run\",\"label\",\"score\",\"marg\",\"marg.ideal\", \"score.freq\",\"marg.freq\", \"marg.freq.ideal\", \"resnik.avg\", \"resnik.avg.p\", \"lin.avg\", \"lin.avg.p\", \"jc.avg\", \"jc.avg.p\", \"freq\");");
 		load.append("\n return (d);");
 		load.append("\n}\n");
-		load.append("b4o.name<-\"");
+		load.append("boqa.name<-\"");
 		load.append(new File(RESULT_NAME).getAbsolutePath());
 		load.append("\";\n");
-		load.append("b4o.base.name<-\"");
+		load.append("boqa.base.name<-\"");
 		load.append(new File(RESULT_NAME.split("\\.")[0]).getAbsolutePath());
 		load.append("\";\n");
 		load.flush();
@@ -372,7 +372,7 @@ public class Benchmark
 						
 						ExperimentStore store = processItem(item,false,new Random(seed));
 	
-						for (int j=0;j<Benchmark.this.b4o.getNumberOfItems();j++)
+						for (int j=0;j<Benchmark.this.boqa.getNumberOfItems();j++)
 						{
 							resultBuilder.append(fixedRun);
 							resultBuilder.append("\t");
@@ -402,7 +402,7 @@ public class Benchmark
 							resultBuilder.append("\t");
 							resultBuilder.append(store.jc.getMarginal(j));
 							resultBuilder.append("\t");
-							resultBuilder.append(Benchmark.this.b4o.hasItemFrequencies(item)?1:0);
+							resultBuilder.append(Benchmark.this.boqa.hasItemFrequencies(item)?1:0);
 							resultBuilder.append("\n");
 						}
 	
