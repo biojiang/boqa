@@ -4,3 +4,6 @@ The authors of this software have filed a patent on ontology search
 algorithms for several applications, including the algorithm 
 implemented in this work. 
 (see: http://www.wipo.int/pctdb/en/wo.jsp?WO=2011018245)
+
+In order to start the benchmark, just invoke the supplied makefile.
+You need Java, ant and R for successfully completing the build.
