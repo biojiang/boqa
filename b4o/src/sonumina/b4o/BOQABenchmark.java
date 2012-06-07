@@ -19,7 +19,7 @@ import sonumina.b4o.benchmark.Benchmark;
  * 
  * @author Sebastian Bauer
  */
-public class B4OBenchmark
+public class BOQABenchmark
 {
 	static private String ontologyPath;
 	static private String annotationPath;
@@ -62,7 +62,7 @@ public class B4OBenchmark
 		   if (cl.hasOption('h'))
 		   {
 			   HelpFormatter f = new HelpFormatter();
-			   f.printHelp(B4OBenchmark.class.getName(), opt);
+			   f.printHelp(BOQABenchmark.class.getName(), opt);
 			   System.exit(0);
 		   }
 		   

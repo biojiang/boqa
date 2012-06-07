@@ -1,7 +1,7 @@
 #
 # Primitive makefile
 #
-B4OBENCHMARK=java -Xmx16G -cp bin:jars/commons-cli-1.2.jar sonumina.b4o.B4OBenchmark
+B4OBENCHMARK=java -Xmx16G -cp bin:jars/commons-cli-1.2.jar sonumina.b4o.BOQABenchmark
 SIZE_OF_SCORE_DISTRIBUTION=500000
 DESTDIR ?= /home/sba/workspace/fabn-manuscript/data
 
