@@ -23,6 +23,12 @@ import sonumina.b4o.calculation.Observations;
 import sonumina.b4o.calculation.B4O.Result;
 import sonumina.math.graph.SlimDirectedGraphView;
 
+/**
+ * Class that implements the logic of the benchmark presented in
+ * the paper.
+ *
+ * @author Sebastian Bauer
+ */
 public class Benchmark
 {
 	private Ontology graph;
@@ -40,7 +46,12 @@ public class Benchmark
 	
 	/** Number of samples taken per item */
 	private int samplesPerItem = 5;
-	
+
+	/**
+	 * Container for a full experiment. Contains input data as well as results.
+	 * 
+	 * @author Sebastian Bauer
+	 */
 	static class ExperimentStore
 	{
 		Observations obs;
@@ -72,13 +83,12 @@ public class Benchmark
 
 	/**
 	 * Processes the simulation and evaluation for the given item.
+	 * That is, we first generate some obfuscated observations and then
+	 * apply the tested algorithm to recover the signal.
 	 * 
 	 * @param item
 	 * 
-	 * @returns an array of Results.
-	 *  1. model without frequencies
-	 *  2. model with frequencies
-	 *  3. resnik (score and p value)
+	 * @returns an ExperimentStore
 	 */
 	private ExperimentStore processItem(int item, boolean provideGraph, Random rnd)
 	{
@@ -236,7 +246,9 @@ public class Benchmark
 	}
 
 	/**
-	 * Main Entry.
+	 * Perform the benchmark as described in the paper on the given BOQA context.
+	 * 
+	 * Produces a bunch of files in the current directory.
 	 * 
 	 * @param args
 	 * @throws InterruptedException
