@@ -22,10 +22,10 @@ evaluate: benchmark evaluate-only
 
 .PHONY: evaluate-only
 evaluate-only:
-	echo 'source("benchmark-low-noise-s6_load.R");source("src/sonumina/b4o/eval.R")' | R --vanilla
-	echo 'source("benchmark-normal-noise-s6_load.R");source("src/sonumina/b4o/eval.R")' | R --vanilla
-	echo 'source("benchmark-low-noise-s3_load.R");source("src/sonumina/b4o/eval.R")' | R --vanilla
-	echo 'source("benchmark-normal-noise-s3_load.R");source("src/sonumina/b4o/eval.R")' | R --vanilla
+	echo 'source("benchmark-low-noise-s6_load.R");source("src/sonumina/boqa/eval.R")' | R --vanilla
+	echo 'source("benchmark-normal-noise-s6_load.R");source("src/sonumina/boqa/eval.R")' | R --vanilla
+	echo 'source("benchmark-low-noise-s3_load.R");source("src/sonumina/boqa/eval.R")' | R --vanilla
+	echo 'source("benchmark-normal-noise-s3_load.R");source("src/sonumina/boqa/eval.R")' | R --vanilla
 
 .PHONY: benchmark
 benchmark: build
