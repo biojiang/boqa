@@ -13,6 +13,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 import sonumina.boqa.benchmark.Benchmark;
+import sonumina.boqa.calculation.BOQA;
 
 /**
  * Main entry point of the BOQA benchmark.
@@ -32,14 +33,13 @@ public class BOQABenchmark
 	static private int SIZE_OF_SCORE_DISTRIBUTION = 250000;
 	static private String RESULT_BASE_NAME = "benchmark";
 	
-	static sonumina.boqa.calculation.BOQA b4o = new sonumina.boqa.calculation.BOQA();
-
 	/**
-	 * Parses the command line.
+	 * Parses the command line and returns a corresponding
+	 * BOQA object. 
 	 * 
 	 * @param args
 	 */
-	public static void parseCommandLine(String [] args)
+	public static BOQA parseCommandLine(String [] args)
 	{
 	   Options opt = new Options();
 	   opt.addOption("o", "ontology", true, "Path or URL to the ontology file.");
@@ -52,6 +52,8 @@ public class BOQABenchmark
 	   opt.addOption(null, "beta", true, "Specifies beta (false-negative rate) during simulation. Default is " + BETA + ".");
 	   opt.addOption(null, "sizeOfScoreDistribution", true, "Specifies the size of the score distribution. Default is " + SIZE_OF_SCORE_DISTRIBUTION + ".");
 	   opt.addOption("h", "help", false, "Shows this help");
+
+	   BOQA boqa = new BOQA();
 
 	   try
 	   {
@@ -87,19 +89,19 @@ public class BOQABenchmark
 		   ontologyPath = cl.getOptionValue('o',ontologyPath);
 		   annotationPath = cl.getOptionValue('a', annotationPath);
 		   
-		   b4o.setSimulationAlpha(ALPHA);
-		   b4o.setSimulationBeta(BETA);
-		   b4o.setConsiderFrequenciesOnly(CONSIDER_FREQUENCIES_ONLY);
-		   b4o.setSimulationMaxTerms(MAX_TERMS);
+		   boqa.setSimulationAlpha(ALPHA);
+		   boqa.setSimulationBeta(BETA);
+		   boqa.setConsiderFrequenciesOnly(CONSIDER_FREQUENCIES_ONLY);
+		   boqa.setSimulationMaxTerms(MAX_TERMS);
 		   if (MAX_TERMS != -1)
-			   b4o.setMaxQuerySizeForCachedDistribution(MAX_TERMS);
-		   b4o.setSizeOfScoreDistribution(SIZE_OF_SCORE_DISTRIBUTION);
+			   boqa.setMaxQuerySizeForCachedDistribution(MAX_TERMS);
+		   boqa.setSizeOfScoreDistribution(SIZE_OF_SCORE_DISTRIBUTION);
 	   } catch (ParseException e)
 	   {
 		   System.err.println("Faield to parse commandline: " + e.getLocalizedMessage());
 		   System.exit(1);
 	   }
-	   
+	   return boqa;
 	}
 
 	/**
@@ -111,18 +113,18 @@ public class BOQABenchmark
 	 */
 	public static void main(String[] args) throws InterruptedException, IOException
 	{
-		parseCommandLine(args);
+		BOQA boqa = parseCommandLine(args);
 
 		GlobalPreferences.setProxyPort(888);
 		GlobalPreferences.setProxyHost("realproxy.charite.de");
 
 		Datafiles df = new Datafiles(ontologyPath,annotationPath);
-		b4o.setup(df.graph, df.assoc);
+		boqa.setup(df.graph, df.assoc);
 		
 		Benchmark benchmark = new Benchmark();
 		benchmark.setSamplesPerItem(SAMPLES_PER_ITEM);
 		benchmark.setResultBaseName(RESULT_BASE_NAME);
-		benchmark.benchmark(b4o);
+		benchmark.benchmark(boqa);
 
 		OntologizerThreadGroups.workerThreadGroup.interrupt();
 	}
