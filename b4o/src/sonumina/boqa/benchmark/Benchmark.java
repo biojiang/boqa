@@ -255,27 +255,27 @@ public class Benchmark
 	 * @throws IOException
 	 */
 	@SuppressWarnings("unused")
-	public void benchmark(BOQA b4o) throws InterruptedException, IOException
+	public void benchmark(BOQA boqa) throws InterruptedException, IOException
 	{
 		int i;
 		int numProcessors = BOQA.getNumProcessors();
 
 		/* TODO: Get rid of this ugliness */
-		this.boqa = b4o;
+		this.boqa = boqa;
 		
-		double ALPHA = b4o.getSimulationAlpha();
-		double BETA = b4o.getSimulationBeta();
-		int maxTerms = b4o.getSimulationMaxTerms();
-		boolean CONSIDER_FREQUENCIES_ONLY = b4o.getConsiderFrequenciesOnly();
+		double ALPHA = boqa.getSimulationAlpha();
+		double BETA = boqa.getSimulationBeta();
+		int maxTerms = boqa.getSimulationMaxTerms();
+		boolean CONSIDER_FREQUENCIES_ONLY = boqa.getConsiderFrequenciesOnly();
 		
-		graph = b4o.getOntology();
-		slimGraph = b4o.getSlimGraph();
+		graph = boqa.getOntology();
+		slimGraph = boqa.getSlimGraph();
 		
 		/**************************************************************************************************************************/
 		/* Write score distribution */
 		
 		if (false)
-			b4o.writeScoreDistribution(new File("score-0.txt"),0);
+			boqa.writeScoreDistribution(new File("score-0.txt"),0);
 		
 		/**************************************************************************************************************************/
 
@@ -286,15 +286,15 @@ public class Benchmark
 		hpoTerms.add(new TermID("HP:0000875")); /* Episodic Hypertension */
 		hpoTerms.add(new TermID("HP:0002621")); /* Atherosclerosis */
 
-		b4o.writeDOTExample(new File("hpo-example.dot"), hpoTerms);
+		boqa.writeDOTExample(new File("hpo-example.dot"), hpoTerms);
 
 		/**************************************************************************************************************************/
 
 		int firstItemWithFrequencies = -1;
 		int numItemsWithFrequencies = 0;
-		for (i=0;i<b4o.getNumberOfItems();i++)
+		for (i=0;i<boqa.getNumberOfItems();i++)
 		{
-			if (b4o.hasItemFrequencies(i))
+			if (boqa.hasItemFrequencies(i))
 			{
 				numItemsWithFrequencies++;
 				if (firstItemWithFrequencies == -1)
@@ -303,12 +303,12 @@ public class Benchmark
 		}
 
 		System.out.println("Items with frequencies " + numItemsWithFrequencies + "  First one: " +
-							firstItemWithFrequencies + " which is " + (firstItemWithFrequencies!=-1?b4o.allItemList.get(firstItemWithFrequencies):""));
+							firstItemWithFrequencies + " which is " + (firstItemWithFrequencies!=-1?boqa.allItemList.get(firstItemWithFrequencies):""));
 		
 		/**************************************************************************************************************************/
 		
 		String evidenceString = "All";
-		String [] evidenceCodes = b4o.getEvidenceCodes();
+		String [] evidenceCodes = boqa.getEvidenceCodes();
 		if (evidenceCodes != null && evidenceCodes.length > 0)
 		{
 			StringBuilder evidenceBuilder = new StringBuilder();
@@ -323,7 +323,7 @@ public class Benchmark
 		/* Remember the parameter */
 		BufferedWriter param = new BufferedWriter(new FileWriter(RESULT_NAME.split("\\.")[0]+ "_param.txt"));
 		param.write("alpha\tbeta\tconsider.freqs.only\titems\tterms\tmax.terms\tmax.samples\tevidences\n");
-		param.write(String.format("%g\t%g\t%b\t%d\t%d\t%d\t%d\t%s\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY,b4o.getNumberOfItems(),slimGraph.getNumberOfVertices(),maxTerms,samplesPerItem,evidenceString));
+		param.write(String.format("%g\t%g\t%b\t%d\t%d\t%d\t%d\t%s\n",ALPHA,BETA,CONSIDER_FREQUENCIES_ONLY,boqa.getNumberOfItems(),slimGraph.getNumberOfVertices(),maxTerms,samplesPerItem,evidenceString));
 		param.flush();
 		param.close();
 
@@ -356,7 +356,7 @@ public class Benchmark
 
 		for (int sample = 0; sample < samplesPerItem; sample++)
 		{
-			for (i=0;i<b4o.getNumberOfItems();i++)
+			for (i=0;i<boqa.getNumberOfItems();i++)
 			{
 				final long seed = rnd.nextLong();
 				final int item = i;
