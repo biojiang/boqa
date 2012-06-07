@@ -1,8 +1,11 @@
 #
 # Primitive makefile
 #
-B4OBENCHMARK=java -Xmx16G -cp bin:jars/commons-cli-1.2.jar sonumina.b4o.BOQABenchmark
+BOQABENCHMARK=java -Xmx16G -cp bin:jars/commons-cli-1.2.jar sonumina.b4o.BOQABenchmark
 SIZE_OF_SCORE_DISTRIBUTION=500000
+
+# Defines the directory where to place the results when
+# invoking "make install"
 DESTDIR ?= /home/sba/workspace/fabn-manuscript/data
 
 ifeq ($(ORPHANET),yes)
@@ -26,10 +29,10 @@ evaluate-only:
 
 .PHONY: benchmark
 benchmark: build
-	$(B4OBENCHMARK) --alpha 0.001 -r benchmark-low-noise-s6    -o data/human-phenotype-ontology.obo.gz -a $(ANNOTATIONSFILE) -c -m 6 --sizeOfScoreDistribution $(SIZE_OF_SCORE_DISTRIBUTION)
-	$(B4OBENCHMARK) --alpha 0.002 -r benchmark-normal-noise-s6 -o data/human-phenotype-ontology.obo.gz -a $(ANNOTATIONSFILE) -c -m 6 --sizeOfScoreDistribution $(SIZE_OF_SCORE_DISTRIBUTION)
-	$(B4OBENCHMARK) --alpha 0.001 -r benchmark-low-noise-s3    -o data/human-phenotype-ontology.obo.gz -a $(ANNOTATIONSFILE) -c -m 3 --sizeOfScoreDistribution $(SIZE_OF_SCORE_DISTRIBUTION)
-	$(B4OBENCHMARK) --alpha 0.002 -r benchmark-normal-noise-s3 -o data/human-phenotype-ontology.obo.gz -a $(ANNOTATIONSFILE) -c -m 3 --sizeOfScoreDistribution $(SIZE_OF_SCORE_DISTRIBUTION)
+	$(BOQABENCHMARK) --alpha 0.001 -r benchmark-low-noise-s6    -o data/human-phenotype-ontology.obo.gz -a $(ANNOTATIONSFILE) -c -m 6 --sizeOfScoreDistribution $(SIZE_OF_SCORE_DISTRIBUTION)
+	$(BOQABENCHMARK) --alpha 0.002 -r benchmark-normal-noise-s6 -o data/human-phenotype-ontology.obo.gz -a $(ANNOTATIONSFILE) -c -m 6 --sizeOfScoreDistribution $(SIZE_OF_SCORE_DISTRIBUTION)
+	$(BOQABENCHMARK) --alpha 0.001 -r benchmark-low-noise-s3    -o data/human-phenotype-ontology.obo.gz -a $(ANNOTATIONSFILE) -c -m 3 --sizeOfScoreDistribution $(SIZE_OF_SCORE_DISTRIBUTION)
+	$(BOQABENCHMARK) --alpha 0.002 -r benchmark-normal-noise-s3 -o data/human-phenotype-ontology.obo.gz -a $(ANNOTATIONSFILE) -c -m 3 --sizeOfScoreDistribution $(SIZE_OF_SCORE_DISTRIBUTION)
 
 .PHONY: build
 build: 
