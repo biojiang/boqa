@@ -21,7 +21,7 @@ import ontologizer.types.ByteString;
 import org.junit.Before;
 import org.junit.Test;
 
-import sonumina.b4o.calculation.B4O;
+import sonumina.boqa.calculation.BOQA;
 import sonumina.math.graph.SlimDirectedGraphView;
 import sonumina.math.graph.AbstractGraph.DotAttributesProvider;
 
@@ -115,7 +115,7 @@ public class WordNetParserTest
 		}
 
 		System.err.println("Constructed data set");
-		final B4O b4o = new B4O();
+		final BOQA b4o = new BOQA();
 		b4o.setup(ontology, assocs);
 		System.err.println("Setted up ontology and associations");
 		

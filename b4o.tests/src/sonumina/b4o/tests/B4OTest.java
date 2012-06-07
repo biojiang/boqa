@@ -22,11 +22,11 @@ import ontologizer.types.ByteString;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import sonumina.b4o.InternalDatafiles;
-import sonumina.b4o.benchmark.Benchmark;
-import sonumina.b4o.calculation.B4O;
-import sonumina.b4o.calculation.B4O.Result;
-import sonumina.b4o.calculation.Observations;
+import sonumina.boqa.InternalDatafiles;
+import sonumina.boqa.benchmark.Benchmark;
+import sonumina.boqa.calculation.BOQA;
+import sonumina.boqa.calculation.Observations;
+import sonumina.boqa.calculation.BOQA.Result;
 import sonumina.math.graph.AbstractGraph.DotAttributesProvider;
 import sonumina.math.graph.SlimDirectedGraphView;
 
@@ -59,7 +59,7 @@ public class B4OTest
 		{
 			for (int t=0;t<10;t++)
 			{
-				B4O.choose(rnd,s,chosen,storage);
+				BOQA.choose(rnd,s,chosen,storage);
 
 				/* Check storage array for validity */
 				boolean [] seen = new boolean[storage.length];
@@ -110,7 +110,7 @@ public class B4OTest
 	public void testMostSpecificTerms()
 	{
 		InternalDatafiles data = new InternalDatafiles();
-		B4O b4o = new B4O();
+		BOQA b4o = new BOQA();
 		b4o.setConsiderFrequenciesOnly(false);
 		b4o.setCacheScoreDistribution(false);
 		b4o.setPrecalculateItemMaxs(false);
@@ -126,7 +126,7 @@ public class B4OTest
 	 * 
 	 * @param b4o
 	 */
-	private void checkInternalSimValues(B4O b4o)
+	private void checkInternalSimValues(BOQA b4o)
 	{
 		/* Common ancestors */
 		assertEquals(7,b4o.getCommonAncestorWithMaxIC(11,12));
@@ -291,7 +291,7 @@ public class B4OTest
 		final InternalDatafiles data = new InternalDatafiles();
 		assertEquals(15,data.graph.getNumberOfTerms());
 
-		final B4O b4o = new B4O();
+		final BOQA b4o = new BOQA();
 		b4o.setConsiderFrequenciesOnly(false);
 		b4o.setPrecalculateItemMaxs(true);
 		b4o.setCacheScoreDistribution(true);
@@ -343,7 +343,7 @@ public class B4OTest
 		for (int i=0;i<b4o.allItemList.size();i++)
 			System.out.println(i + " -> " +b4o.allItemList.get(i));
 
-		B4O b4oNoPrecalc = new B4O();
+		BOQA b4oNoPrecalc = new BOQA();
 		b4oNoPrecalc.setConsiderFrequenciesOnly(false);
 		b4oNoPrecalc.setPrecalculateItemMaxs(false);
 		b4oNoPrecalc.setCacheScoreDistribution(false);
@@ -361,7 +361,7 @@ public class B4OTest
 	public void testBenchmarkOnInternalOntology() throws InterruptedException, IOException
 	{
 		final InternalDatafiles data = new InternalDatafiles();
-		B4O b4o = new B4O();
+		BOQA b4o = new BOQA();
 		b4o.setConsiderFrequenciesOnly(false);
 		b4o.setSizeOfScoreDistribution(1000);
 		b4o.setTryLoadingScoreDistribution(false);
@@ -381,7 +381,7 @@ public class B4OTest
 	 * 
 	 * @param b4o
 	 */
-	private void checkHPOSimValues(final B4O b4o)
+	private void checkHPOSimValues(final BOQA b4o)
 	{
 		assertEquals(0.006997929,b4o.resScoreMaxAvgVsItem(new int[]{10,12},4),0.000001);
 		assertEquals(0.162568779,b4o.resScoreMaxAvgVsItem(new int[]{101,1222,1300,2011},78),0.000001);
@@ -391,7 +391,7 @@ public class B4OTest
 	@Test
 	public void testVsOldItemMax() throws InterruptedException, IOException
 	{
-		final B4O b4o = new B4O();
+		final BOQA b4o = new BOQA();
 
 		Datafiles df = hpo;
 
@@ -438,7 +438,7 @@ public class B4OTest
 	@Test
 	public void testMostSpecificOnHPO() throws InterruptedException, IOException
 	{
-		final B4O b4o = new B4O();
+		final BOQA b4o = new BOQA();
 
 		b4o.setConsiderFrequenciesOnly(false);
 		b4o.setCacheScoreDistribution(false);
@@ -456,7 +456,7 @@ public class B4OTest
 			int item = rnd.nextInt(b4o.allItemList.size());
 			
 			Observations obs = b4o.generateObservations(item, rnd);
-			B4O.IntArray sparse = new B4O.IntArray(obs.observations);
+			BOQA.IntArray sparse = new BOQA.IntArray(obs.observations);
 			int [] mst = b4o.mostSpecificTerms(sparse.get());
 
 			/* Get full observation according to mostSpecificTerms() */
@@ -485,7 +485,7 @@ public class B4OTest
 	{
 		Random rnd = new Random(2);
 
-		final B4O b4o = new B4O();
+		final BOQA b4o = new BOQA();
 
 		OBOParser hpoParser = new OBOParser("../b4o/data/human-phenotype-ontology.obo.gz");
 		hpoParser.doParse();
