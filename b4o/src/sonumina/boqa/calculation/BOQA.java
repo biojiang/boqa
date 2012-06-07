@@ -49,7 +49,7 @@ import sonumina.math.graph.SlimDirectedGraphView;
 
 
 /**
- * This is our class implementing the calculation.
+ * This is our class implementing the calculation. 
  * 
  * @author Sebastian Bauer
  */
@@ -58,14 +58,14 @@ public class BOQA
 	/** Our logger */
 	private static Logger logger = Logger.getLogger(BOQA.class.getCanonicalName());
 
-	public Ontology graph;
-	public AssociationContainer assoc;
+	private Ontology graph;
+	private AssociationContainer assoc;
 	
 	/** Term enumerator */
 	private GOTermEnumerator termEnumerator;
 	
 	/** Slim variant of the graph */
-	public SlimDirectedGraphView<Term> slimGraph;
+	private SlimDirectedGraphView<Term> slimGraph;
 
 	/** An array of all items */
 	public ArrayList<ByteString> allItemList;
