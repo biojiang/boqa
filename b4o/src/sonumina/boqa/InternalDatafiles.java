@@ -1,4 +1,4 @@
-package sonumina.b4o;
+package sonumina.boqa;
 
 import java.io.File;
 import java.io.FileNotFoundException;

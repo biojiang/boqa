@@ -1,4 +1,4 @@
-package sonumina.b4o;
+package sonumina.boqa;
 
 import java.io.IOException;
 
@@ -12,7 +12,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import sonumina.b4o.benchmark.Benchmark;
+import sonumina.boqa.benchmark.Benchmark;
 
 /**
  * Main entry point of the BOQA benchmark.
@@ -32,7 +32,7 @@ public class BOQABenchmark
 	static private int SIZE_OF_SCORE_DISTRIBUTION = 250000;
 	static private String RESULT_BASE_NAME = "benchmark";
 	
-	static sonumina.b4o.calculation.BOQA b4o = new sonumina.b4o.calculation.BOQA();
+	static sonumina.boqa.calculation.BOQA b4o = new sonumina.boqa.calculation.BOQA();
 
 	/**
 	 * Parses the command line.

@@ -1,4 +1,4 @@
-package sonumina.b4o.benchmark;
+package sonumina.boqa.benchmark;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -18,9 +18,9 @@ import ontologizer.dotwriter.GODOTWriter;
 import ontologizer.go.Ontology;
 import ontologizer.go.Term;
 import ontologizer.go.TermID;
-import sonumina.b4o.calculation.BOQA;
-import sonumina.b4o.calculation.Observations;
-import sonumina.b4o.calculation.BOQA.Result;
+import sonumina.boqa.calculation.BOQA;
+import sonumina.boqa.calculation.Observations;
+import sonumina.boqa.calculation.BOQA.Result;
 import sonumina.math.graph.SlimDirectedGraphView;
 
 /**

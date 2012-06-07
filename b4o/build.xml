@@ -80,7 +80,7 @@
         <antcall target="build"/>
     </target>
     <target name="B4OBenchmark with Max 6">
-        <java classname="sonumina.b4o.BOQABenchmark" failonerror="true" fork="yes">
+        <java classname="sonumina.boqa.BOQABenchmark" failonerror="true" fork="yes">
             <jvmarg line="-Xmx1G"/>
             <arg line="-o ${workspace_loc}/b4o/data/human-phenotype-ontology.obo.gz -a ${workspace_loc}/b4o/data/phenotype_annotation.omim.orphanet.gz -m 6 -c"/>
             <classpath refid="b4o.classpath"/>

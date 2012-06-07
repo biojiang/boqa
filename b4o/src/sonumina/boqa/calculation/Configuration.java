@@ -1,4 +1,4 @@
-package sonumina.b4o.calculation;
+package sonumina.boqa.calculation;
 
 /**
  * Class to count the different cases.

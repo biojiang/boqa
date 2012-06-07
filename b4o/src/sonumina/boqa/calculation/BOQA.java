@@ -1,4 +1,4 @@
-package sonumina.b4o.calculation;
+package sonumina.boqa.calculation;
 
 import java.io.File;
 import java.io.FileInputStream;

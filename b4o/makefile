@@ -1,7 +1,7 @@
 #
 # Primitive makefile
 #
-BOQABENCHMARK=java -Xmx16G -cp bin:jars/commons-cli-1.2.jar sonumina.b4o.BOQABenchmark
+BOQABENCHMARK=java -Xmx16G -cp bin:jars/commons-cli-1.2.jar sonumina.boqa.BOQABenchmark
 SIZE_OF_SCORE_DISTRIBUTION=500000
 
 # Defines the directory where to place the results when

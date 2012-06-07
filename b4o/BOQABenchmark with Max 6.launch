@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/b4o/src/sonumina/b4o/BOQABenchmark.java"/>
+<listEntry value="/b4o/src/sonumina/boqa/BOQABenchmark.java"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
 </listAttribute>
-<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="sonumina.b4o.BOQABenchmark"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="sonumina.boqa.BOQABenchmark"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-o ${workspace_loc}/b4o/data/human-phenotype-ontology.obo.gz -a ${workspace_loc}/b4o/data/phenotype_annotation.omim.orphanet.gz -m 6 -c"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="b4o"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx1G"/>
