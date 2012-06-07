@@ -15,7 +15,7 @@ import org.apache.commons.cli.ParseException;
 import sonumina.b4o.benchmark.Benchmark;
 
 /**
- * Main entry point of the B4O benchmark.
+ * Main entry point of the BOQA benchmark.
  * 
  * @author Sebastian Bauer
  */
@@ -32,7 +32,7 @@ public class BOQABenchmark
 	static private int SIZE_OF_SCORE_DISTRIBUTION = 250000;
 	static private String RESULT_BASE_NAME = "benchmark";
 	
-	static sonumina.b4o.calculation.B4O b4o = new sonumina.b4o.calculation.B4O();
+	static sonumina.b4o.calculation.BOQA b4o = new sonumina.b4o.calculation.BOQA();
 
 	/**
 	 * Parses the command line.

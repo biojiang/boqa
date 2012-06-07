@@ -53,10 +53,10 @@ import sonumina.math.graph.SlimDirectedGraphView;
  * 
  * @author Sebastian Bauer
  */
-public class B4O
+public class BOQA
 {
 	/** Our logger */
-	private static Logger logger = Logger.getLogger(B4O.class.getCanonicalName());
+	private static Logger logger = Logger.getLogger(BOQA.class.getCanonicalName());
 
 	public Ontology graph;
 	public AssociationContainer assoc;
@@ -1215,7 +1215,7 @@ public class B4O
 	}
 
 	/**
-	 * Setups the B4O for the given ontology and associations.
+	 * Setups the BOQA for the given ontology and associations.
 	 * 
 	 * @param ontology
 	 * @param associations

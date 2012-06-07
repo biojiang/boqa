@@ -18,9 +18,9 @@ import ontologizer.dotwriter.GODOTWriter;
 import ontologizer.go.Ontology;
 import ontologizer.go.Term;
 import ontologizer.go.TermID;
-import sonumina.b4o.calculation.B4O;
+import sonumina.b4o.calculation.BOQA;
 import sonumina.b4o.calculation.Observations;
-import sonumina.b4o.calculation.B4O.Result;
+import sonumina.b4o.calculation.BOQA.Result;
 import sonumina.math.graph.SlimDirectedGraphView;
 
 /**
@@ -33,7 +33,7 @@ public class Benchmark
 {
 	private Ontology graph;
 	private SlimDirectedGraphView<Term> slimGraph;
-	private B4O b4o;
+	private BOQA b4o;
 
 	/** Verbose output */
 	private boolean VERBOSE;
@@ -255,10 +255,10 @@ public class Benchmark
 	 * @throws IOException
 	 */
 	@SuppressWarnings("unused")
-	public void benchmark(B4O b4o) throws InterruptedException, IOException
+	public void benchmark(BOQA b4o) throws InterruptedException, IOException
 	{
 		int i;
-		int numProcessors = B4O.getNumProcessors();
+		int numProcessors = BOQA.getNumProcessors();
 
 		/* TODO: Get rid of this ugliness */
 		this.b4o = b4o;
