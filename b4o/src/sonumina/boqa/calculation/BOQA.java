@@ -162,16 +162,13 @@ public class BOQA
 	private double ALPHA_GRID[] = new double[]{1e-10,0.0005,0.001,0.005,0.01};
 	private double BETA_GRID[] = new double[] {1e-10,0.005,0.01,0.05,0.1,0.2,0.4,0.8,0.9};
 	
-//	private final static int MAX_SAMPLES = 1;
+
 //	private static boolean CONSIDER_FREQUENCIES_ONLY = false;
-//	private final static String RESULT_NAME = "fnd.txt";
 //	private final static String [] evidenceCodes = null;
 //	private final static int SIZE_OF_SCORE_DISTRIBUTION = 250000;
 //	public static int maxTerms = -1;
 
-	private final int MAX_SAMPLES = 5;
 	private boolean CONSIDER_FREQUENCIES_ONLY = true;
-	private final String RESULT_NAME = "fnd-freq-only.txt";
 	private final String [] evidenceCodes = null;//new String[]{"PCS","ICE"};
 	private int SIZE_OF_SCORE_DISTRIBUTION = 250000;
 	private final int NUMBER_OF_BINS_IN_APPROXIMATED_SCORE_DISTRIBUTION = 10000;
