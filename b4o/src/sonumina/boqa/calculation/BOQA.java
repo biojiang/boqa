@@ -49,9 +49,20 @@ import sonumina.math.graph.SlimDirectedGraphView;
 
 
 /**
- * This is our class implementing the calculation. 
+ * This is core class implementing BOQA. Currently, it also implements
+ * other procedures based on semantic similarity measures but this is
+ * planned to be refactored.
+ * 
+ * In order to perform the algorithm, you need to setup a new BOQA
+ * object a ontology and associations via setup(). One can then use
+ * assignMarginals() on the observations to obtain marginal probabilities.
+ * 
+ * Refer to the BOQATest class for a working example usage.
  * 
  * @author Sebastian Bauer
+ * 
+ * @see setup, sonumina.boqa.tests.BOQATest
+ * 
  */
 public class BOQA
 {
@@ -587,6 +598,10 @@ public class BOQA
 		}
 	}
 	
+	/**
+	 * Indicates whether we want to measure the time of the algorithm.
+	 * Used for profiling.
+	 */
 	private static final boolean MEASURE_TIME = false;
 
 	private long timeDuration;
