@@ -1912,23 +1912,45 @@ public class BOQA
 		return f;
 	}
 
+	/**
+	 * This is a container for the results of the class.
+	 * 
+	 * @author Sebastian Bauer
+	 */
 	static public class Result
 	{
-		double [] marginals;
-		double [] marginalsIdeal;
-		double [] scores;
+		/** Contains the marginal probability for each item */
+		private double [] marginals;
+		
+		/** Contains the marginal probability for each item */
+		private double [] marginalsIdeal;
+		private double [] scores;
+		
+		/** Some statistics for each item (number of false-positives, etc. ) */
 		Configuration [] stats;
 		
+		/**
+		 * Get the score of the given item.
+		 * 
+		 * @param i
+		 * @return
+		 */
 		public double getScore(int i)
 		{
 			return scores[i];
 		}
 		
+		/**
+		 * Get the marginal probability of the given item.
+		 * 
+		 * @param i
+		 * @return
+		 */
 		public double getMarginal(int i)
 		{
 			return marginals[i];
 		}
-		
+
 		public double getMarginalIdeal(int i)
 		{
 			return marginalsIdeal[i];
