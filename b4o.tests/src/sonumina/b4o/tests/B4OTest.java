@@ -314,7 +314,7 @@ public class B4OTest
 							{
 								if (t.getName().equals(vt))
 								{
-									int idx = b4o.slimGraph.getVertexIndex(t);
+									int idx = b4o.getSlimGraph().getVertexIndex(t);
 									info.append("\\n" + b4o.getNumberOfItemsAnnotatedToTerm(idx) + " " + String.format("%g",b4o.terms2IC[idx]));
 									break;
 								}
@@ -336,8 +336,8 @@ public class B4OTest
 
 
 		System.out.println("Term Mapping");
-		for (int i=0;i<b4o.slimGraph.getNumberOfVertices();i++)
-			System.out.println(i + " ->  " + b4o.slimGraph.getVertex(i).getIDAsString());
+		for (int i=0;i<b4o.getSlimGraph().getNumberOfVertices();i++)
+			System.out.println(i + " ->  " + b4o.getSlimGraph().getVertex(i).getIDAsString());
 		
 		System.out.println("Item Mapping");
 		for (int i=0;i<b4o.allItemList.size();i++)
@@ -403,13 +403,13 @@ public class B4OTest
 		b4o.setup(df.graph, df.assoc);
 
 		/* This is older code which we keep for testing here */
-		int [][] micaForItem = new int[b4o.allItemList.size()][b4o.slimGraph.getNumberOfVertices()];
+		int [][] micaForItem = new int[b4o.allItemList.size()][b4o.getSlimGraph().getNumberOfVertices()];
 		for (int item = 0; item < b4o.allItemList.size(); item++)
 		{
 			/* The fixed set */
 			int [] t2 = b4o.items2DirectTerms[item];
 
-			for (int to = 0; to < b4o.slimGraph.getNumberOfVertices(); to++)
+			for (int to = 0; to < b4o.getSlimGraph().getNumberOfVertices(); to++)
 			{
 				double maxIC = Double.NEGATIVE_INFINITY;
 				int maxCommon = -1;
@@ -527,7 +527,7 @@ public class B4OTest
 
 		long start = System.nanoTime();
 		System.err.println("Calculating");
-		Result result = b4o.assignMarginals(o, false, 1);
+		b4o.assignMarginals(o, false, 1);
 		long end = System.nanoTime();
 
 		System.err.println(((end - start)/1000/1000) + "ms");
