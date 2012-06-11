@@ -7,7 +7,7 @@
 <listEntry value="1"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="sonumina.boqa.BOQABenchmark"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-o ${workspace_loc}/boqa/data/human-phenotype-ontology.obo.gz -a ${workspace_loc}/b4o/data/phenotype_annotation.omim.orphanet.gz -m 6 -c"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-o ${workspace_loc}/boqa/data/human-phenotype-ontology.obo.gz -a ${workspace_loc}/boqa/data/phenotype_annotation.omim.orphanet.gz -m 6 -c"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="boqa"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx1G"/>
 </launchConfiguration>
