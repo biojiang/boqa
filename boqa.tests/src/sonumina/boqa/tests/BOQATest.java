@@ -1,4 +1,4 @@
-package sonumina.b4o.tests;
+package sonumina.boqa.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -30,7 +30,7 @@ import sonumina.boqa.calculation.BOQA.Result;
 import sonumina.math.graph.AbstractGraph.DotAttributesProvider;
 import sonumina.math.graph.SlimDirectedGraphView;
 
-public class B4OTest
+public class BOQATest
 {
 	private static Datafiles hpo;
 	
