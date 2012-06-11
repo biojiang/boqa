@@ -115,8 +115,8 @@ public class WordNetParserTest
 		}
 
 		System.err.println("Constructed data set");
-		final BOQA b4o = new BOQA();
-		b4o.setup(ontology, assocs);
+		final BOQA boqa = new BOQA();
+		boqa.setup(ontology, assocs);
 		System.err.println("Setted up ontology and associations");
 		
 	}
