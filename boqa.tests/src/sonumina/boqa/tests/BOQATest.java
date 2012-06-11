@@ -37,7 +37,7 @@ public class BOQATest
 	@BeforeClass
 	public static void loadHPO() throws InterruptedException, IOException
 	{
-		hpo = new Datafiles("../b4o/data/human-phenotype-ontology.obo.gz","../b4o/data/phenotype_annotation.omim.gz");
+		hpo = new Datafiles("../boqa/data/human-phenotype-ontology.obo.gz","../boqa/data/phenotype_annotation.omim.gz");
 	}
 
 	/**
@@ -110,98 +110,98 @@ public class BOQATest
 	public void testMostSpecificTerms()
 	{
 		InternalDatafiles data = new InternalDatafiles();
-		BOQA b4o = new BOQA();
-		b4o.setConsiderFrequenciesOnly(false);
-		b4o.setCacheScoreDistribution(false);
-		b4o.setPrecalculateItemMaxs(false);
-		b4o.setPrecalculateScoreDistribution(false);
-		b4o.setup(data.graph, data.assoc);
+		BOQA boqa = new BOQA();
+		boqa.setConsiderFrequenciesOnly(false);
+		boqa.setCacheScoreDistribution(false);
+		boqa.setPrecalculateItemMaxs(false);
+		boqa.setPrecalculateScoreDistribution(false);
+		boqa.setup(data.graph, data.assoc);
 		
-		checkIntArrayContentsUnordered(new int[]{1,2},b4o.mostSpecificTerms(new int[]{0,1,2}));
-		checkIntArrayContentsUnordered(new int[]{9,10,11,12,13,14},b4o.mostSpecificTerms(new int[]{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}));
+		checkIntArrayContentsUnordered(new int[]{1,2},boqa.mostSpecificTerms(new int[]{0,1,2}));
+		checkIntArrayContentsUnordered(new int[]{9,10,11,12,13,14},boqa.mostSpecificTerms(new int[]{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}));
 	}
 	
 	/**
 	 * A helper function to test similarity values of the internal ontology.
 	 * 
-	 * @param b4o
+	 * @param boqa
 	 */
-	private void checkInternalSimValues(BOQA b4o)
+	private void checkInternalSimValues(BOQA boqa)
 	{
 		/* Common ancestors */
-		assertEquals(7,b4o.getCommonAncestorWithMaxIC(11,12));
-		assertTrue(b4o.getCommonAncestorWithMaxIC(9,11) == 4 || b4o.getCommonAncestorWithMaxIC(9,11) == 6);
+		assertEquals(7,boqa.getCommonAncestorWithMaxIC(11,12));
+		assertTrue(boqa.getCommonAncestorWithMaxIC(9,11) == 4 || boqa.getCommonAncestorWithMaxIC(9,11) == 6);
 		
 		/* Resnik */
-		assertEquals(0.223144,b4o.resScoreMaxAvg(new int[]{7}, new int[]{8}),0.001);
-		assertTrue(b4o.resScoreMaxAvg(new int[]{7}, new int[]{8}) == b4o.resScoreMaxAvg(new int[]{11}, new int[]{8}));
+		assertEquals(0.223144,boqa.resScoreMaxAvg(new int[]{7}, new int[]{8}),0.001);
+		assertTrue(boqa.resScoreMaxAvg(new int[]{7}, new int[]{8}) == boqa.resScoreMaxAvg(new int[]{11}, new int[]{8}));
 
 		/* Lin */
-		assertEquals(0.243529,b4o.linScoreMaxAvg(new int[]{7}, new int[]{8}),0.001);
-		assertEquals(1,b4o.linScoreMaxAvg(new int[]{12}, new int[]{12}),0.001);
-		assertEquals(1,b4o.linScoreMaxAvg(new int[]{0}, new int[]{0}),0.001);
+		assertEquals(0.243529,boqa.linScoreMaxAvg(new int[]{7}, new int[]{8}),0.001);
+		assertEquals(1,boqa.linScoreMaxAvg(new int[]{12}, new int[]{12}),0.001);
+		assertEquals(1,boqa.linScoreMaxAvg(new int[]{0}, new int[]{0}),0.001);
 		
 		/* JC */
-		assertEquals(0.42,b4o.jcScoreMaxAvg(new int[]{7}, new int[]{8}),0.001);
-		assertEquals(1,b4o.jcScoreMaxAvg(new int[]{12}, new int[]{12}),0.001);
-		assertEquals(1,b4o.jcScoreMaxAvg(new int[]{0}, new int[]{0}),0.001);
+		assertEquals(0.42,boqa.jcScoreMaxAvg(new int[]{7}, new int[]{8}),0.001);
+		assertEquals(1,boqa.jcScoreMaxAvg(new int[]{12}, new int[]{12}),0.001);
+		assertEquals(1,boqa.jcScoreMaxAvg(new int[]{0}, new int[]{0}),0.001);
 		
 		/* The follow to scores represent an example for avoiding similarity measure */
 		
 		/* The terms match the terms of the item */
-		assertEquals(0.9163, b4o.resScoreVsItem(new int[]{3,10}, 2), 0.001);
+		assertEquals(0.9163, boqa.resScoreVsItem(new int[]{3,10}, 2), 0.001);
 		
 		/* The terms don't match the terms of the item */
-		assertEquals(1.26286432, b4o.resScoreVsItem(new int[]{9,10}, 2), 0.001);
+		assertEquals(1.26286432, boqa.resScoreVsItem(new int[]{9,10}, 2), 0.001);
 		
 		/* The terms match the terms of the item */
-		assertEquals(1.26286432, b4o.resScoreVsItem(new int[]{12,9}, 0), 0.001);
+		assertEquals(1.26286432, boqa.resScoreVsItem(new int[]{12,9}, 0), 0.001);
 		
 		/* Some other values */
-		assertEquals(0.91629073, b4o.resScoreVsItem(new int[]{10}, 0), 0.001);
-		assertEquals(1.14733979, b4o.resScoreVsItem(new int[]{9,10,12}, 0), 0.001);
+		assertEquals(0.91629073, boqa.resScoreVsItem(new int[]{10}, 0), 0.001);
+		assertEquals(1.14733979, boqa.resScoreVsItem(new int[]{9,10,12}, 0), 0.001);
 
 
 		/* Now a bigger test */
 		
 		/* Item 2 */
-		boolean [] obs = new boolean[b4o.getSlimGraph().getNumberOfVertices()];
+		boolean [] obs = new boolean[boqa.getSlimGraph().getNumberOfVertices()];
 		int item = 2;
 		Observations o = new Observations();
 		o.observations = obs;
 		System.out.println("Testing item " + item);
 
-		for (int i=0;i<b4o.items2DirectTerms[item].length;i++)
+		for (int i=0;i<boqa.items2DirectTerms[item].length;i++)
 		{
-			int t=b4o.items2DirectTerms[item][i];
+			int t=boqa.items2DirectTerms[item][i];
 			obs[t] = true;
-			b4o.activateAncestors(t, obs);
+			boqa.activateAncestors(t, obs);
 		}
 		
 		System.out.println("Observations");
-		for (int i=0;i<b4o.getSlimGraph().getNumberOfVertices();i++)
+		for (int i=0;i<boqa.getSlimGraph().getNumberOfVertices();i++)
 			if (obs[i]) System.out.print(i + " ");
 		System.out.println();
 
-		Result resnikResult = b4o.resnikScore(obs, true, new Random(3));
-		Result linResult = b4o.linScore(obs, true, new Random(3));
-		Result jcResult = b4o.jcScore(obs, true, new Random(3));
-		Result fabnResult = b4o.assignMarginals(o, false);
+		Result resnikResult = boqa.resnikScore(obs, true, new Random(3));
+		Result linResult = boqa.linScore(obs, true, new Random(3));
+		Result jcResult = boqa.jcScore(obs, true, new Random(3));
+		Result fabnResult = boqa.assignMarginals(o, false);
 
 		System.out.println("Resnik");
-		for (int i=0;i<b4o.allItemList.size();i++)
+		for (int i=0;i<boqa.allItemList.size();i++)
 			System.out.println(i + "  p=" + resnikResult.getMarginal(i) + " score=" + resnikResult.getScore(i));
 
 		System.out.println("Lin");
-		for (int i=0;i<b4o.allItemList.size();i++)
+		for (int i=0;i<boqa.allItemList.size();i++)
 			System.out.println(i + "  p=" + linResult.getMarginal(i) + " score=" + linResult.getScore(i));
 
 		System.out.println("JC");
-		for (int i=0;i<b4o.allItemList.size();i++)
+		for (int i=0;i<boqa.allItemList.size();i++)
 			System.out.println(i + "  p=" + jcResult.getMarginal(i) + " score=" + jcResult.getScore(i));
 
 		System.out.println("FABN");
-		for (int i=0;i<b4o.allItemList.size();i++)
+		for (int i=0;i<boqa.allItemList.size();i++)
 			System.out.println(i + " marg=" + fabnResult.getMarginal(i) + " score=" + fabnResult.getScore(i));
 
 		double [] resnikP = new double[] { 0.64384, 0.843968, 0.15518, 0.844376, 0.68832 };
@@ -213,7 +213,7 @@ public class BOQATest
 		double [] fabnScores = new double[] { -0.9724346539489889, -1.3317577761951482, 2.2926928336673593, -0.6160410530454002, -0.6160410530454002 };
 		double [] fabnMarginals = new double[] { 0.032533088008779756, 0.022712933995512156, 0.8518284456000037, 0.046462766197852126, 0.046462766197852126 };
 
-		for (int i=0;i<b4o.allItemList.size();i++)
+		for (int i=0;i<boqa.allItemList.size();i++)
 		{
 			System.out.println(i);
 			assertEquals(resnikP[i], resnikResult.getMarginal(i), 0.05);
@@ -227,39 +227,39 @@ public class BOQATest
 		}
 
 		/* Item 3 */
-		obs = new boolean[b4o.getSlimGraph().getNumberOfVertices()];
+		obs = new boolean[boqa.getSlimGraph().getNumberOfVertices()];
 		item = 3;
 		o = new Observations();
 		o.observations = obs;
 
 		System.out.println("Testing item " + item);
 
-		for (int i=0;i<b4o.items2DirectTerms[item].length;i++)
+		for (int i=0;i<boqa.items2DirectTerms[item].length;i++)
 		{
-			int t=b4o.items2DirectTerms[item][i];
+			int t=boqa.items2DirectTerms[item][i];
 			obs[t] = true;
-			b4o.activateAncestors(t, obs);
+			boqa.activateAncestors(t, obs);
 		}
 		
-		resnikResult = b4o.resnikScore(obs, true, new Random(3));
-		linResult = b4o.linScore(obs, true, new Random(3));
-		jcResult = b4o.jcScore(obs, true, new Random(3));
-		fabnResult = b4o.assignMarginals(o, false);
+		resnikResult = boqa.resnikScore(obs, true, new Random(3));
+		linResult = boqa.linScore(obs, true, new Random(3));
+		jcResult = boqa.jcScore(obs, true, new Random(3));
+		fabnResult = boqa.assignMarginals(o, false);
 		
 		System.out.println("Resnik");
-		for (int i=0;i<b4o.allItemList.size();i++)
+		for (int i=0;i<boqa.allItemList.size();i++)
 			System.out.println(i + "  p=" + resnikResult.getMarginal(i) + " score=" + resnikResult.getScore(i));
 
 		System.out.println("Lin");
-		for (int i=0;i<b4o.allItemList.size();i++)
+		for (int i=0;i<boqa.allItemList.size();i++)
 			System.out.println(i + "  p=" + linResult.getMarginal(i) + " score=" + linResult.getScore(i));
 
 		System.out.println("JC");
-		for (int i=0;i<b4o.allItemList.size();i++)
+		for (int i=0;i<boqa.allItemList.size();i++)
 			System.out.println(i + "  p=" + jcResult.getMarginal(i) + " score=" + jcResult.getScore(i));
 
 		System.out.println("FABN");
-		for (int i=0;i<b4o.allItemList.size();i++)
+		for (int i=0;i<boqa.allItemList.size();i++)
 			System.out.println(i + " marg=" + fabnResult.getMarginal(i) + " score=" + fabnResult.getScore(i));
 
 		resnikScore = new double[]{0.11157177565710485,0.2231435513142097,0.2231435513142097,0.916290731874155,0.11157177565710485};
@@ -271,7 +271,7 @@ public class BOQATest
 		fabnScores = new double[]{-1.633587994564142,-1.633587994564142,-1.3091882336053455,2.196264120323024,-1.3063742210362417};
 		fabnMarginals = new double[]{0.019674959868555657,0.019674959868555657,0.027214407363261438,0.9061445759999325,0.027291096899695524};
 
-		for (int i=0;i<b4o.allItemList.size();i++)
+		for (int i=0;i<boqa.allItemList.size();i++)
 		{
 			System.out.println(i);
 			assertEquals(resnikP[i], resnikResult.getMarginal(i), 0.05);
@@ -286,20 +286,20 @@ public class BOQATest
 	}
 	
 	@Test
-	public void testB4OOnInternalOntology() throws FileNotFoundException
+	public void testBOQAOnInternalOntology() throws FileNotFoundException
 	{
 		final InternalDatafiles data = new InternalDatafiles();
 		assertEquals(15,data.graph.getNumberOfTerms());
 
-		final BOQA b4o = new BOQA();
-		b4o.setConsiderFrequenciesOnly(false);
-		b4o.setPrecalculateItemMaxs(true);
-		b4o.setCacheScoreDistribution(true);
-		b4o.setPrecalculateScoreDistribution(true);
-		b4o.setStoreScoreDistriubtion(false);
-		b4o.setTryLoadingScoreDistribution(false);
-		b4o.setMaxQuerySizeForCachedDistribution(4);
-		b4o.setup(data.graph, data.assoc);
+		final BOQA boqa = new BOQA();
+		boqa.setConsiderFrequenciesOnly(false);
+		boqa.setPrecalculateItemMaxs(true);
+		boqa.setCacheScoreDistribution(true);
+		boqa.setPrecalculateScoreDistribution(true);
+		boqa.setStoreScoreDistriubtion(false);
+		boqa.setTryLoadingScoreDistribution(false);
+		boqa.setMaxQuerySizeForCachedDistribution(4);
+		boqa.setup(data.graph, data.assoc);
 		
 		/* Write out the graph with ICs */
 		data.getGraphWithItems().writeDOT(new FileOutputStream("full-with-ics.dot"), new DotAttributesProvider<String>()
@@ -314,8 +314,8 @@ public class BOQATest
 							{
 								if (t.getName().equals(vt))
 								{
-									int idx = b4o.getSlimGraph().getVertexIndex(t);
-									info.append("\\n" + b4o.getNumberOfItemsAnnotatedToTerm(idx) + " " + String.format("%g",b4o.terms2IC[idx]));
+									int idx = boqa.getSlimGraph().getVertexIndex(t);
+									info.append("\\n" + boqa.getNumberOfItemsAnnotatedToTerm(idx) + " " + String.format("%g",boqa.terms2IC[idx]));
 									break;
 								}
 							}
@@ -336,90 +336,90 @@ public class BOQATest
 
 
 		System.out.println("Term Mapping");
-		for (int i=0;i<b4o.getSlimGraph().getNumberOfVertices();i++)
-			System.out.println(i + " ->  " + b4o.getSlimGraph().getVertex(i).getIDAsString());
+		for (int i=0;i<boqa.getSlimGraph().getNumberOfVertices();i++)
+			System.out.println(i + " ->  " + boqa.getSlimGraph().getVertex(i).getIDAsString());
 		
 		System.out.println("Item Mapping");
-		for (int i=0;i<b4o.allItemList.size();i++)
-			System.out.println(i + " -> " +b4o.allItemList.get(i));
+		for (int i=0;i<boqa.allItemList.size();i++)
+			System.out.println(i + " -> " +boqa.allItemList.get(i));
 
-		BOQA b4oNoPrecalc = new BOQA();
-		b4oNoPrecalc.setConsiderFrequenciesOnly(false);
-		b4oNoPrecalc.setPrecalculateItemMaxs(false);
-		b4oNoPrecalc.setCacheScoreDistribution(false);
-		b4oNoPrecalc.setPrecalculateScoreDistribution(false);
-		b4oNoPrecalc.setStoreScoreDistriubtion(false);
-		b4oNoPrecalc.setTryLoadingScoreDistribution(false);
-		b4oNoPrecalc.setMaxQuerySizeForCachedDistribution(4);
-		b4oNoPrecalc.setup(data.graph, data.assoc);
+		BOQA boqaNoPrecalc = new BOQA();
+		boqaNoPrecalc.setConsiderFrequenciesOnly(false);
+		boqaNoPrecalc.setPrecalculateItemMaxs(false);
+		boqaNoPrecalc.setCacheScoreDistribution(false);
+		boqaNoPrecalc.setPrecalculateScoreDistribution(false);
+		boqaNoPrecalc.setStoreScoreDistriubtion(false);
+		boqaNoPrecalc.setTryLoadingScoreDistribution(false);
+		boqaNoPrecalc.setMaxQuerySizeForCachedDistribution(4);
+		boqaNoPrecalc.setup(data.graph, data.assoc);
 		
-		checkInternalSimValues(b4o);
-		checkInternalSimValues(b4oNoPrecalc);
+		checkInternalSimValues(boqa);
+		checkInternalSimValues(boqaNoPrecalc);
 	}
 
 	@Test
 	public void testBenchmarkOnInternalOntology() throws InterruptedException, IOException
 	{
 		final InternalDatafiles data = new InternalDatafiles();
-		BOQA b4o = new BOQA();
-		b4o.setConsiderFrequenciesOnly(false);
-		b4o.setSizeOfScoreDistribution(1000);
-		b4o.setTryLoadingScoreDistribution(false);
-		b4o.setSimulationMaxTerms(3);
-		b4o.setMaxQuerySizeForCachedDistribution(6);
+		BOQA boqa = new BOQA();
+		boqa.setConsiderFrequenciesOnly(false);
+		boqa.setSizeOfScoreDistribution(1000);
+		boqa.setTryLoadingScoreDistribution(false);
+		boqa.setSimulationMaxTerms(3);
+		boqa.setMaxQuerySizeForCachedDistribution(6);
 
-		b4o.setup(data.graph, data.assoc);
+		boqa.setup(data.graph, data.assoc);
 		
 		Benchmark benchmark = new Benchmark();
 		benchmark.setResultBaseName("internal");
-		benchmark.benchmark(b4o);
+		benchmark.benchmark(boqa);
 	}
 
 
 	/**
 	 * A helper function to check similarity values for the HPO.
 	 * 
-	 * @param b4o
+	 * @param boqa
 	 */
-	private void checkHPOSimValues(final BOQA b4o)
+	private void checkHPOSimValues(final BOQA boqa)
 	{
-		assertEquals(0.006997929,b4o.resScoreMaxAvgVsItem(new int[]{10,12},4),0.000001);
-		assertEquals(0.162568779,b4o.resScoreMaxAvgVsItem(new int[]{101,1222,1300,2011},78),0.000001);
+		assertEquals(0.006997929,boqa.resScoreMaxAvgVsItem(new int[]{10,12},4),0.000001);
+		assertEquals(0.162568779,boqa.resScoreMaxAvgVsItem(new int[]{101,1222,1300,2011},78),0.000001);
 	}
 
 
 	@Test
 	public void testVsOldItemMax() throws InterruptedException, IOException
 	{
-		final BOQA b4o = new BOQA();
+		final BOQA boqa = new BOQA();
 
 		Datafiles df = hpo;
 
-		b4o.setConsiderFrequenciesOnly(false);
-		b4o.setCacheScoreDistribution(false);
-		b4o.setPrecalculateScoreDistribution(false);
-		b4o.setStoreScoreDistriubtion(false);
-		b4o.setPrecalculateItemMaxs(true);
-		b4o.setup(df.graph, df.assoc);
+		boqa.setConsiderFrequenciesOnly(false);
+		boqa.setCacheScoreDistribution(false);
+		boqa.setPrecalculateScoreDistribution(false);
+		boqa.setStoreScoreDistriubtion(false);
+		boqa.setPrecalculateItemMaxs(true);
+		boqa.setup(df.graph, df.assoc);
 
 		/* This is older code which we keep for testing here */
-		int [][] micaForItem = new int[b4o.allItemList.size()][b4o.getSlimGraph().getNumberOfVertices()];
-		for (int item = 0; item < b4o.allItemList.size(); item++)
+		int [][] micaForItem = new int[boqa.allItemList.size()][boqa.getSlimGraph().getNumberOfVertices()];
+		for (int item = 0; item < boqa.allItemList.size(); item++)
 		{
 			/* The fixed set */
-			int [] t2 = b4o.items2DirectTerms[item];
+			int [] t2 = boqa.items2DirectTerms[item];
 
-			for (int to = 0; to < b4o.getSlimGraph().getNumberOfVertices(); to++)
+			for (int to = 0; to < boqa.getSlimGraph().getNumberOfVertices(); to++)
 			{
 				double maxIC = Double.NEGATIVE_INFINITY;
 				int maxCommon = -1;
 
 				for (int ti : t2)
 				{
-					int common = b4o.getCommonAncestorWithMaxIC(to, ti);
-					if (b4o.terms2IC[common] > maxIC)
+					int common = boqa.getCommonAncestorWithMaxIC(to, ti);
+					if (boqa.terms2IC[common] > maxIC)
 					{
-						maxIC = b4o.terms2IC[common];
+						maxIC = boqa.terms2IC[common];
 						maxCommon = common;
 					}
 				}
@@ -430,49 +430,49 @@ public class BOQATest
 		/* Now the test */
 		for (int i=0;i<micaForItem.length;i++)
 			for (int j=0;j<micaForItem[i].length;j++)
-				assertEquals(b4o.terms2IC[micaForItem[i][j]],b4o.resnikTermSim.maxScoreForItem[i][j],0.00001);
+				assertEquals(boqa.terms2IC[micaForItem[i][j]],boqa.resnikTermSim.maxScoreForItem[i][j],0.00001);
 
-		checkHPOSimValues(b4o);
+		checkHPOSimValues(boqa);
 	}
 	
 	@Test
 	public void testMostSpecificOnHPO() throws InterruptedException, IOException
 	{
-		final BOQA b4o = new BOQA();
+		final BOQA boqa = new BOQA();
 
-		b4o.setConsiderFrequenciesOnly(false);
-		b4o.setCacheScoreDistribution(false);
-		b4o.setPrecalculateScoreDistribution(false);
-		b4o.setStoreScoreDistriubtion(false);
-		b4o.setPrecalculateItemMaxs(false);
-		b4o.setSimulationMaxTerms(-1);		
-		b4o.setup(hpo.graph, hpo.assoc);
+		boqa.setConsiderFrequenciesOnly(false);
+		boqa.setCacheScoreDistribution(false);
+		boqa.setPrecalculateScoreDistribution(false);
+		boqa.setStoreScoreDistriubtion(false);
+		boqa.setPrecalculateItemMaxs(false);
+		boqa.setSimulationMaxTerms(-1);		
+		boqa.setup(hpo.graph, hpo.assoc);
 
 		/* Check, mostSpecifc function */
 		for (int i=0;i<5000;i++)
 		{
 			Random rnd = new Random(System.currentTimeMillis());
 			
-			int item = rnd.nextInt(b4o.allItemList.size());
+			int item = rnd.nextInt(boqa.allItemList.size());
 			
-			Observations obs = b4o.generateObservations(item, rnd);
+			Observations obs = boqa.generateObservations(item, rnd);
 			BOQA.IntArray sparse = new BOQA.IntArray(obs.observations);
-			int [] mst = b4o.mostSpecificTerms(sparse.get());
+			int [] mst = boqa.mostSpecificTerms(sparse.get());
 
 			/* Get full observation according to mostSpecificTerms() */
-			boolean [] actualObservations = new boolean[b4o.getSlimGraph().getNumberOfVertices()];
+			boolean [] actualObservations = new boolean[boqa.getSlimGraph().getNumberOfVertices()];
 			for (int t : mst)
 			{
-				for (i = 0;i<b4o.term2Ancestors[t].length;i++)
-					actualObservations[b4o.term2Ancestors[t][i]] = true;
+				for (i = 0;i<boqa.term2Ancestors[t].length;i++)
+					actualObservations[boqa.term2Ancestors[t][i]] = true;
 			}
 			
 			/* Get full observations according to source array */
-			boolean [] expectedObservations = new boolean[b4o.getSlimGraph().getNumberOfVertices()];
+			boolean [] expectedObservations = new boolean[boqa.getSlimGraph().getNumberOfVertices()];
 			for (int t : sparse.get())
 			{
-				for (i = 0;i<b4o.term2Ancestors[t].length;i++)
-					expectedObservations[b4o.term2Ancestors[t][i]] = true;
+				for (i = 0;i<boqa.term2Ancestors[t].length;i++)
+					expectedObservations[boqa.term2Ancestors[t][i]] = true;
 			}
 
 			for (i=0;i<actualObservations.length;i++)
@@ -485,9 +485,9 @@ public class BOQATest
 	{
 		Random rnd = new Random(2);
 
-		final BOQA b4o = new BOQA();
+		final BOQA boqa = new BOQA();
 
-		OBOParser hpoParser = new OBOParser("../b4o/data/human-phenotype-ontology.obo.gz");
+		OBOParser hpoParser = new OBOParser("../boqa/data/human-phenotype-ontology.obo.gz");
 		hpoParser.doParse();
 		TermContainer tc = new TermContainer(hpoParser.getTermMap(),hpoParser.getFormatVersion(),hpoParser.getDate());
 		Ontology ontology = new Ontology(tc);
@@ -515,19 +515,19 @@ public class BOQATest
 		}
 
 		System.err.println("Constructed data set");
-		b4o.setConsiderFrequenciesOnly(false);
-		b4o.setPrecalculateScoreDistribution(false);
-		b4o.setCacheScoreDistribution(false);
-		b4o.setPrecalculateItemMaxs(false);
-		b4o.setup(ontology, assocs);
+		boqa.setConsiderFrequenciesOnly(false);
+		boqa.setPrecalculateScoreDistribution(false);
+		boqa.setCacheScoreDistribution(false);
+		boqa.setPrecalculateItemMaxs(false);
+		boqa.setup(ontology, assocs);
 		System.err.println("Setted up ontology and associations");
 
 		Observations o = new Observations();
-		o.observations = new boolean[b4o.getOntology().getNumberOfTerms()];
+		o.observations = new boolean[boqa.getOntology().getNumberOfTerms()];
 
 		long start = System.nanoTime();
 		System.err.println("Calculating");
-		b4o.assignMarginals(o, false, 1);
+		boqa.assignMarginals(o, false, 1);
 		long end = System.nanoTime();
 
 		System.err.println(((end - start)/1000/1000) + "ms");
