@@ -42,3 +42,12 @@ build:
 .PHONY: install
 install:
 	cp *_result.RObj *_param.txt *_summary.txt $(DESTDIR)
+
+.PHONY: dist
+dist:
+	rm -Rf /tmp/boqa-dist
+	mkdir -p /tmp/boqa-dist/boqa /tmp/boqa-dist/boqa/boqa.tests
+	cp -Rp .classpath .project makefile build.xml README data src ontologizer.src jars /tmp/boqa-dist/boqa
+	cp -Rp ../boqa.tests /tmp/boqa-dist/
+	find /tmp/boqa-dist/  -depth  -type d  -path *.svn* -exec rm -Rf {} ';'
+	tar c -C /tmp boqa-dist  | bzip2 >boqa-dist.tar.gz
