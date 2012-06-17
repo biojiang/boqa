@@ -3223,6 +3223,17 @@ public class BOQA
 	}
 
 	/**
+	 * Returns the index of the given term.
+	 * 
+	 * @param t
+	 * @return
+	 */
+	public int getTermIndex(Term t)
+	{
+		return slimGraph.getVertexIndex(t);
+	}
+	
+	/**
 	 * Returns the ontology.
 	 * 
 	 * @return
