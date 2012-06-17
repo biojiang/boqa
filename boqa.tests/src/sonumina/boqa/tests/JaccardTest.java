@@ -20,9 +20,6 @@ public class JaccardTest
 		boqa.setPrecalculateScoreDistribution(false);
 		boqa.setup(data.graph, data.assoc);
 
-		for (Term t : data.graph)
-			System.out.println(t.getName() + " " + data.graph.getSlimGraphView().getVertexIndex(t));
-		
 		Assert.assertEquals(1.0, boqa.jaccard(0, 0),0.0001);
 		Assert.assertEquals(1.0, boqa.jaccard(0, 1),0.0001);
 		Assert.assertEquals(1.0, boqa.jaccard(1, 1),0.0001);
@@ -33,6 +30,5 @@ public class JaccardTest
 		Assert.assertEquals(0.0, boqa.jaccard(10, 11),0.0001);
 		Assert.assertEquals(0.6, boqa.jaccard(3, 4),0.0001);
 		Assert.assertEquals(0.6, boqa.jaccard(4, 3),0.0001);
-
 	}
 }
