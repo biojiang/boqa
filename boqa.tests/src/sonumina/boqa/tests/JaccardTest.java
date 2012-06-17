@@ -2,8 +2,6 @@ package sonumina.boqa.tests;
 
 import junit.framework.Assert;
 
-import ontologizer.go.Term;
-
 import org.junit.Test;
 
 import sonumina.boqa.InternalDatafiles;
