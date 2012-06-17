@@ -1909,6 +1909,16 @@ public class BOQA
 	}
 	
 	/**
+	 * Return the IC of term i
+	 * @param i
+	 * @return
+	 */
+	public double getIC(int i)
+	{
+		return terms2IC[i];
+	}
+	
+	/**
 	 * Converts the frequency string to a double value.
 	 * 
 	 * @param freq
