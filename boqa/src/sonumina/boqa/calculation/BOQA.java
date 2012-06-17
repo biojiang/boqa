@@ -2252,7 +2252,7 @@ public class BOQA
 		
 		tt1a.retainAll(tt2a);
 
-		return (double)tt1a.size() / tt2a.size();
+		return (double)tt1a.size() / union.size();
 	}
 	
 	/**
