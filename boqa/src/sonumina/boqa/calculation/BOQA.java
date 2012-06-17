@@ -2256,6 +2256,18 @@ public class BOQA
 	}
 	
 	/**
+	 * Returns the term similarity according to Mathur and Dinakarpadnian.
+	 *  
+	 * @param t1
+	 * @param t2
+	 * @return
+	 */
+	public double mbTermSim(int t1, int t2)
+	{
+		return jaccard(t1, t2) * (terms2IC[t1] + terms2IC[t2])/2;
+	}
+	
+	/**
 	 * Returns a minimal length array of terms of which the induced graph
 	 * is the same as of the given terms. These are the leaf terms.
 	 * 
