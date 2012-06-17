@@ -51,6 +51,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
@@ -191,6 +192,9 @@ public class BOQA
 
 	/** Contains the term with maximum common ancestor of two terms */
 	private int micaMatrix[][];
+
+	/** Contains the jaccard index */
+	private double jaccardMatrix[][];
 
 	/** Contains the query cache, needs to be synched when accessed */
 	private QuerySets queryCache;
@@ -2217,6 +2221,38 @@ public class BOQA
 		}
 		
 		return bestTerm;
+	}
+	
+	/**
+	 * Returns the jaccard index of the given two terms.
+	 * 
+	 * @param t1
+	 * @param t2
+	 * @return
+	 */
+	public double jaccard(int t1, int t2)
+	{
+		if (t1 == t2)
+			return 1;
+
+		if (jaccardMatrix != null)
+		{
+			if (t1 < t2)
+				return jaccardMatrix[t1][t2 - t1 - 1];
+			else 
+				return jaccardMatrix[t2][t1 - t2 - 1];
+		}
+
+		Term tt1 = slimGraph.getVertex(t1);
+		Term tt2 = slimGraph.getVertex(t2);
+		HashSet<ByteString> tt1a = new HashSet<ByteString>(termEnumerator.getAnnotatedGenes(tt1.getID()).totalAnnotated);
+		HashSet<ByteString> tt2a = new HashSet<ByteString>(termEnumerator.getAnnotatedGenes(tt2.getID()).totalAnnotated);
+		HashSet<ByteString> union = new HashSet<ByteString>(tt1a);
+		union.addAll(tt2a);
+		
+		tt1a.retainAll(tt2a);
+
+		return (double)tt1a.size() / tt2a.size();
 	}
 	
 	/**
