@@ -2264,19 +2264,7 @@ public class BOQA
 
 		return (double)tt1a.size() / union.size();
 	}
-	
-	/**
-	 * Returns the term similarity according to Mathur and Dinakarpadnian.
-	 *  
-	 * @param t1
-	 * @param t2
-	 * @return
-	 */
-	public double mbTermSim(int t1, int t2)
-	{
-		return jaccard(t1, t2) * (terms2IC[t1] + terms2IC[t2])/2;
-	}
-	
+
 	/**
 	 * Returns a minimal length array of terms of which the induced graph
 	 * is the same as of the given terms. These are the leaf terms.
@@ -2936,6 +2924,68 @@ public class BOQA
 		return simScore(observations, pval, jcTermSim, rnd);
 	}
 
+	
+	/**
+	 * Returns the term similarity according to Mathur and Dinakarpadnian.
+	 *  
+	 * @param t1 term 1
+	 * @param t2 term 2
+	 * @return
+	 */
+	public double mbTermSim(int t1, int t2)
+	{
+		return jaccard(t1, t2) * (terms2IC[t1] + terms2IC[t2])/2;
+	}
+
+	/**
+	 * Returns the msim according to Mathur and Dinakarpadnian, i.e.,
+	 * the maximum simimlarity between t1 and all of tl2.
+	 * 
+	 * @param t1
+	 * @param tl2
+	 * @return
+	 */
+	public double msim(int t1, int tl2[])
+	{
+		double s=0.0;
+		for (int j=0;j<tl2.length;j++)
+		{
+			double snew = mbTermSim(t1,tl2[j]);
+			if (snew > 0.0) s = snew;
+		}
+		return s;
+	}
+
+	/**
+	 * Returns the unsymetric mbsim according to
+	 * Mathur and Dinakarpadnian.
+	 * 
+	 * @param tl1
+	 * @param tl2
+	 * @return
+	 */
+	public double mbsimUnsym(int tl1[], int tl2[])
+	{
+		double s = 0.0;
+		for (int i=0;i<tl1.length;i++)
+			s += msim(tl1[i],tl2);
+
+		return s / tl1.length;
+	}
+
+	/**
+	 * Returns (symetric) mbsim according to Mathur and
+	 * Dinakarpadnian.
+	 * 
+	 * @param tl1
+	 * @param tl2
+	 * @return
+	 */
+	public double mbsim(int tl1[], int tl2[])
+	{
+		return (mbsimUnsym(tl1, tl2) + mbsimUnsym(tl2, tl1)) / 2;
+	}
+	
 	/** Lock for randomized queries */
 	private ReentrantReadWriteLock queriesLock = new ReentrantReadWriteLock();
 

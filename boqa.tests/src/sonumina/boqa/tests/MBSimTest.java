@@ -28,5 +28,11 @@ public class MBSimTest
 		Assert.assertEquals(0.6*(-Math.log(4./5) - Math.log(4./5))/2, boqa.mbTermSim(3, 4),0.0001);
 		Assert.assertEquals(0.5*(-Math.log(1./5) - Math.log(2./5))/2, boqa.mbTermSim(9, 12),0.0001);
 		Assert.assertEquals(0.5*(-Math.log(1./5) - Math.log(2./5))/2, boqa.mbTermSim(12, 9),0.0001);
+		
+		
+		Assert.assertEquals(0.6*(-Math.log(4./5) - Math.log(4./5))/2, boqa.mbsim(new int[]{3}, new int[]{4}),0.0001);
+		Assert.assertEquals(0.5*(-Math.log(1./5) - Math.log(2./5))/2, boqa.mbsim(new int[]{9}, new int[]{12}),0.0001);
+		Assert.assertEquals(0.5*(-Math.log(1./5) - Math.log(2./5))/2, boqa.mbsim(new int[]{12}, new int[]{9}),0.0001);
+		
 	}
 }
