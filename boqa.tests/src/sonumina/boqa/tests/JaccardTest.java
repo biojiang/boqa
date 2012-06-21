@@ -30,12 +30,13 @@ public class JaccardTest
 		Assert.assertEquals(0.6, boqa.jaccard(4, 3),0.0001);
 		Assert.assertEquals(0.25, boqa.jaccard(10, 3),0.0001);
 		Assert.assertEquals(0.25, boqa.jaccard(3, 10),0.0001);
-		Assert.assertEquals(0.25, boqa.jaccard(3, 11),0.0001);
-		Assert.assertEquals(0.2, boqa.jaccard(3, 12),0.0001);
-		Assert.assertEquals(0.25, boqa.jaccard(3, 10),0.0001);
 
 		Assert.assertEquals(0.25, boqa.jaccard(3, 11),0.0001);
 		Assert.assertEquals(0.2, boqa.jaccard(3, 12),0.0001);
 		Assert.assertEquals(0.5, boqa.jaccard(3, 13),0.0001);
+		
+		Assert.assertEquals(0.0,boqa.jaccard(10, 11),0.0001);
+		Assert.assertEquals(0.0,boqa.jaccard(10, 12),0.0001);
+		Assert.assertEquals(0.0,boqa.jaccard(10, 13),0.0001);
 	}
 }

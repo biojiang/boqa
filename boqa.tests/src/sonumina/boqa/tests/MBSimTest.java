@@ -29,23 +29,35 @@ public class MBSimTest
 		Assert.assertEquals(0.5*(-Math.log(1./5) - Math.log(2./5))/2, boqa.mbTermSim(9, 12),0.0001);
 		Assert.assertEquals(0.5*(-Math.log(1./5) - Math.log(2./5))/2, boqa.mbTermSim(12, 9),0.0001);
 		Assert.assertEquals(0.25*(-Math.log(4./5) - Math.log(1./5))/2, boqa.mbTermSim(3, 10),0.0001);
+		Assert.assertEquals(0.6*(-Math.log(4./5) - Math.log(4./5))/2, boqa.mbsim(new int[]{3}, new int[]{4}),0.0001);
+		Assert.assertEquals(0.5*(-Math.log(1./5) - Math.log(2./5))/2, boqa.mbsim(new int[]{9}, new int[]{12}),0.0001);
+		Assert.assertEquals(0.5*(-Math.log(1./5) - Math.log(2./5))/2, boqa.mbsim(new int[]{12}, new int[]{9}),0.0001);
+
+		/* Larger test */
 
 		Assert.assertEquals(0.25*(-Math.log(4./5) - Math.log(1./5))/2, boqa.mbTermSim(3, 11),0.0001);
 		Assert.assertEquals(0.2*(-Math.log(4./5) - Math.log(2./5))/2, boqa.mbTermSim(3, 12),0.0001);
 		Assert.assertEquals(0.5*(-Math.log(4./5) - Math.log(2./5))/2, boqa.mbTermSim(3, 13),0.0001);
-
 		/* Maximum of the three previous ones */
 		Assert.assertEquals(0.5*(-Math.log(4./5) - Math.log(2./5))/2, boqa.msim(3, new int[]{11,12,13}),0.0001);
 
-		System.out.println(boqa.mbTermSim(10, 11));
-		System.out.println(boqa.mbTermSim(10, 12));
-		System.out.println(boqa.mbTermSim(10, 13));
+		Assert.assertEquals(0.0,boqa.mbTermSim(10, 11),0.0001);
+		Assert.assertEquals(0.0,boqa.mbTermSim(10, 12),0.0001);
+		Assert.assertEquals(0.0,boqa.mbTermSim(10, 13),0.0001);
+		/* Maximum of the three previous ones */
+		Assert.assertEquals(0, boqa.msim(10, new int[]{11,12,13}),0.0001);
 
-		System.out.println(boqa.mbsimUnsym(new int[]{3,10}, new int[]{11,12,13}));
+		/* 0.1424292853985456 */
+		Assert.assertEquals(0.5*0.5*(-Math.log(4./5) - Math.log(2./5))/2, boqa.mbsimUnsym(new int[]{3,10}, new int[]{11,12,13}),0.0001);
+
+		/* The other part */
+		Assert.assertEquals(0.25*(-Math.log(4./5) - Math.log(1./5))/2, boqa.msim(11, new int[]{3,10}),0.0001);
+		Assert.assertEquals(0.2*(-Math.log(4./5) - Math.log(2./5))/2, boqa.msim(12, new int[]{3,10}),0.0001);
+		Assert.assertEquals(0.5*(-Math.log(4./5) - Math.log(2./5))/2, boqa.msim(13, new int[]{3,10}),0.0001);
+
 		
-		Assert.assertEquals(0.6*(-Math.log(4./5) - Math.log(4./5))/2, boqa.mbsim(new int[]{3}, new int[]{4}),0.0001);
-		Assert.assertEquals(0.5*(-Math.log(1./5) - Math.log(2./5))/2, boqa.mbsim(new int[]{9}, new int[]{12}),0.0001);
-		Assert.assertEquals(0.5*(-Math.log(1./5) - Math.log(2./5))/2, boqa.mbsim(new int[]{12}, new int[]{9}),0.0001);
+		System.out.println(boqa.mbsimUnsym(new int[]{11,12,13}, new int[]{3,10}));
+		
 		
 		
 	}
