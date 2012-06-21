@@ -2986,6 +2986,46 @@ public class BOQA
 		return (mbsimUnsym(tl1, tl2) + mbsimUnsym(tl2, tl1)) / 2;
 	}
 	
+	/**
+	 * Makes the calculation according to Mathur and
+	 * Dinakarpadnian. We handle the observations as an
+	 * item and compare it to all other items.
+	 * 
+	 * @param observations the input observations.
+	 * @param pval to be set to true if significance should be determined
+	 * @param rnd the random source
+	 * 
+	 * @return
+	 */
+	public Result mbScore(boolean [] observations)
+	{
+		int [] observedTerms = getMostSpecificTermsSparse(observations);
+		
+		Result res = new Result();
+		res.scores = new double[allItemList.size()];
+		res.marginals = new double[allItemList.size()];
+
+		long startTime = System.currentTimeMillis();
+		long lastTime = startTime;
+		
+		for (int i = 0;i<allItemList.size();i++)
+		{
+			long time = System.currentTimeMillis();
+
+			if (time - lastTime > 5000)
+			{
+				System.out.println((time - startTime) + "ms " + i / (double)allItemList.size());
+				lastTime = time;
+			}
+
+			/* Determine and remember the plain score */
+			double score = mbsim(observedTerms, items2DirectTerms[i]);
+			res.scores[i] = score;
+		}
+		return res;
+	}
+
+	
 	/** Lock for randomized queries */
 	private ReentrantReadWriteLock queriesLock = new ReentrantReadWriteLock();
 
