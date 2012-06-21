@@ -95,6 +95,7 @@ public class Benchmark
 		Result resnik;
 		Result lin;
 		Result jc;
+		Result mb;
 	}
 	
 	/**
@@ -146,6 +147,7 @@ public class Benchmark
 		id.resnik = boqa.resnikScore(obs.observations, true, rnd);
 		id.lin = boqa.linScore(obs.observations, true, rnd);
 		id.jc = boqa.jcScore(obs.observations, true, rnd);
+		id.mb = boqa.mbScore(obs.observations);
 		
 		/******** The rest is for debugging purposes ********/
 		if (VERBOSE || provideGraph)
@@ -368,7 +370,7 @@ public class Benchmark
 		load.append("\"" + new File(RESULT_NAME).getAbsolutePath() + "\", ");
 		load.append("colClasses=c(\"integer\",\"integer\",rep(\"numeric\",12),\"integer\"),h=F");
 		load.append(")");
-		load.append("\n colnames(d)<-c(\"run\",\"label\",\"score\",\"marg\",\"marg.ideal\", \"score.freq\",\"marg.freq\", \"marg.freq.ideal\", \"resnik.avg\", \"resnik.avg.p\", \"lin.avg\", \"lin.avg.p\", \"jc.avg\", \"jc.avg.p\", \"freq\");");
+		load.append("\n colnames(d)<-c(\"run\",\"label\",\"score\",\"marg\",\"marg.ideal\", \"score.freq\",\"marg.freq\", \"marg.freq.ideal\", \"resnik.avg\", \"resnik.avg.p\", \"lin.avg\", \"lin.avg.p\", \"jc.avg\", \"jc.avg.p\", \"mb\", \"freq\");");
 		load.append("\n return (d);");
 		load.append("\n}\n");
 		load.append("boqa.name<-\"");
@@ -436,6 +438,8 @@ public class Benchmark
 							resultBuilder.append(store.jc.getScore(j));
 							resultBuilder.append("\t");
 							resultBuilder.append(store.jc.getMarginal(j));
+							resultBuilder.append("\t");
+							resultBuilder.append(store.mb.getScore(j));
 							resultBuilder.append("\t");
 							resultBuilder.append(Benchmark.this.boqa.hasItemFrequencies(item)?1:0);
 							resultBuilder.append("\n");
