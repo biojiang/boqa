@@ -51,14 +51,14 @@ public class MBSimTest
 		Assert.assertEquals(0.5*0.5*(-Math.log(4./5) - Math.log(2./5))/2, boqa.mbsimUnsym(new int[]{3,10}, new int[]{11,12,13}),0.0001);
 
 		/* The other part */
-		Assert.assertEquals(0.25*(-Math.log(4./5) - Math.log(1./5))/2, boqa.msim(11, new int[]{3,10}),0.0001);
-		Assert.assertEquals(0.2*(-Math.log(4./5) - Math.log(2./5))/2, boqa.msim(12, new int[]{3,10}),0.0001);
-		Assert.assertEquals(0.5*(-Math.log(4./5) - Math.log(2./5))/2, boqa.msim(13, new int[]{3,10}),0.0001);
+		double r1 = 0.25*(-Math.log(4./5) - Math.log(1./5))/2;
+		double r2 = 0.2*(-Math.log(4./5) - Math.log(2./5))/2;
+		double r3 = 0.5*(-Math.log(4./5) - Math.log(2./5))/2;
+		Assert.assertEquals(r1, boqa.msim(11, new int[]{3,10}),0.0001);
+		Assert.assertEquals(r2, boqa.msim(12, new int[]{3,10}),0.0001);
+		Assert.assertEquals(r3, boqa.msim(13, new int[]{3,10}),0.0001);
+		Assert.assertEquals((r1 + r2 + r3)/3, boqa.mbsimUnsym(new int[]{11,12,13}, new int[]{3,10}), 0.0001);
 
-		
-		System.out.println(boqa.mbsimUnsym(new int[]{11,12,13}, new int[]{3,10}));
-		
-		
-		
+		Assert.assertEquals((0.1424292853985456 + 0.20929156069482216)/2,boqa.mbsim(new int[]{11,12,13}, new int[]{3,10}),0.0001);
 	}
 }
