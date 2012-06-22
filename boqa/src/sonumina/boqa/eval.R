@@ -151,7 +151,7 @@ v<-matrix(c("marg","BN", T,
 	"lin.avg.p", "Lin P", F,
 	"jc.avg", "JC",T,
 	"jc.avg.p", "JC P", F,
-	"mb", "MB", F),ncol=3,byrow=T)
+	"mb", "MB", T),ncol=3,byrow=T)
 
 boqa.name.robj<-paste(boqa.base.name,"RObj",sep=".")
 boqa.name.result.robj<-paste(boqa.base.name,"_result.RObj",sep="")
