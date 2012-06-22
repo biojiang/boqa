@@ -368,7 +368,7 @@ public class Benchmark
 		BufferedWriter load = new BufferedWriter(new FileWriter(RESULT_NAME.split("\\.")[0]+ "_load.R"));
 		load.append("boqa.load.data<-function() {\n d<-read.table(");
 		load.append("\"" + new File(RESULT_NAME).getAbsolutePath() + "\", ");
-		load.append("colClasses=c(\"integer\",\"integer\",rep(\"numeric\",12),\"integer\"),h=F");
+		load.append("colClasses=c(\"integer\",\"integer\",rep(\"numeric\",13),\"integer\"),h=F");
 		load.append(")");
 		load.append("\n colnames(d)<-c(\"run\",\"label\",\"score\",\"marg\",\"marg.ideal\", \"score.freq\",\"marg.freq\", \"marg.freq.ideal\", \"resnik.avg\", \"resnik.avg.p\", \"lin.avg\", \"lin.avg.p\", \"jc.avg\", \"jc.avg.p\", \"mb\", \"freq\");");
 		load.append("\n return (d);");
