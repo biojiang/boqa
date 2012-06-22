@@ -227,10 +227,18 @@ print(sprintf("tp=%d tp+fp=%d ppv=%g",avg.p.tp,avg.p.positives,avg.p.tp/avg.p.po
 #col<-c("red","blue","cyan","green","gray","orange","magenta", "black")
 col<-rainbow(length(res.list))
 
+
+#
+# Output basic figures. They are generated slightly different in the
+# manuscript but the data is the same.
+#
+
+# Precision/Recall Plot
+
 pdf(paste(boqa.base.name,"-precall.pdf",sep=""))
 
 plot.new()
-plot.window(xlim=c(0,1),ylim=c(0,1),xlab="Precision")
+plot.window(xlim=c(0,1),ylim=c(0,1),xlab="Precision",ylab="Recall")
 axis(1)
 axis(2)
 box()
@@ -238,6 +246,26 @@ for (i in 1:length(res.list))
 {
 	lines(res.list[[i]]$recall.lines,res.list[[i]]$prec.lines,type="l",col=col[i])
 	points(res.list[[i]]$recall.dots,res.list[[i]]$prec.dots,pch=i,col=col[i])
+}
+
+legend(x="bottomleft",as.character(lapply(res.list,function(x) x$name)),col=col,lty=1,pch=1:length(res.list),cex=0.9)
+
+dev.off()
+
+
+# ROC plot
+
+pdf(paste(boqa.base.name,"-roc.pdf",sep=""))
+
+plot.new()
+plot.window(xlim=c(0,1),ylim=c(0,1),xlab="True Positive Rate",ylab="False Positive Rate")
+axis(1)
+axis(2)
+box()
+for (i in 1:length(res.list))
+{
+	lines(res.list[[i]]$fpr.lines,res.list[[i]]$tpr.lines,type="l",col=col[i])
+	points(res.list[[i]]$fpr.dots,res.list[[i]]$tpr.dots,pch=i,col=col[i])
 }
 
 legend(x="bottomleft",as.character(lapply(res.list,function(x) x$name)),col=col,lty=1,pch=1:length(res.list),cex=0.9)
