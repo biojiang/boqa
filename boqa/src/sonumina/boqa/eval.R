@@ -268,6 +268,6 @@ for (i in 1:length(res.list))
 	points(res.list[[i]]$fpr.dots,res.list[[i]]$tpr.dots,pch=i,col=col[i])
 }
 
-legend(x="bottomleft",as.character(lapply(res.list,function(x) x$name)),col=col,lty=1,pch=1:length(res.list),cex=0.9)
+legend(x="bottomright",as.character(lapply(res.list,function(x) x$name)),col=col,lty=1,pch=1:length(res.list),cex=0.9)
 
 dev.off()
