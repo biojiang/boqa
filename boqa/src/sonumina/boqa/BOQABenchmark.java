@@ -150,6 +150,8 @@ public class BOQABenchmark
 	{
 		BOQA boqa = parseCommandLine(args);
 
+		boqa.setPrecalculateJaccard(true);
+
 		GlobalPreferences.setProxyPort(888);
 		GlobalPreferences.setProxyHost("realproxy.charite.de");
 
