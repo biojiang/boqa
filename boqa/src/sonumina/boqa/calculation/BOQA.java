@@ -243,6 +243,9 @@ public class BOQA
 	/** Activate debugging */
 	private final boolean DEBUG = false;
 	
+	/** Precalculate the jaccard matrix */
+	private boolean PRECALCULATE_JACCARD = false;
+	
 	/** Use cached MaxIC terms. Speeds up Resnik */
 	private boolean PRECALCULATE_MAXICS = true;
 	
@@ -380,6 +383,16 @@ public class BOQA
 	public void setPrecalculateScoreDistribution(boolean precalc)
 	{
 		PRECALCULATE_SCORE_DISTRIBUTION = precalc;
+	}
+	
+	/**
+	 * Sets whether jaccard similarity shall be precalculated.
+	 * 
+	 * @param precalc
+	 */
+	public void setPrecalculateJaccard(boolean precalc)
+	{
+		this.PRECALCULATE_JACCARD = precalc;
 	}
 	
 	/**
@@ -1306,6 +1319,21 @@ public class BOQA
 			
 			System.out.println("There were " + oldSize + " items but we consider only " + allItemList.size() + " of them with frequencies.");
 			System.out.println("Considering " + slimGraph.getNumberOfVertices() + " terms");
+		}
+		
+		/** Here we precalculate the jaccard similiartiy of two given terms in a dense matrix */
+		if (PRECALCULATE_JACCARD)
+		{
+			logger.info("Calculating Jaccard");
+			double [][] newJaccardMatrix = new double[slimGraph.getNumberOfVertices()][];
+			for (int i=0;i<slimGraph.getNumberOfVertices();i++)
+			{
+				newJaccardMatrix[i] = new double[slimGraph.getNumberOfVertices() - i - 1];
+				for (int j=i+1;j<slimGraph.getNumberOfVertices();j++)
+					newJaccardMatrix[i][j - i - 1] = jaccard(i,j);
+			}
+			jaccardMatrix = newJaccardMatrix;
+			logger.info("Calculated Jaccard");
 		}
 		
 		/** Here we precalculate the maxICs of two given terms in a dense matrix */
