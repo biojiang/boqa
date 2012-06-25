@@ -2889,7 +2889,7 @@ public class BOQA
 
 			if (time - lastTime > 5000)
 			{
-				System.out.println((time - startTime) + "ms " + i / (double)allItemList.size());
+				System.out.println(termSim.name() + ": " + (time - startTime) + "ms " + i / (double)allItemList.size());
 				lastTime = time;
 			}
 
@@ -3042,7 +3042,7 @@ public class BOQA
 
 			if (time - lastTime > 5000)
 			{
-				System.out.println((time - startTime) + "ms " + i / (double)allItemList.size());
+				System.out.println("mbScore: " + (time - startTime) + "ms " + i / (double)allItemList.size());
 				lastTime = time;
 			}
 
