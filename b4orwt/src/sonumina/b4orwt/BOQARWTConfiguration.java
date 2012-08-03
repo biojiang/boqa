@@ -1,7 +1,7 @@
 package sonumina.b4orwt;
 
+import org.eclipse.rwt.application.Application;
 import org.eclipse.rwt.application.ApplicationConfiguration;
-import org.eclipse.rwt.application.ApplicationConfigurator;
 import org.eclipse.ui.forms.internal.widgets.formtextkit.FormTextAdapterResource;
 import org.eclipse.ui.forms.internal.widgets.formtextkit.FormTextResource;
 import org.eclipse.ui.forms.internal.widgets.togglehyperlinkkit.ToggleHyperlinkAdapterResource;
@@ -14,24 +14,25 @@ import org.eclipse.ui.forms.widgets.ToggleHyperlink;
  * 
  * @author Sebastian Bauer
  */
-public class BOQARWTConfigurator implements ApplicationConfigurator
+public class BOQARWTConfiguration implements ApplicationConfiguration
 {
 	@Override
-	public void configure(ApplicationConfiguration config)
+	public void configure(Application application)
 	{
 		/* Needed for Forms */
-		config.addThemableWidget(ToggleHyperlink.class);
-		config.addThemableWidget(FormText.class);
-		config.addResource(new ToggleHyperlinkResource());
-		config.addResource(new ToggleHyperlinkAdapterResource());
-		config.addResource(new FormTextResource());
-		config.addResource(new FormTextAdapterResource());
+		application.addThemableWidget(ToggleHyperlink.class);
+		application.addThemableWidget(FormText.class);
+		application.addResource(new ToggleHyperlinkResource());
+		application.addResource(new ToggleHyperlinkAdapterResource());
+		application.addResource(new FormTextResource());
+		application.addResource(new FormTextAdapterResource());
 		
 		/* Add our own styles */
-		config.addStyleSheet("org.eclipse.rap.rwt.theme.Default", "b4o.css");
+		application.addStyleSheet("org.eclipse.rap.rwt.theme.Default", "b4o.css");
 		
 		/* Add the entry point of our application */
-		config.addEntryPoint("/main", BOQARWT.class, null);
-//		config.addEntryPoint("default", TestRWT.class);
+		application.addEntryPoint("/main", BOQARWT.class, null);
+//		application.addEntryPoint("default", TestRWT.class);
+
 	}
 }

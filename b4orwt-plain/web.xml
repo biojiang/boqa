@@ -4,13 +4,8 @@
   <description>Welcome to FABN</description>
 
   <context-param>
-    <param-name>org.eclipse.rwt.entryPoints</param-name>
-    <param-value>sonumina.b4orwt.BOQARWT</param-value>  
-  </context-param>
- 
-  <context-param>
-   <param-name>org.eclipse.rwt.Configurator</param-name>
-   <param-value>sonumina.b4orwt.BOQARWTConfigurator</param-value>
+   <param-name>org.eclipse.rap.applicationConfiguration</param-name>
+   <param-value>sonumina.b4orwt.BOQARWTConfiguration</param-value>
   </context-param>
 
   <listener>
