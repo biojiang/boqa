@@ -24,14 +24,14 @@ import sonumina.boqa.calculation.Observations;
 import sonumina.math.graph.DirectedGraph;
 import sonumina.math.graph.SlimDirectedGraphView;
 
-public class B4OCore
+public class BOQACore
 {
-	private static Logger logger = Logger.getLogger(B4OCore.class.getName());
+	private static Logger logger = Logger.getLogger(BOQACore.class.getName());
 	
 	static int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
-	static final String DEFINITIONS_PATH = "/home/sba/workspace/b4oweb/human-phenotype-ontology.obo.gz";
-	static final String ASSOCIATIONS_PATH = "/home/sba/workspace/b4oweb/phenotype_annotation.omim.gz";
+	static final String DEFINITIONS_PATH = "/home/sba/workspace/boqa/data/human-phenotype-ontology.obo.gz";
+	static final String ASSOCIATIONS_PATH = "/home/sba/workspace/boqa/data/phenotype_annotation.omim.gz";
 
 	static BOQA b4o = new BOQA();
 	
@@ -62,7 +62,7 @@ public class B4OCore
 
 	static
 	{
-		logger.info("Starting " + B4OCore.class.getName());
+		logger.info("Starting " + BOQACore.class.getName());
 		
 		long start = System.currentTimeMillis();
 

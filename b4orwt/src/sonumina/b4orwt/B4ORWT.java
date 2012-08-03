@@ -67,7 +67,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 
 import sonumina.b4orwt.TermDetails.ITermDetailsProvider;
-import sonumina.b4oweb.server.core.B4OCore;
+import sonumina.b4oweb.server.core.BOQACore;
 import sonumina.b4oweb.server.core.ItemResultEntry;
 import sonumina.math.graph.DirectedGraph;
 import sonumina.math.graph.Edge;
@@ -123,9 +123,9 @@ public class B4ORWT implements IEntryPoint
     class TermLabelProvider implements TermGraph.ILabelProvider<Integer>
     {
 			@Override
-			public String getLabel(Integer t) { return B4OCore.getTerm(t).getName(); }
+			public String getLabel(Integer t) { return BOQACore.getTerm(t).getName(); }
 			@Override
-			public String getTooltip(Integer t) { return B4OCore.getTerm(t).getDefinition()!=null?DescriptionParser.parse(B4OCore.getTerm(t).getDefinition()):null; }
+			public String getTooltip(Integer t) { return BOQACore.getTerm(t).getDefinition()!=null?DescriptionParser.parse(BOQACore.getTerm(t).getDefinition()):null; }
 			@Override
 			public String getVariant(Integer t) { return null; }
     };
@@ -189,7 +189,7 @@ public class B4ORWT implements IEntryPoint
     	    	final ArrayList<Term> visibleTerms = new ArrayList<Term>();
 
     	    	int numberOfTerms = 0;
-    			for (Term t : B4OCore.getTerms(termFilterString))
+    			for (Term t : BOQACore.getTerms(termFilterString))
     			{
     				if (t.getName().equals(nameOfCurrentlySelectedTerm))
     					indexOfPreviousSelection = numberOfTerms;
@@ -255,7 +255,7 @@ public class B4ORWT implements IEntryPoint
     		selectedTermIds.add(i);
 
     		/* Section */
-    		String def = B4OCore.getTerm(i).getDefinition();
+    		String def = BOQACore.getTerm(i).getDefinition();
     		
     		final Section s = selectedTermsFormToolkit.createSection(selelectedScrolledForm.getBody(), Section.TWISTIE|(def!=null?Section.DESCRIPTION:0)|Section.LEFT_TEXT_CLIENT_ALIGNMENT);
     		s.setLayoutData(new GridData(GridData.FILL_HORIZONTAL|GridData.GRAB_HORIZONTAL));
@@ -278,7 +278,7 @@ public class B4ORWT implements IEntryPoint
     	    });
 
     		/* Label of the section */
-    		Label l = selectedTermsFormToolkit.createLabel(tc,B4OCore.getTerm(i).getName(), SWT.LEFT);
+    		Label l = selectedTermsFormToolkit.createLabel(tc,BOQACore.getTerm(i).getName(), SWT.LEFT);
     		l.addMouseListener(new MouseAdapter()
     		{
 				public void mouseUp(MouseEvent e) {	s.setExpanded(!s.isExpanded()); }
@@ -325,14 +325,14 @@ public class B4ORWT implements IEntryPoint
      */
 	private void addInducedSubGraphToGraph(Collection<Integer> termIds, final DirectedGraph<Integer> graph)
 	{
-		B4OCore.visitAncestors(termIds,new B4OCore.IAncestorVisitor()
+		BOQACore.visitAncestors(termIds,new BOQACore.IAncestorVisitor()
 		{
 			public void visit(int t) { 	graph.addVertex(t); }
 		});
 		
 		for (Integer v : graph)
 		{
-			int [] parents = B4OCore.getParents(v);
+			int [] parents = BOQACore.getParents(v);
 			for (int p : parents)
 			graph.addEdge(new Edge<Integer>(p,v));
 		}
@@ -387,7 +387,7 @@ public class B4ORWT implements IEntryPoint
     		@Override
     		public void run()
     		{
-    	    	final List<ItemResultEntry> result = B4OCore.score(clonedList, MULTITHREADING);
+    	    	final List<ItemResultEntry> result = BOQACore.score(clonedList, MULTITHREADING);
 
     	    	display.asyncExec(new Runnable() {
 					@Override
@@ -404,7 +404,7 @@ public class B4ORWT implements IEntryPoint
 		    	    	for (ItemResultEntry e : result)
 		    	    	{
 		    	    		int id = e.getItemId();
-		    	    		String name = B4OCore.getItemName(id);
+		    	    		String name = BOQACore.getItemName(id);
 
 		    	    		/* Find out which nodes to display in the graph display */
 		    	    	    final HashSet<Integer> queryTerms = new HashSet<Integer>();
@@ -413,8 +413,8 @@ public class B4ORWT implements IEntryPoint
 		    	    		addInducedSubGraphToGraph(clonedList, graph);
 		    	    		for (Integer tid : graph) /* Keep query terms */
 		    	    			queryTerms.add(tid);
-		    	    		addInducedSubGraphToGraph(B4OCore.getTermsDirectlyAnnotatedTo(id), graph);
-		    	    		B4OCore.visitAncestors(toIntegerArray(B4OCore.getTermsDirectlyAnnotatedTo(id)),new B4OCore.IAncestorVisitor()
+		    	    		addInducedSubGraphToGraph(BOQACore.getTermsDirectlyAnnotatedTo(id), graph);
+		    	    		BOQACore.visitAncestors(toIntegerArray(BOQACore.getTermsDirectlyAnnotatedTo(id)),new BOQACore.IAncestorVisitor()
 		    	    		{
 		    	    			public void visit(int t) { 	itemTerms.add(t); }
 		    	    		});
@@ -637,12 +637,12 @@ public class B4ORWT implements IEntryPoint
 				if (availableVisibleTermsList != null)
 					t = availableVisibleTermsList.get(index);
 				else
-					t = B4OCore.getTerm(termFilterString, index);
+					t = BOQACore.getTerm(termFilterString, index);
 				if (t != null)
 				{
 					item.setText(0,t.getName());
 					item.setText(1,t.getID().toString());
-					item.setText(2,Integer.toString(B4OCore.getNumberOfTermsAnnotatedToTerm(B4OCore.getIdOfTerm(t))));
+					item.setText(2,Integer.toString(BOQACore.getNumberOfTermsAnnotatedToTerm(BOQACore.getIdOfTerm(t))));
 					if (t.getDefinition() != null)
 						item.setData("#tooltip", DescriptionParser.parse(t.getDefinition()));
 				}
@@ -662,7 +662,7 @@ public class B4ORWT implements IEntryPoint
 				int index = availableTermsTable.getSelectionIndex();
 				if (index >= 0)
 				{
-					Term t = B4OCore.getTerm(termFilterString, index);
+					Term t = BOQACore.getTerm(termFilterString, index);
 					selectedTermDetails.setTermID(t.getID());
 				}
 	    	}
@@ -688,12 +688,12 @@ public class B4ORWT implements IEntryPoint
 	    selectedTermDetails.setTermDetailsProvider(new ITermDetailsProvider() {
 			public String getName(TermID term)
 			{
-				return B4OCore.getTerm(term).getName();
+				return BOQACore.getTerm(term).getName();
 			}
 			
 			public String getDescription(TermID term)
 			{
-				return B4OCore.getTerm(term).getDefinition();
+				return BOQACore.getTerm(term).getDefinition();
 			}
 		});
 	    selectedTermDetails.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -766,7 +766,7 @@ public class B4ORWT implements IEntryPoint
 	 */
 	private void addSelectedTermToSelectedTerms()
 	{
-		selectedTermsList.add(new SelectedTerm(B4OCore.getIdOfTerm(B4OCore.getTerm(termFilterString, availableTermsTable.getSelectionIndex())),true));
+		selectedTermsList.add(new SelectedTerm(BOQACore.getIdOfTerm(BOQACore.getTerm(termFilterString, availableTermsTable.getSelectionIndex())),true));
 		updateSelectedTermsTable();
 	}
 
@@ -808,7 +808,7 @@ public class B4ORWT implements IEntryPoint
 	 */
 	private void setSelectionOfAvailableTermListToTerm(int index)
 	{
-		Term t = B4OCore.getTerm(index);
+		Term t = BOQACore.getTerm(index);
 
 		selectedTermDetails.setTermID(t.getID());
 		if (availableVisiblePos2SortedIndex != null)
