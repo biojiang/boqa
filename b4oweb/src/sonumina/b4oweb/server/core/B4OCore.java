@@ -18,9 +18,9 @@ import ontologizer.go.Ontology;
 import ontologizer.go.Term;
 import ontologizer.go.TermContainer;
 import ontologizer.go.TermID;
-import sonumina.b4o.calculation.B4O;
-import sonumina.b4o.calculation.B4O.Result;
-import sonumina.b4o.calculation.Observations;
+import sonumina.boqa.calculation.BOQA;
+import sonumina.boqa.calculation.BOQA.Result;
+import sonumina.boqa.calculation.Observations;
 import sonumina.math.graph.DirectedGraph;
 import sonumina.math.graph.SlimDirectedGraphView;
 
@@ -33,7 +33,7 @@ public class B4OCore
 	static final String DEFINITIONS_PATH = "/home/sba/workspace/b4oweb/human-phenotype-ontology.obo.gz";
 	static final String ASSOCIATIONS_PATH = "/home/sba/workspace/b4oweb/phenotype_annotation.omim.gz";
 
-	static B4O b4o = new B4O();
+	static BOQA b4o = new BOQA();
 	
 	/**
 	 * The static ontology object. Defines terms that the user can select.
