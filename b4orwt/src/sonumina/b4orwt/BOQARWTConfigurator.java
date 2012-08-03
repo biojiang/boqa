@@ -14,7 +14,7 @@ import org.eclipse.ui.forms.widgets.ToggleHyperlink;
  * 
  * @author Sebastian Bauer
  */
-public class B4ORWTConfigurator implements ApplicationConfigurator
+public class BOQARWTConfigurator implements ApplicationConfigurator
 {
 	@Override
 	public void configure(ApplicationConfiguration config)
@@ -31,7 +31,7 @@ public class B4ORWTConfigurator implements ApplicationConfigurator
 		config.addStyleSheet("org.eclipse.rap.rwt.theme.Default", "b4o.css");
 		
 		/* Add the entry point of our application */
-		config.addEntryPoint("/main", B4ORWT.class, null);
+		config.addEntryPoint("/main", BOQARWT.class, null);
 //		config.addEntryPoint("default", TestRWT.class);
 	}
 }

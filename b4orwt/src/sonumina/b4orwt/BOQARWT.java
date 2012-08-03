@@ -77,7 +77,7 @@ import sonumina.math.graph.Edge;
  * 
  * @author Sebastian Bauer
  */
-public class B4ORWT implements IEntryPoint
+public class BOQARWT implements IEntryPoint
 {
 	private Display display;
 
