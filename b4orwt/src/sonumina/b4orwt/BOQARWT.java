@@ -11,8 +11,8 @@ import ontologizer.go.DescriptionParser;
 import ontologizer.go.Term;
 import ontologizer.go.TermID;
 
-import org.eclipse.rwt.lifecycle.IEntryPoint;
-import org.eclipse.rwt.lifecycle.UICallBack;
+import org.eclipse.rap.rwt.application.AbstractEntryPoint;
+import org.eclipse.rap.rwt.service.ServerPushSession;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -77,7 +77,7 @@ import sonumina.math.graph.Edge;
  * 
  * @author Sebastian Bauer
  */
-public class BOQARWT implements IEntryPoint
+public class BOQARWT extends AbstractEntryPoint
 {
 	private Display display;
 
@@ -176,7 +176,8 @@ public class BOQARWT implements IEntryPoint
     	else  nameOfCurrentlySelectedTerm = null;
 
     	final String callbackId = getUniqueCallbackId(); 
-    	UICallBack.activate(callbackId);
+//    	UICallBack.activate(callbackId);
+    	final ServerPushSession sps = new ServerPushSession();
 
     	Thread t = new Thread(new Runnable()
     	{
@@ -221,17 +222,19 @@ public class BOQARWT implements IEntryPoint
     			    		availableTermsTable.setSelection(prev);
     				}
     			});
-    			
-    	    	/* Deactivate UI Callback */
-    	    	display.asyncExec(new Runnable()
-    	    	{
-    	    		@Override
-    	    		public void run() {
-    	    			UICallBack.deactivate(callbackId);
-    	    		}
-    	    	});
+
+    			sps.stop();
+//    	    	/* Deactivate UI Callback */
+//    	    	display.asyncExec(new Runnable()
+//    	    	{
+//    	    		@Override
+//    	    		public void run() {
+//    	    			UICallBack.deactivate(callbackId);
+//    	    		}
+//    	    	});
     		}
     	});
+    	sps.start();
     	t.setDaemon(true);
     	t.start();
     }
@@ -379,8 +382,9 @@ public class BOQARWT implements IEntryPoint
     			clonedList.add(st.id);
 
     	/* Activate UI Callback */
-    	final String callbackId = getUniqueCallbackId(); 
-    	UICallBack.activate(callbackId);
+    	final String callbackId = getUniqueCallbackId();
+    	final ServerPushSession sps = new ServerPushSession();
+//    	UICallBack.activate(callbackId);
 
     	Runnable threadRunnable = new Runnable()
     	{
@@ -503,35 +507,36 @@ public class BOQARWT implements IEntryPoint
 				});
 
     	    	/* Deactivate UI Callback */
-    	    	display.asyncExec(new Runnable()
-    	    	{
-    	    		@Override
-    	    		public void run() {
-    	    			UICallBack.deactivate(callbackId);
-    	    		}
-    	    	});
+//    	    	display.asyncExec(new Runnable()
+//    	    	{
+//    	    		@Override
+//    	    		public void run() {
+//    	    			UICallBack.deactivate(callbackId);
+//    	    		}
+//				});
+    	    	if (MULTITHREADING)
+    	    		sps.stop();
     		}
     	};
     	
     	if (MULTITHREADING)
     	{
     		Thread t = new Thread(threadRunnable);
+    		sps.start();
     		t.setDaemon(true);
     		t.start();
     	} else threadRunnable.run();
     }
     
-    /**
-     * Main entry for an RWT application. We do what the name suggests
-     * and create the UI.
-     */
-	public int createUI()
-	{       
-		display = new Display();
-	    Shell shell = new Shell( display, 0 );
-	    shell.setLayout(new FillLayout());
+    
+    @Override
+    protected void createContents(Composite parent)
+    {
+    	BOQARWTConfiguration.addRequiredJS();
 
-	    SashForm verticalSash = new SashForm(shell, SWT.VERTICAL);
+    	parent.setLayout(new FillLayout());
+
+	    SashForm verticalSash = new SashForm(parent, SWT.VERTICAL);
 	    
 	    SashForm horizontalSash = new SashForm(verticalSash, SWT.HORIZONTAL);
 		
@@ -747,16 +752,16 @@ public class BOQARWT implements IEntryPoint
 	    resultComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 	    resultComposite.setLayout(new FillLayout());
 
-	    shell.setMaximized(true);
-	    shell.layout();
+//	    shell.setMaximized(true);
+//	    shell.layout();
 	    updateAvailableTermsTable();
-	    shell.open();
+//	    shell.open();
 //	    while( !shell.isDisposed() ) {
 //	      if( !display.readAndDispatch() )
 //	        display.sleep();
 //	    }
 //	    display.dispose();
-	    return 0;
+//	    return 0;
 	}
 
 

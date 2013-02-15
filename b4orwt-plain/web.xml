@@ -9,12 +9,12 @@
   </context-param>
 
   <listener>
-    <listener-class>org.eclipse.rwt.internal.engine.RWTServletContextListener</listener-class>
+    <listener-class>org.eclipse.rap.rwt.engine.RWTServletContextListener</listener-class>
   </listener>
 
   <servlet>
     <servlet-name>rapServlet</servlet-name>
-    <servlet-class>org.eclipse.rwt.internal.engine.RWTDelegate</servlet-class>
+    <servlet-class>org.eclipse.rap.rwt.engine.RWTServlet</servlet-class>
   </servlet>
  
   <servlet-mapping>
