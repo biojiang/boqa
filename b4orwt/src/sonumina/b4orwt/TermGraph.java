@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-//import org.eclipse.rwt.lifecycle.WidgetUtil;
+
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -205,8 +206,8 @@ public class TermGraph<T> extends Canvas
 					b.setText(labelProvider.getLabel(vertex));
 					b.setData(VERTEX_KEY, vertex);
 					String variant = labelProvider.getVariant(vertex);
-//					if (variant != null)
-//						b.setData(WidgetUtil.CUSTOM_VARIANT, variant);
+					if (variant != null)
+						b.setData(RWT.CUSTOM_VARIANT, variant);
 					b.setToolTipText(labelProvider.getTooltip(vertex));
 					b.addSelectionListener(buttonSelectionListener);
 					Point def = b.computeSize(SWT.DEFAULT, SWT.DEFAULT,true);
