@@ -79,6 +79,13 @@ import sonumina.math.graph.Edge;
  */
 public class BOQARWT extends AbstractEntryPoint
 {
+	static BOQACore boqaCore;
+	
+	static
+	{
+		boqaCore = new BOQACore("/home/sba/work/boqa/data/human-phenotype-ontology.obo.gz","/home/sba/work/boqa/data/phenotype_annotation.omim.gz");
+	}
+	
 	private Display display;
 
 	/** String used to filter terms of the available table list */
@@ -123,9 +130,9 @@ public class BOQARWT extends AbstractEntryPoint
     class TermLabelProvider implements TermGraph.ILabelProvider<Integer>
     {
 			@Override
-			public String getLabel(Integer t) { return BOQACore.getTerm(t).getName(); }
+			public String getLabel(Integer t) { return boqaCore.getTerm(t).getName(); }
 			@Override
-			public String getTooltip(Integer t) { return BOQACore.getTerm(t).getDefinition()!=null?DescriptionParser.parse(BOQACore.getTerm(t).getDefinition()):null; }
+			public String getTooltip(Integer t) { return boqaCore.getTerm(t).getDefinition()!=null?DescriptionParser.parse(boqaCore.getTerm(t).getDefinition()):null; }
 			@Override
 			public String getVariant(Integer t) { return null; }
     };
@@ -190,7 +197,7 @@ public class BOQARWT extends AbstractEntryPoint
     	    	final ArrayList<Term> visibleTerms = new ArrayList<Term>();
 
     	    	int numberOfTerms = 0;
-    			for (Term t : BOQACore.getTerms(termFilterString))
+    			for (Term t : boqaCore.getTerms(termFilterString))
     			{
     				if (t.getName().equals(nameOfCurrentlySelectedTerm))
     					indexOfPreviousSelection = numberOfTerms;
@@ -258,7 +265,7 @@ public class BOQARWT extends AbstractEntryPoint
     		selectedTermIds.add(i);
 
     		/* Section */
-    		String def = BOQACore.getTerm(i).getDefinition();
+    		String def = boqaCore.getTerm(i).getDefinition();
     		
     		final Section s = selectedTermsFormToolkit.createSection(selelectedScrolledForm.getBody(), Section.TWISTIE|(def!=null?Section.DESCRIPTION:0)|Section.LEFT_TEXT_CLIENT_ALIGNMENT);
     		s.setLayoutData(new GridData(GridData.FILL_HORIZONTAL|GridData.GRAB_HORIZONTAL));
@@ -281,7 +288,7 @@ public class BOQARWT extends AbstractEntryPoint
     	    });
 
     		/* Label of the section */
-    		Label l = selectedTermsFormToolkit.createLabel(tc,BOQACore.getTerm(i).getName(), SWT.LEFT);
+    		Label l = selectedTermsFormToolkit.createLabel(tc,boqaCore.getTerm(i).getName(), SWT.LEFT);
     		l.addMouseListener(new MouseAdapter()
     		{
 				public void mouseUp(MouseEvent e) {	s.setExpanded(!s.isExpanded()); }
@@ -328,14 +335,14 @@ public class BOQARWT extends AbstractEntryPoint
      */
 	private void addInducedSubGraphToGraph(Collection<Integer> termIds, final DirectedGraph<Integer> graph)
 	{
-		BOQACore.visitAncestors(termIds,new BOQACore.IAncestorVisitor()
+		boqaCore.visitAncestors(termIds,new BOQACore.IAncestorVisitor()
 		{
 			public void visit(int t) { 	graph.addVertex(t); }
 		});
 		
 		for (Integer v : graph)
 		{
-			int [] parents = BOQACore.getParents(v);
+			int [] parents = boqaCore.getParents(v);
 			for (int p : parents)
 			graph.addEdge(new Edge<Integer>(p,v));
 		}
@@ -391,7 +398,7 @@ public class BOQARWT extends AbstractEntryPoint
     		@Override
     		public void run()
     		{
-    	    	final List<ItemResultEntry> result = BOQACore.score(clonedList, MULTITHREADING);
+    	    	final List<ItemResultEntry> result = boqaCore.score(clonedList, MULTITHREADING);
 
     	    	display.asyncExec(new Runnable() {
 					@Override
@@ -408,7 +415,7 @@ public class BOQARWT extends AbstractEntryPoint
 		    	    	for (ItemResultEntry e : result)
 		    	    	{
 		    	    		int id = e.getItemId();
-		    	    		String name = BOQACore.getItemName(id);
+		    	    		String name = boqaCore.getItemName(id);
 
 		    	    		/* Find out which nodes to display in the graph display */
 		    	    	    final HashSet<Integer> queryTerms = new HashSet<Integer>();
@@ -417,8 +424,8 @@ public class BOQARWT extends AbstractEntryPoint
 		    	    		addInducedSubGraphToGraph(clonedList, graph);
 		    	    		for (Integer tid : graph) /* Keep query terms */
 		    	    			queryTerms.add(tid);
-		    	    		addInducedSubGraphToGraph(BOQACore.getTermsDirectlyAnnotatedTo(id), graph);
-		    	    		BOQACore.visitAncestors(toIntegerArray(BOQACore.getTermsDirectlyAnnotatedTo(id)),new BOQACore.IAncestorVisitor()
+		    	    		addInducedSubGraphToGraph(boqaCore.getTermsDirectlyAnnotatedTo(id), graph);
+		    	    		boqaCore.visitAncestors(toIntegerArray(boqaCore.getTermsDirectlyAnnotatedTo(id)),new BOQACore.IAncestorVisitor()
 		    	    		{
 		    	    			public void visit(int t) { 	itemTerms.add(t); }
 		    	    		});
@@ -532,7 +539,10 @@ public class BOQARWT extends AbstractEntryPoint
     @Override
     protected void createContents(Composite parent)
     {
+    	/* Ensure that the proper java script files are loaded */
     	BOQARWTConfiguration.addRequiredJS();
+
+    	display = parent.getDisplay();
 
     	parent.setLayout(new FillLayout());
 
@@ -642,12 +652,12 @@ public class BOQARWT extends AbstractEntryPoint
 				if (availableVisibleTermsList != null)
 					t = availableVisibleTermsList.get(index);
 				else
-					t = BOQACore.getTerm(termFilterString, index);
+					t = boqaCore.getTerm(termFilterString, index);
 				if (t != null)
 				{
 					item.setText(0,t.getName());
 					item.setText(1,t.getID().toString());
-					item.setText(2,Integer.toString(BOQACore.getNumberOfTermsAnnotatedToTerm(BOQACore.getIdOfTerm(t))));
+					item.setText(2,Integer.toString(boqaCore.getNumberOfTermsAnnotatedToTerm(boqaCore.getIdOfTerm(t))));
 					if (t.getDefinition() != null)
 						item.setData("#tooltip", DescriptionParser.parse(t.getDefinition()));
 				}
@@ -667,7 +677,7 @@ public class BOQARWT extends AbstractEntryPoint
 				int index = availableTermsTable.getSelectionIndex();
 				if (index >= 0)
 				{
-					Term t = BOQACore.getTerm(termFilterString, index);
+					Term t = boqaCore.getTerm(termFilterString, index);
 					selectedTermDetails.setTermID(t.getID());
 				}
 	    	}
@@ -693,12 +703,12 @@ public class BOQARWT extends AbstractEntryPoint
 	    selectedTermDetails.setTermDetailsProvider(new ITermDetailsProvider() {
 			public String getName(TermID term)
 			{
-				return BOQACore.getTerm(term).getName();
+				return boqaCore.getTerm(term).getName();
 			}
 			
 			public String getDescription(TermID term)
 			{
-				return BOQACore.getTerm(term).getDefinition();
+				return boqaCore.getTerm(term).getDefinition();
 			}
 		});
 	    selectedTermDetails.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -771,7 +781,7 @@ public class BOQARWT extends AbstractEntryPoint
 	 */
 	private void addSelectedTermToSelectedTerms()
 	{
-		selectedTermsList.add(new SelectedTerm(BOQACore.getIdOfTerm(BOQACore.getTerm(termFilterString, availableTermsTable.getSelectionIndex())),true));
+		selectedTermsList.add(new SelectedTerm(boqaCore.getIdOfTerm(boqaCore.getTerm(termFilterString, availableTermsTable.getSelectionIndex())),true));
 		updateSelectedTermsTable();
 	}
 
@@ -813,7 +823,7 @@ public class BOQARWT extends AbstractEntryPoint
 	 */
 	private void setSelectionOfAvailableTermListToTerm(int index)
 	{
-		Term t = BOQACore.getTerm(index);
+		Term t = boqaCore.getTerm(index);
 
 		selectedTermDetails.setTermID(t.getID());
 		if (availableVisiblePos2SortedIndex != null)

@@ -30,43 +30,57 @@ public class BOQACore
 	
 	static int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
-	static final String DEFINITIONS_PATH = "/home/sba/workspace/boqa/data/human-phenotype-ontology.obo.gz";
-	static final String ASSOCIATIONS_PATH = "/home/sba/workspace/boqa/data/phenotype_annotation.omim.gz";
+	static final String DEFAULT_DEFINITIONS_PATH = "/home/sba/workspace/boqa/data/human-phenotype-ontology.obo.gz";
+	static final String DEFAULT_ASSOCIATIONS_PATH = "/home/sba/workspace/boqa/data/phenotype_annotation.omim.gz";
 
-	static BOQA b4o = new BOQA();
+	BOQA b4o = new BOQA();
 	
 	/**
 	 * The static ontology object. Defines terms that the user can select.
 	 */
-	static private Ontology ontology;
+	private Ontology ontology;
 
 	/**
 	 * The corresponding slim view.
 	 */
-	static private SlimDirectedGraphView<Term> slimGraph;
+	private SlimDirectedGraphView<Term> slimGraph;
 
 	/**
 	 * Contains the indices of the term in sorted order
 	 */
-	static private int [] sorted2Idx;
+	private int [] sorted2Idx;
 	
 	/**
 	 * Contains the rank of the term within the sorted order. 
 	 */
-	static private int [] idx2Sorted;
+	private int [] idx2Sorted;
 	
 	/**
 	 * The static association container. Defines the items.
 	 */
-	static private AssociationContainer associations;
+	private AssociationContainer associations;
 
-	static
+	/**
+	 * Constructs the boqa core using default data.
+	 */
+	public BOQACore()
+	{
+		this(DEFAULT_DEFINITIONS_PATH,DEFAULT_ASSOCIATIONS_PATH);
+	}
+	
+	/**
+	 * Constructs the boqa core using default data.
+	 * 
+	 * @param definitionPath
+	 * @param associationPath
+	 */
+	public BOQACore(String definitionPath, String associationPath)
 	{
 		logger.info("Starting " + BOQACore.class.getName());
 		
 		long start = System.currentTimeMillis();
 
-		OBOParser oboParser = new OBOParser(DEFINITIONS_PATH,OBOParser.PARSE_DEFINITIONS);
+		OBOParser oboParser = new OBOParser(definitionPath,OBOParser.PARSE_DEFINITIONS);
 		try {
 			oboParser.doParse();
 		} catch (IOException e1) {
@@ -75,7 +89,7 @@ public class BOQACore
 			e1.printStackTrace();
 		}
 		TermContainer goTerms = new TermContainer(oboParser.getTermMap(), oboParser.getFormatVersion(), oboParser.getDate());
-		logger.info("OBO file \"" + DEFINITIONS_PATH + "\" parsed");
+		logger.info("OBO file \"" + definitionPath + "\" parsed");
 
 		Ontology localOntology = new Ontology(goTerms);
 		logger.info("Ontology graph with " + localOntology.getNumberOfTerms() + " terms created");
@@ -83,7 +97,7 @@ public class BOQACore
 		/* Load associations */
 		AssociationContainer localAssociations;
 		try {
-			AssociationParser ap = new AssociationParser(ASSOCIATIONS_PATH,localOntology.getTermContainer(),null,null);
+			AssociationParser ap = new AssociationParser(associationPath,localOntology.getTermContainer(),null,null);
 			localAssociations = new AssociationContainer(ap.getAssociations(), ap.getSynonym2gene(), ap.getDbObject2gene());
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -138,7 +152,7 @@ public class BOQACore
 	 * 
 	 * @return
 	 */
-	public static Ontology getOntology()
+	public Ontology getOntology()
 	{
 		return ontology;
 	}
@@ -148,7 +162,7 @@ public class BOQACore
 	 * 
 	 * @return
 	 */
-	public static AssociationContainer getAssociations()
+	public AssociationContainer getAssociations()
 	{
 		return associations;
 	}
@@ -159,7 +173,7 @@ public class BOQACore
 	 * @param sortedIdx
 	 * @return
 	 */
-	public static Term getTerm(int sortedIdx)
+	public Term getTerm(int sortedIdx)
 	{
 		return slimGraph.getVertex(sorted2Idx[sortedIdx]);
 	}
@@ -172,7 +186,7 @@ public class BOQACore
 	 * 
 	 * @TODO: Optimize via proper index data structure.
 	 */
-	public static Iterable<Term> getTerms(final String pattern)
+	public Iterable<Term> getTerms(final String pattern)
 	{
 		return new Iterable<Term>() {
 			
@@ -214,7 +228,7 @@ public class BOQACore
 	 * @param which
 	 * @return
 	 */
-	public static Term getTerm(final String pattern, int which)
+	public Term getTerm(final String pattern, int which)
 	{
 		for (Term t : getTerms(pattern))
 			if (which-- == 0)
@@ -228,7 +242,7 @@ public class BOQACore
 	 * @param pattern may be null
 	 * @return
 	 */
-	public static int getNumberTerms(String pattern)
+	public int getNumberTerms(String pattern)
 	{
 		if (pattern == null || pattern.length() == 0)
 			return slimGraph.getNumberOfVertices();
@@ -247,7 +261,7 @@ public class BOQACore
 	 * @param t
 	 * @return
 	 */
-	public static int getIdOfTerm(Term t)
+	public int getIdOfTerm(Term t)
 	{
 		return idx2Sorted[slimGraph.getVertexIndex(t)];
 	}
@@ -258,7 +272,7 @@ public class BOQACore
 	 * @param t
 	 * @return
 	 */
-	public static int getIdOfTerm(TermID tid)
+	public int getIdOfTerm(TermID tid)
 	{
 		Term t = ontology.getTerm(tid);
 		return idx2Sorted[slimGraph.getVertexIndex(t)];
@@ -270,7 +284,7 @@ public class BOQACore
 	 * @param tid
 	 * @return
 	 */
-	public static Term getTerm(TermID tid)
+	public Term getTerm(TermID tid)
 	{
 		return ontology.getTerm(tid);
 	}
@@ -281,7 +295,7 @@ public class BOQACore
 	 * @param serverIds
 	 * @return
 	 */
-	public static List<ItemResultEntry> score(List<Integer> serverIds)
+	public List<ItemResultEntry> score(List<Integer> serverIds)
 	{
 		return score(serverIds, true);
 	}
@@ -293,7 +307,7 @@ public class BOQACore
 	 * @param multithreading
 	 * @return
 	 */
-	public static List<ItemResultEntry> score(List<Integer> serverIds, boolean multiThreading)
+	public List<ItemResultEntry> score(List<Integer> serverIds, boolean multiThreading)
 	{
 		long start = System.currentTimeMillis();
 		
@@ -338,7 +352,7 @@ public class BOQACore
 	 * @param itemId
 	 * @return
 	 */
-	public static String getItemName(int itemId)
+	public String getItemName(int itemId)
 	{
 		return b4o.allItemList.get(itemId).toString();
 	}
@@ -350,7 +364,7 @@ public class BOQACore
 	 * @param serverId
 	 * @return
 	 */
-	public static int getNumberOfTermsAnnotatedToTerm(int serverId)
+	public int getNumberOfTermsAnnotatedToTerm(int serverId)
 	{
 		return b4o.getNumberOfItemsAnnotatedToTerm(sorted2Idx[serverId]);
 	}
@@ -361,7 +375,7 @@ public class BOQACore
 	 * @param itemId
 	 * @return
 	 */
-	public static int[] getTermsDirectlyAnnotatedTo(int itemId)
+	public int[] getTermsDirectlyAnnotatedTo(int itemId)
 	{
 		int [] t = b4o.getTermsDirectlyAnnotatedTo(itemId);
 		int [] st = new int[t.length];
@@ -378,7 +392,7 @@ public class BOQACore
 	 * @param itemId
 	 * @return
 	 */
-	public static double[] getFrequenciesOfTermsDirectlyAnnotatedTo(int itemId)
+	public double[] getFrequenciesOfTermsDirectlyAnnotatedTo(int itemId)
 	{
 		double [] f = b4o.getFrequenciesOfTermsDirectlyAnnotatedTo(itemId);
 		double [] sf = new double[f.length];
@@ -393,7 +407,7 @@ public class BOQACore
 	 * @param sid
 	 * @return
 	 */
-	public static int[] getParents(int t)
+	public int[] getParents(int t)
 	{
 		int [] p = b4o.getParents(sorted2Idx[t]);
 		int [] np = new int[p.length];
@@ -414,7 +428,7 @@ public class BOQACore
 	 * 
 	 * @param t
 	 */
-	public static void visitAncestors(Collection<Integer> terms, final IAncestorVisitor visitor)
+	public void visitAncestors(Collection<Integer> terms, final IAncestorVisitor visitor)
 	{
 		/* Get initial terms */
 		ArrayList<Term> initTerms = new ArrayList<Term>(terms.size());
