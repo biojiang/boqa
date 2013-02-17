@@ -16,11 +16,11 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.core.commands_3.6.1.v20120521-2329.jar" sourcepath="WebContent/WEB-INF/lib/org.eclipse.core.commands.source_3.6.1.v20120521-2329.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.core.commands_3.6.1.v20120814-150512.jar" sourcepath="WebContent/WEB-INF/lib/org.eclipse.core.commands.source_3.6.1.v20120814-150512.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.equinox.common_3.6.100.v20120522-1841.jar" sourcepath="WebContent/WEB-INF/lib/org.eclipse.equinox.common.source_3.6.100.v20120522-1841.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.rap.jface_1.5.0.20120612-1458.jar" sourcepath="WebContent/WEB-INF/lib/org.eclipse.rap.jface.source_1.5.0.20120612-1458.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.rap.ui.forms_1.5.0.20120612-1458.jar" sourcepath="WebContent/WEB-INF/lib/org.eclipse.rap.ui.forms.source_1.5.0.20120612-1458.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.rap.rwt_1.5.0.20120612-1458.jar" sourcepath="WebContent/WEB-INF/lib/org.eclipse.rap.rwt.source_1.5.0.20120612-1458.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.rap.jface_2.0.0.20130107-0921.jar" sourcepath="WebContent/WEB-INF/lib/lib/org.eclipse.rap.jface.source_2.0.0.20130107-0921.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.rap.ui.forms_2.0.0.20130111-1314.jar" sourcepath="WebContent/WEB-INF/lib/org.eclipse.rap.ui.forms.source_2.0.0.20130111-1314.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.rap.rwt_2.0.0.20130205-1612.jar" sourcepath="WebContent/WEB-INF/lib/org.eclipse.rap.rwt.source_2.0.0.20130205-1612.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/com.ibm.icu.base_4.4.2.v20110831.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
