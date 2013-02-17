@@ -1,25 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
-  <display-name>Welcome to FABN</display-name>
-  <description>Welcome to FABN</description>
- 
+  <display-name>Welcome to BOQA</display-name>
+  <description>Welcome to BOQA</description>
+
   <context-param>
-    <param-name>org.eclipse.rwt.entryPoints</param-name>
-    <param-value>sonumina.b4orwt.B4ORWT</param-value>
+   <param-name>org.eclipse.rap.applicationConfiguration</param-name>
+   <param-value>sonumina.b4orwt.BOQARWTConfiguration</param-value>
   </context-param>
- 
-  <context-param>
-   <param-name>org.eclipse.rwt.Configurator</param-name>
-   <param-value>sonumina.b4orwt.B4ORWTConfigurator</param-value>
-  </context-param>
- 
+
   <listener>
-    <listener-class>org.eclipse.rwt.internal.engine.RWTServletContextListener</listener-class>
+    <listener-class>org.eclipse.rap.rwt.engine.RWTServletContextListener</listener-class>
   </listener>
- 
+
   <servlet>
     <servlet-name>rapServlet</servlet-name>
-    <servlet-class>org.eclipse.rwt.internal.engine.RWTDelegate</servlet-class>
+    <servlet-class>org.eclipse.rap.rwt.engine.RWTServlet</servlet-class>
   </servlet>
  
   <servlet-mapping>
