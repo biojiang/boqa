@@ -189,19 +189,19 @@ public class BOQATest
 		Result fabnResult = boqa.assignMarginals(o, false);
 
 		System.out.println("Resnik");
-		for (int i=0;i<boqa.allItemList.size();i++)
+		for (int i=0;i<boqa.getNumberOfItems();i++)
 			System.out.println(i + "  p=" + resnikResult.getMarginal(i) + " score=" + resnikResult.getScore(i));
 
 		System.out.println("Lin");
-		for (int i=0;i<boqa.allItemList.size();i++)
+		for (int i=0;i<boqa.getNumberOfItems();i++)
 			System.out.println(i + "  p=" + linResult.getMarginal(i) + " score=" + linResult.getScore(i));
 
 		System.out.println("JC");
-		for (int i=0;i<boqa.allItemList.size();i++)
+		for (int i=0;i<boqa.getNumberOfItems();i++)
 			System.out.println(i + "  p=" + jcResult.getMarginal(i) + " score=" + jcResult.getScore(i));
 
 		System.out.println("FABN");
-		for (int i=0;i<boqa.allItemList.size();i++)
+		for (int i=0;i<boqa.getNumberOfItems();i++)
 			System.out.println(i + " marg=" + fabnResult.getMarginal(i) + " score=" + fabnResult.getScore(i));
 
 		double [] resnikP = new double[] { 0.64384, 0.843968, 0.15518, 0.844376, 0.68832 };
@@ -213,7 +213,7 @@ public class BOQATest
 		double [] fabnScores = new double[] { -0.9724346539489889, -1.3317577761951482, 2.2926928336673593, -0.6160410530454002, -0.6160410530454002 };
 		double [] fabnMarginals = new double[] { 0.032533088008779756, 0.022712933995512156, 0.8518284456000037, 0.046462766197852126, 0.046462766197852126 };
 
-		for (int i=0;i<boqa.allItemList.size();i++)
+		for (int i=0;i<boqa.getNumberOfItems();i++)
 		{
 			System.out.println(i);
 			assertEquals(resnikP[i], resnikResult.getMarginal(i), 0.05);
@@ -247,19 +247,19 @@ public class BOQATest
 		fabnResult = boqa.assignMarginals(o, false);
 		
 		System.out.println("Resnik");
-		for (int i=0;i<boqa.allItemList.size();i++)
+		for (int i=0;i<boqa.getNumberOfItems();i++)
 			System.out.println(i + "  p=" + resnikResult.getMarginal(i) + " score=" + resnikResult.getScore(i));
 
 		System.out.println("Lin");
-		for (int i=0;i<boqa.allItemList.size();i++)
+		for (int i=0;i<boqa.getNumberOfItems();i++)
 			System.out.println(i + "  p=" + linResult.getMarginal(i) + " score=" + linResult.getScore(i));
 
 		System.out.println("JC");
-		for (int i=0;i<boqa.allItemList.size();i++)
+		for (int i=0;i<boqa.getNumberOfItems();i++)
 			System.out.println(i + "  p=" + jcResult.getMarginal(i) + " score=" + jcResult.getScore(i));
 
 		System.out.println("FABN");
-		for (int i=0;i<boqa.allItemList.size();i++)
+		for (int i=0;i<boqa.getNumberOfItems();i++)
 			System.out.println(i + " marg=" + fabnResult.getMarginal(i) + " score=" + fabnResult.getScore(i));
 
 		resnikScore = new double[]{0.11157177565710485,0.2231435513142097,0.2231435513142097,0.916290731874155,0.11157177565710485};
@@ -271,7 +271,7 @@ public class BOQATest
 		fabnScores = new double[]{-1.633587994564142,-1.633587994564142,-1.3091882336053455,2.196264120323024,-1.3063742210362417};
 		fabnMarginals = new double[]{0.019674959868555657,0.019674959868555657,0.027214407363261438,0.9061445759999325,0.027291096899695524};
 
-		for (int i=0;i<boqa.allItemList.size();i++)
+		for (int i=0;i<boqa.getNumberOfItems();i++)
 		{
 			System.out.println(i);
 			assertEquals(resnikP[i], resnikResult.getMarginal(i), 0.05);
@@ -340,8 +340,8 @@ public class BOQATest
 			System.out.println(i + " ->  " + boqa.getSlimGraph().getVertex(i).getIDAsString());
 		
 		System.out.println("Item Mapping");
-		for (int i=0;i<boqa.allItemList.size();i++)
-			System.out.println(i + " -> " +boqa.allItemList.get(i));
+		for (int i=0;i<boqa.getNumberOfItems();i++)
+			System.out.println(i + " -> " +boqa.getItem(i));
 
 		BOQA boqaNoPrecalc = new BOQA();
 		boqaNoPrecalc.setConsiderFrequenciesOnly(false);
@@ -403,8 +403,8 @@ public class BOQATest
 		boqa.setup(df.graph, df.assoc);
 
 		/* This is older code which we keep for testing here */
-		int [][] micaForItem = new int[boqa.allItemList.size()][boqa.getSlimGraph().getNumberOfVertices()];
-		for (int item = 0; item < boqa.allItemList.size(); item++)
+		int [][] micaForItem = new int[boqa.getNumberOfItems()][boqa.getSlimGraph().getNumberOfVertices()];
+		for (int item = 0; item < boqa.getNumberOfItems(); item++)
 		{
 			/* The fixed set */
 			int [] t2 = boqa.items2DirectTerms[item];
@@ -453,7 +453,7 @@ public class BOQATest
 		{
 			Random rnd = new Random(System.currentTimeMillis());
 			
-			int item = rnd.nextInt(boqa.allItemList.size());
+			int item = rnd.nextInt(boqa.getNumberOfItems());
 			
 			Observations obs = boqa.generateObservations(item, rnd);
 			BOQA.IntArray sparse = new BOQA.IntArray(obs.observations);
