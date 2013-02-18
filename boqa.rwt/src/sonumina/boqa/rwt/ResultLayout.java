@@ -1,4 +1,4 @@
-package sonumina.b4orwt;
+package sonumina.boqa.rwt;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;

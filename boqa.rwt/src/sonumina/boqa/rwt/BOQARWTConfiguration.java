@@ -1,4 +1,4 @@
-package sonumina.b4orwt;
+package sonumina.boqa.rwt;
 
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.application.Application;

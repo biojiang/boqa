@@ -1,4 +1,4 @@
-package sonumina.b4orwt;
+package sonumina.boqa.rwt;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -66,9 +66,9 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 
-import sonumina.b4orwt.TermDetails.ITermDetailsProvider;
 import sonumina.b4oweb.server.core.BOQACore;
 import sonumina.b4oweb.server.core.ItemResultEntry;
+import sonumina.boqa.rwt.TermDetails.ITermDetailsProvider;
 import sonumina.math.graph.DirectedGraph;
 import sonumina.math.graph.Edge;
 

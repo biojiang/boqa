@@ -5,7 +5,7 @@
 
   <context-param>
    <param-name>org.eclipse.rap.applicationConfiguration</param-name>
-   <param-value>sonumina.b4orwt.BOQARWTConfiguration</param-value>
+   <param-value>sonumina.boqa.rwt.BOQARWTConfiguration</param-value>
   </context-param>
 
   <listener>

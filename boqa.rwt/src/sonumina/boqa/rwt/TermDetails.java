@@ -1,4 +1,4 @@
-package sonumina.b4orwt;
+package sonumina.boqa.rwt;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
