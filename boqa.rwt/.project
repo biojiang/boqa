@@ -3,6 +3,7 @@
 	<name>boqa.rwt</name>
 	<comment></comment>
 	<projects>
+		<project>boqa</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

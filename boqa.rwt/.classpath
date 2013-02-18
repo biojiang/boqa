@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry excluding="ontologizer/sampling/SetConstructor.java" kind="src" path="external"/>
 	<classpathentry kind="src" path="internal"/>
-	<classpathentry kind="src" path="src.grappa"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>
 			<attribute name="owner.project.facets" value="java"/>
@@ -22,5 +20,6 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.rap.ui.forms_2.0.0.20130111-1314.jar" sourcepath="WebContent/WEB-INF/lib/org.eclipse.rap.ui.forms.source_2.0.0.20130111-1314.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.rap.rwt_2.0.0.20130205-1612.jar" sourcepath="WebContent/WEB-INF/lib/org.eclipse.rap.rwt.source_2.0.0.20130205-1612.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/com.ibm.icu.base_4.4.2.v20110831.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/boqa"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
