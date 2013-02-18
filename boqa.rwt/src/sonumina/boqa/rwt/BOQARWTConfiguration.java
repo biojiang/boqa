@@ -37,7 +37,7 @@ public class BOQARWTConfiguration implements ApplicationConfiguration
 		application.addResource(TOGGLEHYPERLINKADAPTER_JS, ThemeManager.STANDARD_RESOURCE_LOADER);
 		
 		/* Add our own styles */
-		application.addStyleSheet("org.eclipse.rap.rwt.theme.Default", "b4o.css");
+		application.addStyleSheet("org.eclipse.rap.rwt.theme.Default", "boqa.css");
 		
 		/* Add the entry point of our application */
 		application.addEntryPoint("/main", BOQARWT.class, null);
