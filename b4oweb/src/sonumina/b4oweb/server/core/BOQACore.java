@@ -354,7 +354,7 @@ public class BOQACore
 	 */
 	public String getItemName(int itemId)
 	{
-		return b4o.allItemList.get(itemId).toString();
+		return b4o.getItem(itemId).toString();
 	}
 
 	/**
