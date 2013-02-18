@@ -170,9 +170,9 @@ public class Benchmark
 				
 			};
 	
-			ArrayList<Pair> scoreList = new ArrayList<Pair>(boqa.allItemList.size());
-			ArrayList<Pair> idealList = new ArrayList<Pair>(boqa.allItemList.size());
-			for (i=0;i<boqa.allItemList.size();i++)
+			ArrayList<Pair> scoreList = new ArrayList<Pair>(boqa.getNumberOfItems());
+			ArrayList<Pair> idealList = new ArrayList<Pair>(boqa.getNumberOfItems());
+			for (i=0;i<boqa.getNumberOfItems();i++)
 			{
 				scoreList.add(new Pair(i,modelWithoutFrequencies.getScore(i)));
 				idealList.add(new Pair(i,modelWithoutFrequencies.getMarginalIdeal(i)));
@@ -193,7 +193,7 @@ public class Benchmark
 			{
 				Pair p = scoreList.get(i);
 				boolean itIs = p.idx == item;
-				System.out.println((i+1) + (itIs?"(*)":"") + ": " + boqa.allItemList.get(p.idx) + ": " +  p.score + " " + modelWithoutFrequencies.getMarginal(p.idx));
+				System.out.println((i+1) + (itIs?"(*)":"") + ": " + boqa.getItem(p.idx) + ": " +  p.score + " " + modelWithoutFrequencies.getMarginal(p.idx));
 			}
 	
 			int scoreRank  = 0;
@@ -340,7 +340,7 @@ public class Benchmark
 		}
 
 		System.out.println("Items with frequencies " + numItemsWithFrequencies + "  First one: " +
-							firstItemWithFrequencies + " which is " + (firstItemWithFrequencies!=-1?boqa.allItemList.get(firstItemWithFrequencies):""));
+							firstItemWithFrequencies + " which is " + (firstItemWithFrequencies!=-1?boqa.getItem(firstItemWithFrequencies):""));
 		
 		/**************************************************************************************************************************/
 		

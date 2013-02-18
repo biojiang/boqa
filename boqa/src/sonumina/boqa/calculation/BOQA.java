@@ -115,7 +115,7 @@ public class BOQA
 	private SlimDirectedGraphView<Term> slimGraph;
 
 	/** An array of all items */
-	public ArrayList<ByteString> allItemList;
+	private ArrayList<ByteString> allItemList;
 	
 	/** Map items to their index */
 	public HashMap<ByteString,Integer> item2Index;
@@ -3293,4 +3293,17 @@ public class BOQA
 	{
 		return allItemList.size();
 	}
+	
+	/**
+	 * Returns the item for the given index.
+	 * 
+	 * @param itemIndex
+	 * @return
+	 */
+	public ByteString getItem(int itemIndex)
+	{
+		return allItemList.get(itemIndex);
+	}
+
+	
 }
