@@ -115,77 +115,77 @@ public class BOQA
 	private ArrayList<ByteString> allItemList;
 	
 	/** Map items to their index */
-	public HashMap<ByteString,Integer> item2Index;
+	private HashMap<ByteString,Integer> item2Index;
 
 	/** Links items to terms */
-	public int [][] items2Terms;
+	private int [][] items2Terms;
 
 	/**
 	 * For each item, contains the term ids which need to be switched on, if
 	 * the previous item was on.
 	 */
-	public int [][] diffOnTerms;
+	private int [][] diffOnTerms;
 	
 	/**
 	 * Same as diffOnTerms but for switching off terms.
 	 */
-	public int [][] diffOffTerms;
+	private int [][] diffOffTerms;
 
 	/**
 	 * Similar to diffOnTerms but each adjacent frequency-implied state
 	 */
-	public int [][][] diffOnTermsFreqs;
+	private int [][][] diffOnTermsFreqs;
 	
 	/**
 	 * Similar to diffOffTerms but each adjacent frequency-implied state
 	 */
-	public int [][][] diffOffTermsFreqs;
+	private int [][][] diffOffTermsFreqs;
 	
 	/**
 	 * The factors of each combination.
 	 */
-	public double [][] factors;
+	private double [][] factors;
 
 	/** Links items to directly associated terms */
-	public int [][] items2DirectTerms;
+	private int [][] items2DirectTerms;
 
 	/**
 	 * Links items to the frequencies of corresponding directly associated terms.
 	 * Frequencies are interpreted as probabilities that the corresponding term
 	 * is on.
 	 */ 
-	public double [][] items2TermFrequencies;
+	private double [][] items2TermFrequencies;
 	
 	/**
 	 * This contains the (ascending) order of the items2TermFrequencies,
 	 * E.g., use item2TermFrequenciesOrder[0][2] to determine the term
 	 * that is associated to first item and has the third lowest frequency.
 	 */
-	public int [][] item2TermFrequenciesOrder;
+	private int [][] item2TermFrequenciesOrder;
 	
 	/** Indicates whether an item have explicit frequencies */
-	public boolean [] itemHasFrequencies;
+	private boolean [] itemHasFrequencies;
 	
 	/** Contains all the ancestors of the terms */
-	public int [][] term2Ancestors;
+	private int [][] term2Ancestors;
 
 	/** Contains the parents of the terms */
-	public int [][] term2Parents;
+	private int [][] term2Parents;
 	
 	/** Contains the children of the term */
-	public int [][] term2Children;
+	private int [][] term2Children;
 	
 	/** Contains the descendants of the (i.e., children, grand-children, etc.) */
-	public int [][] term2Descendants;
+	private int [][] term2Descendants;
 
 	/** Contains the order of the terms */
-	public int [] termsInTopologicalOrder;
+	private int [] termsInTopologicalOrder;
 	
 	/** Contains the topological rank of the term */
-	public int [] termsToplogicalRank;
+	private int [] termsToplogicalRank;
 
 	/** Contains the IC of the terms */
-	public double [] terms2IC;
+	private double [] terms2IC;
 
 	/** Contains the term with maximum common ancestor of two terms */
 	private int micaMatrix[][];
@@ -3222,6 +3222,17 @@ public class BOQA
 	public int[] getTermsDirectlyAnnotatedTo(int itemId)
 	{
 		return items2DirectTerms[itemId]; 
+	}
+
+	/**
+	 * Returns all the ancestors of the given term.
+	 * 
+	 * @param termId
+	 * @return
+	 */
+	public int [] getAncestors(int termId)
+	{
+		return term2Ancestors[termId];
 	}
 
 	/**

@@ -171,9 +171,9 @@ public class BOQATest
 		o.observations = obs;
 		System.out.println("Testing item " + item);
 
-		for (int i=0;i<boqa.items2DirectTerms[item].length;i++)
+		for (int i=0;i<boqa.getTermsDirectlyAnnotatedTo(item).length;i++)
 		{
-			int t=boqa.items2DirectTerms[item][i];
+			int t=boqa.getTermsDirectlyAnnotatedTo(item)[i];
 			obs[t] = true;
 			boqa.activateAncestors(t, obs);
 		}
@@ -234,9 +234,9 @@ public class BOQATest
 
 		System.out.println("Testing item " + item);
 
-		for (int i=0;i<boqa.items2DirectTerms[item].length;i++)
+		for (int i=0;i<boqa.getTermsDirectlyAnnotatedTo(item).length;i++)
 		{
-			int t=boqa.items2DirectTerms[item][i];
+			int t=boqa.getTermsDirectlyAnnotatedTo(item)[i];
 			obs[t] = true;
 			boqa.activateAncestors(t, obs);
 		}
@@ -315,7 +315,7 @@ public class BOQATest
 								if (t.getName().equals(vt))
 								{
 									int idx = boqa.getSlimGraph().getVertexIndex(t);
-									info.append("\\n" + boqa.getNumberOfItemsAnnotatedToTerm(idx) + " " + String.format("%g",boqa.terms2IC[idx]));
+									info.append("\\n" + boqa.getNumberOfItemsAnnotatedToTerm(idx) + " " + String.format("%g",boqa.getTermIC(idx)));
 									break;
 								}
 							}
@@ -407,7 +407,7 @@ public class BOQATest
 		for (int item = 0; item < boqa.getNumberOfItems(); item++)
 		{
 			/* The fixed set */
-			int [] t2 = boqa.items2DirectTerms[item];
+			int [] t2 = boqa.getTermsDirectlyAnnotatedTo(item);
 
 			for (int to = 0; to < boqa.getSlimGraph().getNumberOfVertices(); to++)
 			{
@@ -417,9 +417,9 @@ public class BOQATest
 				for (int ti : t2)
 				{
 					int common = boqa.getCommonAncestorWithMaxIC(to, ti);
-					if (boqa.terms2IC[common] > maxIC)
+					if (boqa.getTermIC(common) > maxIC)
 					{
-						maxIC = boqa.terms2IC[common];
+						maxIC = boqa.getTermIC(common);
 						maxCommon = common;
 					}
 				}
@@ -430,7 +430,7 @@ public class BOQATest
 		/* Now the test */
 		for (int i=0;i<micaForItem.length;i++)
 			for (int j=0;j<micaForItem[i].length;j++)
-				assertEquals(boqa.terms2IC[micaForItem[i][j]],boqa.resnikTermSim.maxScoreForItem[i][j],0.00001);
+				assertEquals(boqa.getTermIC(micaForItem[i][j]),boqa.resnikTermSim.maxScoreForItem[i][j],0.00001);
 
 		checkHPOSimValues(boqa);
 	}
@@ -463,16 +463,16 @@ public class BOQATest
 			boolean [] actualObservations = new boolean[boqa.getSlimGraph().getNumberOfVertices()];
 			for (int t : mst)
 			{
-				for (i = 0;i<boqa.term2Ancestors[t].length;i++)
-					actualObservations[boqa.term2Ancestors[t][i]] = true;
+				for (i = 0;i<boqa.getAncestors(t).length;i++)
+					actualObservations[boqa.getAncestors(t)[i]] = true;
 			}
 			
 			/* Get full observations according to source array */
 			boolean [] expectedObservations = new boolean[boqa.getSlimGraph().getNumberOfVertices()];
 			for (int t : sparse.get())
 			{
-				for (i = 0;i<boqa.term2Ancestors[t].length;i++)
-					expectedObservations[boqa.term2Ancestors[t][i]] = true;
+				for (i = 0;i<boqa.getAncestors(t).length;i++)
+					expectedObservations[boqa.getAncestors(t)[i]] = true;
 			}
 
 			for (i=0;i<actualObservations.length;i++)
