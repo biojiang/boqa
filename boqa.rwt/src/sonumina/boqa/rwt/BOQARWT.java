@@ -155,19 +155,6 @@ public class BOQARWT extends AbstractEntryPoint
     private LinkedList<SelectedTerm> selectedTermsList = new LinkedList<SelectedTerm>();
     private LinkedList<Section> selectedTermSectionList = new LinkedList<Section>();
 
-    /** Used for UICallback which is used to update the UI from threads */
-    private int calculationCallbackId = 0;
-    
-    /**
-     * Returns a unique id that can be used for UICallback.
-     * 
-     * @return
-     */
-    private String getUniqueCallbackId()
-    {
-    	return "callback" + calculationCallbackId++;
-    }
-    
     /**
      * Updates the content of the term table.
      * 
@@ -182,8 +169,6 @@ public class BOQARWT extends AbstractEntryPoint
     	if (ti != null && ti.length > 0) nameOfCurrentlySelectedTerm = ti[0].getText();
     	else  nameOfCurrentlySelectedTerm = null;
 
-    	final String callbackId = getUniqueCallbackId(); 
-//    	UICallBack.activate(callbackId);
     	final ServerPushSession sps = new ServerPushSession();
 
     	Thread t = new Thread(new Runnable()
@@ -231,14 +216,6 @@ public class BOQARWT extends AbstractEntryPoint
     			});
 
     			sps.stop();
-//    	    	/* Deactivate UI Callback */
-//    	    	display.asyncExec(new Runnable()
-//    	    	{
-//    	    		@Override
-//    	    		public void run() {
-//    	    			UICallBack.deactivate(callbackId);
-//    	    		}
-//    	    	});
     		}
     	});
     	sps.start();
@@ -389,9 +366,7 @@ public class BOQARWT extends AbstractEntryPoint
     			clonedList.add(st.id);
 
     	/* Activate UI Callback */
-    	final String callbackId = getUniqueCallbackId();
     	final ServerPushSession sps = new ServerPushSession();
-//    	UICallBack.activate(callbackId);
 
     	Runnable threadRunnable = new Runnable()
     	{
@@ -513,14 +488,6 @@ public class BOQARWT extends AbstractEntryPoint
 					}
 				});
 
-    	    	/* Deactivate UI Callback */
-//    	    	display.asyncExec(new Runnable()
-//    	    	{
-//    	    		@Override
-//    	    		public void run() {
-//    	    			UICallBack.deactivate(callbackId);
-//    	    		}
-//				});
     	    	if (MULTITHREADING)
     	    		sps.stop();
     		}
@@ -627,9 +594,6 @@ public class BOQARWT extends AbstractEntryPoint
 	    itemsColumn.setWidth(itemsColumn.getWidth() + 6);
 	    if (itemsColumn.getWidth() < 50)
 	    	itemsColumn.setWidth(50);
-
-//	    availableTermsTable.setData( Table.ENABLE_RICH_TEXT, Boolean.TRUE ); /* RWT */
-//	    availableTermsTable.setData( Table.ITEM_HEIGHT, new Integer(20)); /* RWT */
 
 	    availableTermsTable.setHeaderVisible(true);
 	    availableTermsTable.addControlListener(new ControlAdapter() {
@@ -762,16 +726,7 @@ public class BOQARWT extends AbstractEntryPoint
 	    resultComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 	    resultComposite.setLayout(new FillLayout());
 
-//	    shell.setMaximized(true);
-//	    shell.layout();
 	    updateAvailableTermsTable();
-//	    shell.open();
-//	    while( !shell.isDisposed() ) {
-//	      if( !display.readAndDispatch() )
-//	        display.sleep();
-//	    }
-//	    display.dispose();
-//	    return 0;
 	}
 
 
