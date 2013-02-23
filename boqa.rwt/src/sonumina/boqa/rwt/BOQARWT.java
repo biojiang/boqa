@@ -223,7 +223,8 @@ public class BOQARWT extends AbstractEntryPoint
     }
     
     /**
-     * Updates the content of the selected terms table.
+     * Updates the content of the selected terms table
+     * according to the contents of selectedTermSectionList.
      */
     private void updateSelectedTermsTable()
     {
