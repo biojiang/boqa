@@ -33,7 +33,7 @@ public class BOQACore
 	static final String DEFAULT_DEFINITIONS_PATH = "/home/sba/workspace/boqa/data/human-phenotype-ontology.obo.gz";
 	static final String DEFAULT_ASSOCIATIONS_PATH = "/home/sba/workspace/boqa/data/phenotype_annotation.omim.gz";
 
-	BOQA b4o = new BOQA();
+	private BOQA b4o = new BOQA();
 	
 	/**
 	 * The static ontology object. Defines terms that the user can select.
