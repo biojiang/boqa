@@ -109,9 +109,17 @@ public class BOQARWT extends AbstractEntryPoint
     private ScrolledForm selelectedScrolledForm;
     private FormToolkit selectedTermsFormToolkit;
 
+    /**
+     * Represents a selected term.
+     * 
+     * @author Sebastian Bauer
+     */
     static private class SelectedTerm
     {
+    	/** The Id (Index) */
     	int id;
+
+    	/** Shall the term really be consdered as active? */
     	boolean active;
 
     	public SelectedTerm(int id, boolean active)
