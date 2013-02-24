@@ -24,6 +24,11 @@ import sonumina.boqa.calculation.Observations;
 import sonumina.math.graph.DirectedGraph;
 import sonumina.math.graph.SlimDirectedGraphView;
 
+/**
+ * This is the server core for the boqa implementation.
+ * 
+ * @author Sebastian Bauer
+ */
 public class BOQACore
 {
 	private static Logger logger = Logger.getLogger(BOQACore.class.getName());
@@ -120,6 +125,8 @@ public class BOQACore
 
 		logger.info("Got ontology, associations and slim graph after " + (System.currentTimeMillis() - start)/1000d + "s");
 
+		/* Create the sorted index */
+
 		/* Sort the term according to the alphabet */
 		class TermName
 		{
@@ -147,7 +154,6 @@ public class BOQACore
 			sorted2Idx[i] = terms[i].index;
 			idx2Sorted[terms[i].index] = i;
 		}
-		
 	}
 	
 	/**
