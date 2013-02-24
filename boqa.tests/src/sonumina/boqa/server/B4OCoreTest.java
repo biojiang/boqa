@@ -1,28 +1,25 @@
-package sonumina.b4oweb;
+package sonumina.boqa.server;
 
-import static org.junit.Assert.*;
-
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
-import org.mortbay.jetty.security.B64Code;
-
-import sonumina.b4oweb.server.core.B4OCore;
-import sonumina.b4oweb.server.core.ItemResultEntry;
 
 public class B4OCoreTest
 {
 	@Test
-	public void test()
+	public void test() throws InterruptedException, IOException
 	{
 		int i;
-		List<ItemResultEntry> resultList = B4OCore.score(Arrays.asList(0,1));
+
+		BOQACore c = new BOQACore("../boqa/data/human-phenotype-ontology.obo.gz","../boqa/data/phenotype_annotation.omim.gz");
+
+		List<ItemResultEntry> resultList = c.score(Arrays.asList(0,1));
 		for (i=0;i<resultList.size();i++)
 		{
 			int id = resultList.get(i).getItemId();
-			System.out.println(id + " " + B4OCore.getItemName(id) + " " + resultList.get(i).getScore());
+			System.out.println(id + " " + c.getItemName(id) + " " + resultList.get(i).getScore());
 			if (i>10) break;
 		}
 	}
