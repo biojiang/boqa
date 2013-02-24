@@ -25,7 +25,8 @@ import sonumina.math.graph.DirectedGraph;
 import sonumina.math.graph.SlimDirectedGraphView;
 
 /**
- * This is the server core for the boqa implementation.
+ * This is the server core for the boqa implementation. It main
+ * purpose is to maintain a separate id space of terms.
  * 
  * @author Sebastian Bauer
  */
@@ -62,11 +63,6 @@ public class BOQACore
 	 * Contains the rank of the term within the sorted order. 
 	 */
 	private int [] idx2Sorted;
-	
-	/**
-	 * The static association container. Defines the items.
-	 */
-	private AssociationContainer associations;
 
 	/**
 	 * Constructs the boqa core using default data.
@@ -120,7 +116,6 @@ public class BOQACore
 		boqa.setup(localOntology, localAssociations);
 
 		ontology = boqa.getOntology();
-		associations = boqa.getAssociations();
 		slimGraph = boqa.getSlimGraph();
 
 		logger.info("Got ontology, associations and slim graph after " + (System.currentTimeMillis() - start)/1000d + "s");
@@ -155,26 +150,6 @@ public class BOQACore
 			idx2Sorted[terms[i].index] = i;
 		}
 	}
-	
-	/**
-	 * Returns the global ontology.
-	 * 
-	 * @return
-	 */
-	public Ontology getOntology()
-	{
-		return ontology;
-	}
-	
-	/**
-	 * Returns the global association container.
-	 * 
-	 * @return
-	 */
-	public AssociationContainer getAssociations()
-	{
-		return associations;
-	}
 
 	/**
 	 * Returns the term at the given sorted index.
@@ -188,7 +163,8 @@ public class BOQACore
 	}
 
 	/**
-	 * Returns the terms matching the pattern. 
+	 * Return an iterator that iterates over terms matching 
+	 * the patterns. 
 	 * 
 	 * @param pattern
 	 * @return
@@ -235,7 +211,7 @@ public class BOQACore
 	 * 
 	 * @param pattern
 	 * @param which
-	 * @return
+	 * @return the term or null.
 	 */
 	public Term getTerm(final String pattern, int which)
 	{
