@@ -40,4 +40,17 @@ public class B4OCoreTest
 			p = t;
 		}
 	}
+
+	@Test
+	public void testIdem()
+	{
+		int numberOfTerms = c.getNumberTerms(null);
+		Assert.assertTrue(numberOfTerms > 0);
+
+		for (int i=0;i<numberOfTerms;i++)
+		{
+			Term t = c.getTerm(i);
+			Assert.assertEquals(i, c.getIdOfTerm(t));
+		}
+	}
 }
