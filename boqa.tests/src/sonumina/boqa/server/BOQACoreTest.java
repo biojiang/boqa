@@ -9,7 +9,7 @@ import ontologizer.go.Term;
 
 import org.junit.Test;
 
-public class B4OCoreTest
+public class BOQACoreTest
 {
 	public static BOQACore c = new BOQACore("../boqa/data/human-phenotype-ontology.obo.gz","../boqa/data/phenotype_annotation.omim.gz");
 
