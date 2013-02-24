@@ -73,10 +73,10 @@ public class BOQACore
 	}
 	
 	/**
-	 * Constructs the boqa core using default data.
+	 * Constructs the boqa core by loading the data from the gvien files.
 	 * 
-	 * @param definitionPath
-	 * @param associationPath
+	 * @param definitionPath name of the obo file
+	 * @param associationPath name of the association (GAF) file.
 	 */
 	public BOQACore(String definitionPath, String associationPath)
 	{
@@ -107,7 +107,31 @@ public class BOQACore
 			e.printStackTrace();
 			localAssociations = new AssociationContainer();
 		}
-		
+
+		logger.info("Got ontology and associations" + (System.currentTimeMillis() - start)/1000d + "s");
+
+		init(localOntology,localAssociations);
+	}
+	
+	/**
+	 * Constructs the boqa core by using the specified ontology and associations.
+	 * 
+	 * @param localOntology
+	 * @param localAssociations
+	 */
+	public BOQACore(Ontology localOntology, AssociationContainer localAssociations)
+	{
+		init(localOntology, localAssociations);
+	}
+	
+	/**
+	 * Initializes attributes of the class.
+	 * 
+	 * @param localOntology
+	 * @param localAssociations
+	 */
+	private void init(Ontology localOntology, AssociationContainer localAssociations)
+	{
 		boqa.setConsiderFrequenciesOnly(false);
 		boqa.setMaxFrequencyTerms(5);
 		boqa.setPrecalculateScoreDistribution(false);
@@ -117,8 +141,6 @@ public class BOQACore
 
 		ontology = boqa.getOntology();
 		slimGraph = boqa.getSlimGraph();
-
-		logger.info("Got ontology, associations and slim graph after " + (System.currentTimeMillis() - start)/1000d + "s");
 
 		/* Create the sorted index */
 
