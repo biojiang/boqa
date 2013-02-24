@@ -33,7 +33,10 @@ public class BOQACore
 	static final String DEFAULT_DEFINITIONS_PATH = "/home/sba/workspace/boqa/data/human-phenotype-ontology.obo.gz";
 	static final String DEFAULT_ASSOCIATIONS_PATH = "/home/sba/workspace/boqa/data/phenotype_annotation.omim.gz";
 
-	private BOQA b4o = new BOQA();
+	/**
+	 * The boqa object
+	 */
+	private BOQA boqa = new BOQA();
 	
 	/**
 	 * The static ontology object. Defines terms that the user can select.
@@ -104,16 +107,16 @@ public class BOQACore
 			localAssociations = new AssociationContainer();
 		}
 		
-		b4o.setConsiderFrequenciesOnly(false);
-		b4o.setMaxFrequencyTerms(5);
-		b4o.setPrecalculateScoreDistribution(false);
-		b4o.setPrecalculateItemMaxs(false);
-		b4o.setPrecalculateMaxICs(false);
-		b4o.setup(localOntology, localAssociations);
+		boqa.setConsiderFrequenciesOnly(false);
+		boqa.setMaxFrequencyTerms(5);
+		boqa.setPrecalculateScoreDistribution(false);
+		boqa.setPrecalculateItemMaxs(false);
+		boqa.setPrecalculateMaxICs(false);
+		boqa.setup(localOntology, localAssociations);
 
-		ontology = b4o.getOntology();
-		associations = b4o.getAssociations();
-		slimGraph = b4o.getSlimGraph();
+		ontology = boqa.getOntology();
+		associations = boqa.getAssociations();
+		slimGraph = boqa.getSlimGraph();
 
 		logger.info("Got ontology, associations and slim graph after " + (System.currentTimeMillis() - start)/1000d + "s");
 
@@ -315,7 +318,7 @@ public class BOQACore
 		for (int id : serverIds)
 		{
 			observations[sorted2Idx[id]] = true;
-			b4o.activateAncestors(sorted2Idx[id],observations);
+			boqa.activateAncestors(sorted2Idx[id],observations);
 		}
 		
 		List<ItemResultEntry> resultList = new ArrayList<ItemResultEntry>();
@@ -323,7 +326,7 @@ public class BOQACore
 		Observations o = new Observations();
 		o.observations = observations;
 
-		Result result = b4o.assignMarginals(o, true, multiThreading?numberOfThreads:1);
+		Result result = boqa.assignMarginals(o, true, multiThreading?numberOfThreads:1);
 		for (int i=0;i<result.size();i++)
 		{
 			ItemResultEntry newEntry = ItemResultEntry.create(i, result.getMarginal(i));
@@ -354,7 +357,7 @@ public class BOQACore
 	 */
 	public String getItemName(int itemId)
 	{
-		return b4o.getItem(itemId).toString();
+		return boqa.getItem(itemId).toString();
 	}
 
 	/**
@@ -366,7 +369,7 @@ public class BOQACore
 	 */
 	public int getNumberOfTermsAnnotatedToTerm(int serverId)
 	{
-		return b4o.getNumberOfItemsAnnotatedToTerm(sorted2Idx[serverId]);
+		return boqa.getNumberOfItemsAnnotatedToTerm(sorted2Idx[serverId]);
 	}
 
 	/**
@@ -377,7 +380,7 @@ public class BOQACore
 	 */
 	public int[] getTermsDirectlyAnnotatedTo(int itemId)
 	{
-		int [] t = b4o.getTermsDirectlyAnnotatedTo(itemId);
+		int [] t = boqa.getTermsDirectlyAnnotatedTo(itemId);
 		int [] st = new int[t.length];
 		
 		for (int i=0;i<t.length;i++)
@@ -394,7 +397,7 @@ public class BOQACore
 	 */
 	public double[] getFrequenciesOfTermsDirectlyAnnotatedTo(int itemId)
 	{
-		double [] f = b4o.getFrequenciesOfTermsDirectlyAnnotatedTo(itemId);
+		double [] f = boqa.getFrequenciesOfTermsDirectlyAnnotatedTo(itemId);
 		double [] sf = new double[f.length];
 		for (int i=0;i<sf.length;i++)
 			sf[i] = f[i];
@@ -409,7 +412,7 @@ public class BOQACore
 	 */
 	public int[] getParents(int t)
 	{
-		int [] p = b4o.getParents(sorted2Idx[t]);
+		int [] p = boqa.getParents(sorted2Idx[t]);
 		int [] np = new int[p.length];
 		for (int i=0;i<p.length;i++)
 			np[i] = idx2Sorted[p[i]];
