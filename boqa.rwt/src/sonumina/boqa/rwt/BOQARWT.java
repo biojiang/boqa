@@ -65,9 +65,9 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 
-import sonumina.b4oweb.server.core.BOQACore;
-import sonumina.b4oweb.server.core.ItemResultEntry;
 import sonumina.boqa.rwt.TermDetails.ITermDetailsProvider;
+import sonumina.boqa.server.BOQACore;
+import sonumina.boqa.server.ItemResultEntry;
 import sonumina.math.graph.DirectedGraph;
 import sonumina.math.graph.Edge;
 
