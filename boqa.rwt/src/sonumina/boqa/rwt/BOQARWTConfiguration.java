@@ -3,6 +3,8 @@ package sonumina.boqa.rwt;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.application.Application;
 import org.eclipse.rap.rwt.application.ApplicationConfiguration;
+import org.eclipse.rap.rwt.application.EntryPoint;
+import org.eclipse.rap.rwt.application.IEntryPoint;
 import org.eclipse.rap.rwt.client.service.JavaScriptLoader;
 import org.eclipse.rap.rwt.internal.theme.ThemeManager;
 import org.eclipse.ui.forms.widgets.FormText;
@@ -36,8 +38,17 @@ public class BOQARWTConfiguration implements ApplicationConfiguration
 		application.addStyleSheet("org.eclipse.rap.rwt.theme.Default", "boqa.css");
 		
 		/* Add the entry point of our application */
-		application.addEntryPoint("/main", BOQARWT.class, null);
-//		application.addEntryPoint("/main", TestRWT.class, null);
+		application.addEntryPoint("/main", getEntryPoint(), null);
+	}
+	
+	/**
+	 * Returns the entry point.
+	 * 
+	 * @return
+	 */
+	protected Class<? extends EntryPoint> getEntryPoint()
+	{
+		return BOQARWT.class;
 	}
 
 	/**
