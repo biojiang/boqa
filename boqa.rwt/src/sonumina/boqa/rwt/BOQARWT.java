@@ -2,6 +2,8 @@ package sonumina.boqa.rwt;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -91,7 +93,23 @@ public class BOQARWT extends AbstractEntryPoint
 	
 	static
 	{
-		initBoqaCore("/home/sba/work/boqa/data/human-phenotype-ontology.obo.gz","/home/sba/work/boqa/data/phenotype_annotation.omim.gz");
+		Reader reader;
+		String ontology = "/home/sba/work/boqa/data/human-phenotype-ontology.obo.gz";
+		String associations = "/home/sba/work/boqa/data/phenotype_annotation.omim.gz";
+		
+		try {
+			reader = new FileReader("config.properties");
+			Properties prop = new Properties();
+			prop.load(reader);
+			
+			ontology = prop.getProperty("ontology", ontology);
+			associations = prop.getProperty("associations", associations);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		initBoqaCore(ontology,associations);
 	}
 	
 	private Display display;
