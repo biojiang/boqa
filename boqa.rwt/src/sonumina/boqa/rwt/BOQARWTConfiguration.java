@@ -5,10 +5,6 @@ import org.eclipse.rap.rwt.application.Application;
 import org.eclipse.rap.rwt.application.ApplicationConfiguration;
 import org.eclipse.rap.rwt.client.service.JavaScriptLoader;
 import org.eclipse.rap.rwt.internal.theme.ThemeManager;
-import org.eclipse.ui.forms.internal.widgets.formtextkit.FormTextAdapterResource;
-import org.eclipse.ui.forms.internal.widgets.formtextkit.FormTextResource;
-import org.eclipse.ui.forms.internal.widgets.togglehyperlinkkit.ToggleHyperlinkAdapterResource;
-import org.eclipse.ui.forms.internal.widgets.togglehyperlinkkit.ToggleHyperlinkResource;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.ToggleHyperlink;
 
@@ -63,7 +59,5 @@ public class BOQARWTConfiguration implements ApplicationConfiguration
 		require(FORMTEXTADAPTER_JS);
 		require(TOGGLEHYPERLINK_JS);
 		require(TOGGLEHYPERLINKADAPTER_JS);	
-//		RWT.getClient().getService(JavaScriptLoader.class).require("rwt-resources/org/eclipse/ui/forms/widgets/FormText.js");
-//		RWT.getClient().getService(JavaScriptLoader.class).require("rwt-resources/org/eclipse/ui/forms/widgets/FormTextAdapter.js");
 	}
 }
