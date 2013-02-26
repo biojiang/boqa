@@ -1,16 +1,20 @@
 package sonumina.boqa.rwt;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 import ontologizer.go.DescriptionParser;
 import ontologizer.go.Term;
 import ontologizer.go.TermID;
 
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.application.AbstractEntryPoint;
 import org.eclipse.rap.rwt.service.ServerPushSession;
 import org.eclipse.swt.SWT;
@@ -78,11 +82,16 @@ import sonumina.math.graph.Edge;
  */
 public class BOQARWT extends AbstractEntryPoint
 {
-	static BOQACore boqaCore;
+	static private BOQACore boqaCore;
+	
+	static public void initBoqaCore(String ontology, String associations)
+	{
+		boqaCore = new BOQACore(ontology,associations);
+	}
 	
 	static
 	{
-		boqaCore = new BOQACore("/home/sba/work/boqa/data/human-phenotype-ontology.obo.gz","/home/sba/work/boqa/data/phenotype_annotation.omim.gz");
+		initBoqaCore("/home/sba/work/boqa/data/human-phenotype-ontology.obo.gz","/home/sba/work/boqa/data/phenotype_annotation.omim.gz");
 	}
 	
 	private Display display;
