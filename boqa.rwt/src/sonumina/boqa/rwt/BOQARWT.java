@@ -654,7 +654,7 @@ public class BOQARWT extends AbstractEntryPoint
 				}
 	    	}
 		});
-	    
+
 	    DragSource termTableDragSource = new DragSource(availableTermsTable,DND.DROP_COPY|DND.DROP_MOVE);
 	    termTableDragSource.addDragListener(new DragSourceAdapter() {
 			@Override
@@ -729,6 +729,11 @@ public class BOQARWT extends AbstractEntryPoint
 	    /* Result */
 	    Composite tempComp = new Composite(verticalSash, 0);
 	    tempComp.setLayout(new GridLayout());
+
+	    Composite resultFilterComposite = new Composite(tempComp,0);
+	    createResultFilter(resultFilterComposite);
+	    if (resultFilterComposite.getChildren().length == 0)
+	    	resultFilterComposite.dispose();
 	    
 	    resultComposite = new ScrolledComposite(tempComp,SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 	    resultComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -737,6 +742,15 @@ public class BOQARWT extends AbstractEntryPoint
 	    updateAvailableTermsTable();
 	}
 
+    /**
+     * Creates the widgets for an additional result filter.
+     * Maybe overwritten by subclasses.
+     * 
+     * @param parent
+     */
+    protected void createResultFilter(Composite parent)
+    {
+    }
 
 	/**
 	 * Adds the term selecetd in the available terms list to
