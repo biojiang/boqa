@@ -73,7 +73,7 @@ public class BOQACore
 	}
 	
 	/**
-	 * Constructs the boqa core by loading the data from the gvien files.
+	 * Constructs the boqa core by loading the data from the given files.
 	 * 
 	 * @param definitionPath name of the obo file
 	 * @param associationPath name of the association (GAF) file.
@@ -112,7 +112,7 @@ public class BOQACore
 
 		init(localOntology,localAssociations);
 	}
-	
+
 	/**
 	 * Constructs the boqa core by using the specified ontology and associations.
 	 * 
