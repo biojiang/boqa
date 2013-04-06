@@ -84,17 +84,40 @@ import sonumina.math.graph.SlimDirectedGraphView;
 /**
  * This is core class implementing BOQA. Currently, it also implements
  * other procedures based on semantic similarity measures but this is
- * planned to be refactored.
+ * planned to be refactored. Thus, at the moment you will find also
+ * some methods and options to work with semantic similarities. 
  * 
- * In order to perform the algorithm, you need to setup a new BOQA
- * object a ontology and associations via setup(). One can then use
- * assignMarginals() on the observations to obtain marginal probabilities.
+ * In order to perform the calculation, you need to setup a new BOQA
+ * object, invoke some methods to alter some options such as
+ * setPrecalculateScoreDistribution() or setConsiderFrequenciesOnly()
+ * etc and finally call setup() with ontologies and associations. One can
+ * then use assignMarginals() on the observations to obtain marginal
+ * probabilities according to the BOQA model.
+ * 
+ * <pre>
+ * {@code
+ * BOQA boqa = new BOQA();
+ * boqa.setConsiderFrequenciesOnly(false);
+ * boqa.setPrecalculateScoreDistribution(false);
+ * boqa.setCacheScoreDistribution(false);
+ * boqa.setStoreScoreDistriubtion(false);
+ * boqa.setTryLoadingScoreDistribution(false);
+ * boqa.setMaxQuerySizeForCachedDistribution(4);
+ * boqa.setup(ontology,associations);
+ * 
+ * boqa.assignMarginals(false, 0, 1, 45, 66);
+ * }
+ * </pre>
+ * 
+ * Note that most times one refers to terms by plain ids. The id
+ * spaces matches the id space of the associated slim graph. Several
+ * convenience methods are provided to convert or access the data.
  * 
  * Refer to the BOQATest class for a working example usage.
  * 
  * @author Sebastian Bauer
  * 
- * @see setup, sonumina.boqa.tests.BOQATest
+ * @see setup, getTermIndex, sonumina.boqa.tests.BOQATest
  * 
  */
 public class BOQA
@@ -2041,6 +2064,32 @@ public class BOQA
 		}
 	}
 
+	/**
+	 * Returns marginal probabilities for the (sparsely) given
+	 * queries/observations. The terms are specified as plain
+	 * int values that range between 0 and the number of the
+	 * terms of the ontology.
+	 * 
+	 * @param takeFrequenciesIntoAccount
+	 * @param observations the ids of the terms. All specified 
+	 * terms are considered to be on. All other are considered to
+	 * be off.
+	 * @return
+	 */
+	public Result assignMarginals(boolean takeFrequenciesIntoAccount, int...observations)
+	{
+		Observations o = new Observations();
+		o.observations = new boolean[getOntology().getNumberOfTerms()];
+		
+		for (int q : observations)
+		{
+			if (q >= o.observations.length)
+				throw new IllegalArgumentException("Observations id " + q + " refers to a non-existing term");
+			o.observations[q] = true;
+		}
+		return assignMarginals(o,takeFrequenciesIntoAccount);
+	}
+	
 	/**
 	 * Provides the marginals for the observations.
 	 * 
