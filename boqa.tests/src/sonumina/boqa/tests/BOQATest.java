@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Random;
 
+import junit.framework.Assert;
 import ontologizer.association.Association;
 import ontologizer.association.AssociationContainer;
 import ontologizer.benchmark.Datafiles;
@@ -105,7 +106,7 @@ public class BOQATest
 		assertTrue(expectedSet.containsAll(actualSet));
 		assertTrue(actualSet.containsAll(expectedSet));
 	}
-		
+
 	@Test
 	public void testMostSpecificTerms()
 	{
@@ -477,6 +478,36 @@ public class BOQATest
 
 			for (i=0;i<actualObservations.length;i++)
 				assertEquals(expectedObservations[i],actualObservations[i]);
+		}
+	}
+
+	@Test
+	public void testAssignMarginals()
+	{
+		final InternalDatafiles data = new InternalDatafiles();
+		BOQA boqa = new BOQA();
+		boqa.setConsiderFrequenciesOnly(false);
+		boqa.setPrecalculateScoreDistribution(false);
+		boqa.setSizeOfScoreDistribution(1000);
+		boqa.setTryLoadingScoreDistribution(false);
+		boqa.setSimulationMaxTerms(3);
+		boqa.setMaxQuerySizeForCachedDistribution(6);
+
+		boqa.setup(data.graph, data.assoc);
+		
+		int numberOfTerms = boqa.getSlimGraph().getNumberOfVertices();
+		
+		Observations o = new Observations();
+		o.observations = new boolean[numberOfTerms];
+		o.observations[0] = true;
+		o.observations[2] = true;
+
+		Result r1 = boqa.assignMarginals(false, 0, 2);
+		Result r2 = boqa.assignMarginals(o, false);
+
+		for (int i = 0; i < boqa.getNumberOfItems(); i++)
+		{
+			assertTrue(r1.getMarginal(i) == r2.getMarginal(i));
 		}
 	}
 
