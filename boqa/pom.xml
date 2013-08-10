@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>boqa</artifactId>
 	<groupId>boqa</groupId>
-	<version>0.1-SNAPSHOT</version>
+	<version>0.2-SNAPSHOT</version>
 
 	<!-- Our local repository. We won't like to depend on external ones so - 
 	     the software can be still compiled with Eclipse without a Maven - plugin -->
