@@ -54,6 +54,7 @@ import ontologizer.go.Ontology;
 import ontologizer.go.Term;
 import ontologizer.go.TermID;
 import sonumina.boqa.calculation.BOQA;
+import sonumina.boqa.calculation.BenchmarkObservations;
 import sonumina.boqa.calculation.Observations;
 import sonumina.boqa.calculation.BOQA.Result;
 import sonumina.math.graph.SlimDirectedGraphView;
@@ -89,7 +90,7 @@ public class Benchmark
 	 */
 	static class ExperimentStore
 	{
-		Observations obs;
+		BenchmarkObservations obs;
 		Result modelWithoutFrequencies;
 		Result modelWithFrequencies;
 		Result resnik;
@@ -130,7 +131,7 @@ public class Benchmark
 	{
 		int i;
 	
-		Observations obs = boqa.generateObservations(item, rnd);
+		BenchmarkObservations obs = boqa.generateObservations(item, rnd);
 		
 		boolean [] observations = obs.observations;
 

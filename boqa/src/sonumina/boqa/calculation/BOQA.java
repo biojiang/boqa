@@ -999,11 +999,11 @@ public class BOQA
 	 * @param item
 	 * @return
 	 */
-	public Observations generateObservations(int item, Random rnd)
+	public BenchmarkObservations generateObservations(int item, Random rnd)
 	{
 		int retry = 0;
 
-		Observations o = null;
+		BenchmarkObservations o = null;
 		
 		do
 		{
@@ -1204,7 +1204,7 @@ public class BOQA
 				System.out.println("Number of modelled false negatives " + stats.getCases(Configuration.NodeCase.FALSE_NEGATIVE) + " (beta=" +  stats.falseNegativeRate() + "%)");
 			}
 		
-			o = new Observations();
+			o = new BenchmarkObservations();
 			o.item = item;
 			o.observations = observations;
 			o.observationStats = stats;
@@ -2125,6 +2125,10 @@ public class BOQA
 		for (i=0;i<res.scores.length;i++)
 			res.scores[i] = Math.log(0);
 
+		final BenchmarkObservations benchmarkObservations;
+		if (observations instanceof BenchmarkObservations) benchmarkObservations = (BenchmarkObservations) observations;
+		else benchmarkObservations = null;
+
 		final double [][][] scores = new double[allItemList.size()][ALPHA_GRID.length][BETA_GRID.length];
 		final double [] idealScores = new double[allItemList.size()];
 
@@ -2160,21 +2164,25 @@ public class BOQA
 						}
 					}
 
-					/* This is used only for benchmarks, where we know the true configuration */
-					if (observations.observationStats != null)
+					if (benchmarkObservations != null)
 					{
-						/* Calculate ideal scores */
-						double fpr = observations.observationStats.falsePositiveRate();
-						if (fpr == 0) fpr = 0.0000001;
-						else if (fpr == 1.0) fpr = 0.999999;
-						else if (Double.isNaN(fpr)) fpr = 0.5;
-			
-						double fnr = observations.observationStats.falseNegativeRate();
-						if (fnr == 0) fnr = 0.0000001;
-						else if (fnr == 1) fnr =0.999999;
-						else if (Double.isNaN(fnr)) fnr = 0.5;
+						/* This is used only for benchmarks, where we know the true configuration */
+						if (benchmarkObservations.observationStats != null)
+						{
+							/* Calculate ideal scores */
+							double fpr = benchmarkObservations.observationStats.falsePositiveRate();
+							if (fpr == 0) fpr = 0.0000001;
+							else if (fpr == 1.0) fpr = 0.999999;
+							else if (Double.isNaN(fpr)) fpr = 0.5;
+				
+							double fnr = benchmarkObservations.observationStats.falseNegativeRate();
+							if (fnr == 0) fnr = 0.0000001;
+							else if (fnr == 1) fnr =0.999999;
+							else if (Double.isNaN(fnr)) fnr = 0.5;
+							
+							idealScores[item] = stats.score(fpr,fnr);
+						}
 						
-						idealScores[item] = stats.score(fpr,fnr);
 					}
 				}
 			};
@@ -2223,16 +2231,19 @@ public class BOQA
 //			System.out.println(res.marginals[i] + "  " + res.marginalsIdeal[i]);
 		}
 
-		/* There is a possibility that ideal marginal is not as good as the marginal
-		 * for the unknown parameter situation,  i.e., if the initial signal got such
-		 * disrupted that another item is more likely. This may produce strange plots.
-		 * Therefore, we take the parameter estimated marginals as the ideal one if
-		 * they match the reality better.
-		 */
-		if (res.marginalsIdeal[observations.item] < res.marginals[observations.item])
+		if (benchmarkObservations != null)
 		{
-			for (i=0;i<allItemList.size();i++)
-				res.marginalsIdeal[i] = res.marginals[i];
+			/* There is a possibility that ideal marginal is not as good as the marginal
+			 * for the unknown parameter situation,  i.e., if the initial signal got such
+			 * disrupted that another item is more likely. This may produce strange plots.
+			 * Therefore, we take the parameter estimated marginals as the ideal one if
+			 * they match the reality better.
+			 */
+			if (res.marginalsIdeal[benchmarkObservations.item] < res.marginals[benchmarkObservations.item])
+			{
+				for (i=0;i<allItemList.size();i++)
+					res.marginalsIdeal[i] = res.marginals[i];
+			}
 		}
 		                       
 //		System.out.println(idealNormalization + "  " + normalization);
