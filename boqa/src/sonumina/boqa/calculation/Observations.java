@@ -45,7 +45,12 @@ package sonumina.boqa.calculation;
  */
 public class Observations
 {
+	/** The associated item. Useful only for the benchmark */
 	public int item;
+	
+	/** Boolean array that indicates which terms are on or off in the query */
 	public boolean [] observations;
+	
+	/** Some statistics. Useful only for the benchmark */
 	public Configuration observationStats;
 }

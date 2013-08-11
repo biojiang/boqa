@@ -110,7 +110,7 @@ import sonumina.math.graph.SlimDirectedGraphView;
  * </pre>
  * 
  * Note that most times one refers to terms by plain ids. The id
- * spaces matches the id space of the associated slim graph. Several
+ * space matches the id space of the associated slim graph. Several
  * convenience methods are provided to convert or access the data.
  * 
  * Refer to the BOQATest class for a working example usage.
