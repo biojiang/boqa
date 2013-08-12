@@ -51,8 +51,8 @@ public class Observations
 	public boolean [] observations;
 	
 	/**
-	 * Create an observations object from sparse array in which terms with
-	 * on status are indicated.  The terms are specified as plain
+	 * Create an observation object from a sparse array in which terms with
+	 * on status are listed.  The terms are specified as plain
 	 * int values that range between 0 and the number of the
 	 * terms of the ontology.
 	 *  
