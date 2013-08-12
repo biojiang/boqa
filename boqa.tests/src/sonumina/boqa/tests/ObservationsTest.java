@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
+import ontologizer.go.TermID;
+
 import org.junit.Test;
 
 import sonumina.boqa.InternalDatafiles;
@@ -23,7 +25,7 @@ public class ObservationsTest {
 		boqa.setSizeOfScoreDistribution(1000);
 		boqa.setTryLoadingScoreDistribution(false);
 		boqa.setSimulationMaxTerms(3);
-		boqa.setPrecalculateItemMaxs(false);;
+		boqa.setPrecalculateItemMaxs(false);
 		boqa.setPrecalculateScoreDistribution(false);
 		boqa.setCacheScoreDistribution(false);
 
@@ -35,5 +37,27 @@ public class ObservationsTest {
 		assertTrue(obs.observations[1]);
 		for (int i=2; i < obs.observations.length; i++)
 			assertFalse(obs.observations[i]); 
+		
+		try
+		{
+			obs = Observations.createFromSparseOnArray(boqa, 19019901);
+			assertFalse(true);
+		} catch (IllegalArgumentException iaex)
+		{
+		}
+		
+		obs = Observations.createFromSparseOnArray(boqa, boqa.getSlimGraph().getVertex(1).getID());
+		assertFalse(obs.observations[0]);
+		assertTrue(obs.observations[1]);
+		for (int i=2; i < obs.observations.length; i++)
+			assertFalse(obs.observations[i]); 
+
+		try
+		{
+			obs = Observations.createFromSparseOnArray(boqa, new TermID("GO:9999999"));
+			assertFalse(true);
+		} catch (IllegalArgumentException iaex)
+		{
+		}
 	}
 }
