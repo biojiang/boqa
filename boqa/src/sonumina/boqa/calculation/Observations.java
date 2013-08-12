@@ -40,8 +40,7 @@ import ontologizer.go.TermID;
 
 
 /**
- * Class maintaining observations and stats regarding to
- * true positives.
+ * Class maintaining observations.
  * 
  * @author Sebastian Bauer
  *
