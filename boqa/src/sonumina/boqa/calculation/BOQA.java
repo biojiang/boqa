@@ -2078,15 +2078,7 @@ public class BOQA
 	 */
 	public Result assignMarginals(boolean takeFrequenciesIntoAccount, int...observations)
 	{
-		Observations o = new Observations();
-		o.observations = new boolean[getOntology().getNumberOfTerms()];
-		
-		for (int q : observations)
-		{
-			if (q >= o.observations.length)
-				throw new IllegalArgumentException("Observations id " + q + " refers to a non-existing term");
-			o.observations[q] = true;
-		}
+		Observations o = Observations.createFromSparseOnArray(this, observations);
 		return assignMarginals(o,takeFrequenciesIntoAccount);
 	}
 	
