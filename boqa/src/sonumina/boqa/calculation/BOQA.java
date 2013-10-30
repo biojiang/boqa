@@ -126,7 +126,6 @@ public class BOQA
 	private static Logger logger = Logger.getLogger(BOQA.class.getCanonicalName());
 
 	private Ontology graph;
-	private AssociationContainer assoc;
 	
 	/** Term enumerator */
 	private GOTermEnumerator termEnumerator;
@@ -1254,7 +1253,7 @@ public class BOQA
 	 * 
 	 * @return
 	 */
-	private Set<ByteString> extractItemsWithFrequencies()
+	private Set<ByteString> extractItemsWithFrequencies(AssociationContainer assoc)
 	{
 		HashSet<ByteString> items = new HashSet<ByteString>();
 
@@ -1306,7 +1305,6 @@ public class BOQA
 	 */
 	public void setup(Ontology ontology, AssociationContainer associations)
 	{
-		assoc = associations;
 		graph = ontology;
 
 //		graph.findRedundantISARelations();
@@ -1318,7 +1316,7 @@ public class BOQA
 		}
 
 		HashSet<ByteString> itemsToBeConsidered = new HashSet<ByteString>(associations.getAllAnnotatedGenes());
-		provideGlobals(itemsToBeConsidered);
+		provideGlobals(associations, itemsToBeConsidered);
 		
 		/* If we want to consider items with frequencies only, we like to shrink
 		 * the item list to contain only the relevant items.
@@ -1335,7 +1333,7 @@ public class BOQA
 			}
 			if (itemsToBeConsidered.size() == 0)
 				throw new RuntimeException("No items left after frequency filtering");
-			provideGlobals(itemsToBeConsidered);
+			provideGlobals(associations, itemsToBeConsidered);
 			
 			System.out.println("There were " + oldSize + " items but we consider only " + allItemList.size() + " of them with frequencies.");
 			System.out.println("Considering " + slimGraph.getNumberOfVertices() + " terms");
@@ -1593,7 +1591,7 @@ public class BOQA
 	 * @param allItemsToBeConsidered
 	 */
 	@SuppressWarnings("unused")
-	private void provideGlobals(Set<ByteString> allItemsToBeConsidered)
+	private void provideGlobals(AssociationContainer assoc, Set<ByteString> allItemsToBeConsidered)
 	{
 		int i;
 
@@ -3254,16 +3252,6 @@ public class BOQA
 	public Ontology getOntology()
 	{
 		return graph;
-	}
-	
-	/**
-	 * Returns the association container.
-	 * 
-	 * @return
-	 */
-	public AssociationContainer getAssociations()
-	{
-		return assoc;
 	}
 
 	/**
