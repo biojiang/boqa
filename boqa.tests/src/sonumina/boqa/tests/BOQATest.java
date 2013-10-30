@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Random;
 
-import junit.framework.Assert;
 import ontologizer.association.Association;
 import ontologizer.association.AssociationContainer;
 import ontologizer.benchmark.Datafiles;
