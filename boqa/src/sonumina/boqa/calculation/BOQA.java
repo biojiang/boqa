@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2012 Sebastian Bauer
+/* Copyright (c) 2010-2013 Sebastian Bauer
  *
  * All rights reserved.
  *
