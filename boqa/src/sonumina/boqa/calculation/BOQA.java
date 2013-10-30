@@ -683,8 +683,14 @@ public class BOQA
 	 * @param item
 	 * @param observed
 	 * @param takeFrequenciesIntoAccount select, if frequencies should be taken into account.
-	 * @param hiddenStorage is the storage used to store the hidden states. It must correspond to the states of the previous item (item -1). If this is the first item,
-	 *  it must be 0.
+	 * @param previousHidden is the storage used to store the hidden states. It must correspond
+	 *  to the states of the previous item (item - 1). If this is the first item, all elements must
+	 *  be initialized to 0. The supplied object will be updated upon the return of this function
+	 *  with the state of specified item.
+	 * @param previousStats is should correspond to the configuration of the previous item (i.e.,
+	 *  item - 1. If the configuration for the first item shall be determined it should correspond
+	 *  to the configuration if no item is active. The supplied object will be updated upon the
+	 *  return of this function with the state of specified item.
 	 * @return
 	 */
 	private WeightedConfigurationList determineCasesForItem(int item, boolean [] observed, boolean takeFrequenciesIntoAccount, boolean [] previousHidden, Configuration previousStats )
