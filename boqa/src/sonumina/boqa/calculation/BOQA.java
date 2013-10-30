@@ -807,7 +807,7 @@ public class BOQA
 				/* Determine the number of terms that have non-1.0 frequency. We restrict them
 				 * to the top 6 (the less probable) due to complexity issues and hope that this
 				 * a good enough approximation. */
-				for (int i=0;i<numAnnotatedTerms && i<6;i++)
+				for (int i = 0; i < numAnnotatedTerms && i < maxFrequencyTerms; i++)
 				{
 					if (items2TermFrequencies[item][item2TermFrequenciesOrder[item][i]] >= 1.0)
 						break;
