@@ -132,6 +132,8 @@ public class BOQACore
 	 */
 	private void init(Ontology localOntology, AssociationContainer localAssociations)
 	{
+		logger.info("Setting up BOQA");
+		
 		boqa.setConsiderFrequenciesOnly(false);
 		boqa.setMaxFrequencyTerms(5);
 		boqa.setPrecalculateScoreDistribution(false);
@@ -141,6 +143,8 @@ public class BOQACore
 
 		ontology = boqa.getOntology();
 		slimGraph = boqa.getSlimGraph();
+
+		logger.info("Sort terms");
 
 		/* Create the sorted index */
 
