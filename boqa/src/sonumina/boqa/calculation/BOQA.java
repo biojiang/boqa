@@ -1845,6 +1845,9 @@ public class BOQA
 		int i;
 
 		long sum=0;
+
+		logger.info("Determining differences");
+
 		/* Fill diff matrix */
 		diffOnTerms = new int[allItemList.size()][];
 		diffOffTerms = new int[allItemList.size()][];
@@ -1862,6 +1865,7 @@ public class BOQA
 		}
 		System.err.println(sum + " differences detected (" + (double)sum/allItemList.size() + " per item)");
 
+		logger.info("Determining differences with frequencies for maximal " + maxFrequencyTerms + " terms");
 		diffOnTermsFreqs = new int[allItemList.size()][][];
 		diffOffTermsFreqs = new int[allItemList.size()][][];
 		factors = new double[allItemList.size()][];
@@ -1902,7 +1906,6 @@ public class BOQA
 			{
 				boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
 				boolean [] taken = new boolean[numTermsWithExplicitFrequencies];
-				int numTermsChoosen = 0;
 
 				double factor = 0.0;
 
@@ -1946,6 +1949,7 @@ public class BOQA
 				config++;
 			}
 		}
+		logger.info("Done with differences!");
 	}
 
 	/**
