@@ -79,20 +79,22 @@ public class DiffVectors
 	/**
 	 * Create the diff annotation vectors.
 	 */
-	private void initDiffVectors(int maxFrequencyTerms, int numberOfTerms, ArrayList<ByteString> allItemList, int [][] items2Terms, double [][] items2TermFrequencies,  int [][] item2TermFrequenciesOrder, int [][] items2DirectTerms, int [][] terms2Ancestors)
+	private void initDiffVectors(int maxFrequencyTerms, int numberOfTerms, int [][] items2Terms, double [][] items2TermFrequencies,  int [][] item2TermFrequenciesOrder, int [][] items2DirectTerms, int [][] terms2Ancestors)
 	{
 		int i;
 
 		long sum=0;
 
+		int numberOfItems = items2Terms.length;
+
 		logger.info("Determining differences");
 
 		/* Fill diff matrix */
-		diffOnTerms = new int[allItemList.size()][];
-		diffOffTerms = new int[allItemList.size()][];
+		diffOnTerms = new int[numberOfItems][];
+		diffOffTerms = new int[numberOfItems][];
 		diffOnTerms[0] = items2Terms[0]; /* For the first step, all terms must be activated */
 		diffOffTerms[0] = new int[0];
-		for (i=1;i<allItemList.size();i++)
+		for (i=1;i<numberOfItems;i++)
 		{
 			int prevOnTerms[] = items2Terms[i-1];
 			int newOnTerms[] = items2Terms[i];
@@ -102,13 +104,13 @@ public class DiffVectors
 
 			sum += diffOnTerms[i].length + diffOffTerms[i].length;
 		}
-		System.err.println(sum + " differences detected (" + (double)sum/allItemList.size() + " per item)");
+		System.err.println(sum + " differences detected (" + (double)sum/numberOfItems + " per item)");
 
 		logger.info("Determining differences with frequencies for maximal " + maxFrequencyTerms + " terms");
-		diffOnTermsFreqs = new int[allItemList.size()][][];
-		diffOffTermsFreqs = new int[allItemList.size()][][];
-		factors = new double[allItemList.size()][];
-		for (int item=0;item<allItemList.size();item++)
+		diffOnTermsFreqs = new int[numberOfItems][][];
+		diffOffTermsFreqs = new int[numberOfItems][][];
+		factors = new double[numberOfItems][];
+		for (int item=0;item<numberOfItems;item++)
 		{
 			int numTerms = items2TermFrequencies[item].length;
 			int numTermsWithExplicitFrequencies = 0;
@@ -198,7 +200,6 @@ public class DiffVectors
 	 *
 	 * @param maxFrequencyTerms
 	 * @param slimGraph
-	 * @param allItemList
 	 * @param items2Terms
 	 * @param items2TermFrequencies
 	 * @param item2TermFrequenciesOrder
@@ -206,10 +207,10 @@ public class DiffVectors
 	 * @param terms2Ancestors
 	 * @return
 	 */
-	public static DiffVectors createDiffVectors(int maxFrequencyTerms, int numberOfTerms, ArrayList<ByteString> allItemList, int [][] items2Terms, double [][] items2TermFrequencies,  int [][] item2TermFrequenciesOrder, int [][] items2DirectTerms, int [][] terms2Ancestors)
+	public static DiffVectors createDiffVectors(int maxFrequencyTerms, int numberOfTerms, int [][] items2Terms, double [][] items2TermFrequencies,  int [][] item2TermFrequenciesOrder, int [][] items2DirectTerms, int [][] terms2Ancestors)
 	{
 		DiffVectors dv = new DiffVectors();
-		dv.initDiffVectors(maxFrequencyTerms, numberOfTerms, allItemList, items2Terms, items2TermFrequencies, item2TermFrequenciesOrder, items2DirectTerms, terms2Ancestors);
+		dv.initDiffVectors(maxFrequencyTerms, numberOfTerms, items2Terms, items2TermFrequencies, item2TermFrequenciesOrder, items2DirectTerms, terms2Ancestors);
 		return dv;
 	}
 }

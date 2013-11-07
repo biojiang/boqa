@@ -1805,7 +1805,7 @@ public class BOQA
 				item2TermFrequenciesOrder[i][j] = freqs[j].termIdx;
 		}
 
-		DiffVectors dv = DiffVectors.createDiffVectors(maxFrequencyTerms, slimGraph.getNumberOfVertices(), allItemList, items2Terms, items2TermFrequencies, item2TermFrequenciesOrder, items2DirectTerms, term2Ancestors);
+		DiffVectors dv = DiffVectors.createDiffVectors(maxFrequencyTerms, slimGraph.getNumberOfVertices(), items2Terms, items2TermFrequencies, item2TermFrequenciesOrder, items2DirectTerms, term2Ancestors);
 		diffOnTerms = dv.diffOnTerms;
 		diffOffTerms = dv.diffOffTerms;
 		diffOnTermsFreqs = dv.diffOnTermsFreqs;
