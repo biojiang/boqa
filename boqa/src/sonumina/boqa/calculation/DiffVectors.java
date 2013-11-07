@@ -38,10 +38,8 @@ package sonumina.boqa.calculation;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-import ontologizer.go.Term;
 import ontologizer.types.ByteString;
 import sonumina.boqa.calculation.BOQA.IntArray;
-import sonumina.math.graph.SlimDirectedGraphView;
 
 public class DiffVectors
 {
@@ -81,7 +79,7 @@ public class DiffVectors
 	/**
 	 * Create the diff annotation vectors.
 	 */
-	private void initDiffVectors(int maxFrequencyTerms, SlimDirectedGraphView<Term> slimGraph, ArrayList<ByteString> allItemList, int [][] items2Terms, double [][] items2TermFrequencies,  int [][] item2TermFrequenciesOrder, int [][] items2DirectTerms, int [][] terms2Ancestors)
+	private void initDiffVectors(int maxFrequencyTerms, int numberOfTerms, ArrayList<ByteString> allItemList, int [][] items2Terms, double [][] items2TermFrequencies,  int [][] item2TermFrequenciesOrder, int [][] items2DirectTerms, int [][] terms2Ancestors)
 	{
 		int i;
 
@@ -139,13 +137,13 @@ public class DiffVectors
 			factors[item] = new double[numConfigs];
 
 			/* Contains the settings of the previous run */
-			IntArray prevArray = new IntArray(slimGraph.getNumberOfVertices());
+			IntArray prevArray = new IntArray(numberOfTerms);
 
 			int config = 0;
 
 			while ((s = sg.next()) != null)
 			{
-				boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
+				boolean [] hidden = new boolean[numberOfTerms];
 				boolean [] taken = new boolean[numTermsWithExplicitFrequencies];
 
 				double factor = 0.0;
@@ -208,10 +206,10 @@ public class DiffVectors
 	 * @param terms2Ancestors
 	 * @return
 	 */
-	public static DiffVectors createDiffVectors(int maxFrequencyTerms, SlimDirectedGraphView<Term> slimGraph, ArrayList<ByteString> allItemList, int [][] items2Terms, double [][] items2TermFrequencies,  int [][] item2TermFrequenciesOrder, int [][] items2DirectTerms, int [][] terms2Ancestors)
+	public static DiffVectors createDiffVectors(int maxFrequencyTerms, int numberOfTerms, ArrayList<ByteString> allItemList, int [][] items2Terms, double [][] items2TermFrequencies,  int [][] item2TermFrequenciesOrder, int [][] items2DirectTerms, int [][] terms2Ancestors)
 	{
 		DiffVectors dv = new DiffVectors();
-		dv.initDiffVectors(maxFrequencyTerms, slimGraph, allItemList, items2Terms, items2TermFrequencies, item2TermFrequenciesOrder, items2DirectTerms, terms2Ancestors);
+		dv.initDiffVectors(maxFrequencyTerms, numberOfTerms, allItemList, items2Terms, items2TermFrequencies, item2TermFrequenciesOrder, items2DirectTerms, terms2Ancestors);
 		return dv;
 	}
 }
