@@ -35,10 +35,8 @@
 
 package sonumina.boqa.calculation;
 
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
-import ontologizer.types.ByteString;
 import sonumina.boqa.calculation.BOQA.IntArray;
 
 public class DiffVectors
