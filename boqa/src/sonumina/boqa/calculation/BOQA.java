@@ -1505,7 +1505,7 @@ public class BOQA
 	 * @param b
 	 * @return
 	 */
-	private static int [] setDiff(int [] a, int [] b)
+	static int [] setDiff(int [] a, int [] b)
 	{
 		int [] c = new int[a.length];
 		int cc = 0; /* current c */
@@ -1805,7 +1805,12 @@ public class BOQA
 				item2TermFrequenciesOrder[i][j] = freqs[j].termIdx;
 		}
 
-		createDiffVectors();
+		DiffVectors dv = DiffVectors.createDiffVectors(maxFrequencyTerms, slimGraph, allItemList, items2Terms, items2TermFrequencies, item2TermFrequenciesOrder, items2DirectTerms, term2Ancestors);
+		diffOnTerms = dv.diffOnTerms;
+		diffOffTerms = dv.diffOffTerms;
+		diffOnTermsFreqs = dv.diffOnTermsFreqs;
+		diffOffTermsFreqs = dv.diffOffTermsFreqs;
+		factors = dv.factors;
 
 		/* Calculate IC */
 		terms2IC = new double[slimGraph.getNumberOfVertices()];
@@ -1835,121 +1840,6 @@ public class BOQA
 					});
 			System.out.println("End (" + ((System.nanoTime() - start) / 1000 / 1000) + "ms)");
 		}
-	}
-
-	/**
-	 * Create the diff annotation vectors.
-	 */
-	private void createDiffVectors()
-	{
-		int i;
-
-		long sum=0;
-
-		logger.info("Determining differences");
-
-		/* Fill diff matrix */
-		diffOnTerms = new int[allItemList.size()][];
-		diffOffTerms = new int[allItemList.size()][];
-		diffOnTerms[0] = items2Terms[0]; /* For the first step, all terms must be activated */
-		diffOffTerms[0] = new int[0];
-		for (i=1;i<allItemList.size();i++)
-		{
-			int prevOnTerms[] = items2Terms[i-1];
-			int newOnTerms[] = items2Terms[i];
-
-			diffOnTerms[i] = setDiff(newOnTerms, prevOnTerms);
-			diffOffTerms[i] = setDiff(prevOnTerms, newOnTerms);
-
-			sum += diffOnTerms[i].length + diffOffTerms[i].length;
-		}
-		System.err.println(sum + " differences detected (" + (double)sum/allItemList.size() + " per item)");
-
-		logger.info("Determining differences with frequencies for maximal " + maxFrequencyTerms + " terms");
-		diffOnTermsFreqs = new int[allItemList.size()][][];
-		diffOffTermsFreqs = new int[allItemList.size()][][];
-		factors = new double[allItemList.size()][];
-		for (int item=0;item<allItemList.size();item++)
-		{
-			int numTerms = items2TermFrequencies[item].length;
-			int numTermsWithExplicitFrequencies = 0;
-			int numConfigs = 0;
-
-			/* Determine the number of terms that have non-1.0 frequency. We restrict them
-			 * to the top 6 (the less probable) due to complexity issues and hope that this
-			 * a good enough approximation. */
-			for (i=0;i<numTerms && i<maxFrequencyTerms;i++)
-			{
-				if (items2TermFrequencies[item][item2TermFrequenciesOrder[item][i]] >= 1.0)
-					break;
-				numTermsWithExplicitFrequencies++;
-			}
-
-			/* We try each possible activity/inactivity combination of terms with explicit frequencies */
-			SubsetGenerator sg = new SubsetGenerator(numTermsWithExplicitFrequencies,numTermsWithExplicitFrequencies);
-			SubsetGenerator.Subset s;
-
-			/* First, determine the number of configs (could calculate binomial coefficient of course) */
-			while ((s = sg.next()) != null)
-				numConfigs++;
-
-			diffOnTermsFreqs[item] = new int[numConfigs][];  
-			diffOffTermsFreqs[item] = new int[numConfigs][];
-			factors[item] = new double[numConfigs];
-
-			/* Contains the settings of the previous run */
-			IntArray prevArray = new IntArray(slimGraph.getNumberOfVertices());
-
-			int config = 0;
-
-			while ((s = sg.next()) != null)
-			{
-				boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
-				boolean [] taken = new boolean[numTermsWithExplicitFrequencies];
-
-				double factor = 0.0;
-
-				/* First, activate variable terms according to the current selection */
-				for (i=0;i<s.r;i++)
-				{
-					int ti = item2TermFrequenciesOrder[item][s.j[i]]; /* index of term within the all directly associated indices */
-					int h = items2DirectTerms[item][ti];			  /* global index of term */
-					hidden[h] = true;
-					activateAncestors(h, hidden);
-					factor += Math.log(items2TermFrequencies[item][ti]);
-					taken[s.j[i]] = true;
-				}
-				
-				/* Needs also respect the inactive terms in the factor */
-				for (i=0;i<numTermsWithExplicitFrequencies;i++)
-				{
-					if (!taken[i])
-						factor += Math.log(1 - items2TermFrequencies[item][item2TermFrequenciesOrder[item][i]]);
-				}
-
-				/* Second, activate mandatory terms */
-				for (i=numTermsWithExplicitFrequencies;i<numTerms;i++)
-				{
-					int ti = item2TermFrequenciesOrder[item][i];
-					int h = items2DirectTerms[item][ti];  /* global index of term */
-					hidden[h] = true;
-					activateAncestors(h, hidden);
-					/* Factor is always 0 */
-				}
-				
-				/* Now make a sparse representation */
-				IntArray newArray = new IntArray(hidden);
-
-				/* And record the difference */
-				diffOnTermsFreqs[item][config] = setDiff(newArray.get(), prevArray.get());
-				diffOffTermsFreqs[item][config] = setDiff(prevArray.get(), newArray.get());
-				factors[item][config] = factor;
-
-				prevArray = newArray;
-				config++;
-			}
-		}
-		logger.info("Done with differences!");
 	}
 
 	/**
