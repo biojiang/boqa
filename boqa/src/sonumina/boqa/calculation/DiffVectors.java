@@ -147,7 +147,6 @@ public class DiffVectors
 			{
 				boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
 				boolean [] taken = new boolean[numTermsWithExplicitFrequencies];
-				int numTermsChoosen = 0;
 
 				double factor = 0.0;
 
@@ -157,7 +156,6 @@ public class DiffVectors
 					int ti = item2TermFrequenciesOrder[item][s.j[i]]; /* index of term within the all directly associated indices */
 					int h = items2DirectTerms[item][ti];			  /* global index of term */
 					hidden[h] = true;
-//					activateAncestors(h, hidden);
 					for (int j = 0; j < terms2Ancestors[h].length; j++)
 						hidden[terms2Ancestors[h][j]] = true;
 					factor += Math.log(items2TermFrequencies[item][ti]);
@@ -177,7 +175,6 @@ public class DiffVectors
 					int ti = item2TermFrequenciesOrder[item][i];
 					int h = items2DirectTerms[item][ti];  /* global index of term */
 					hidden[h] = true;
-//					activateAncestors(h, hidden);
 					for (int j = 0; j < terms2Ancestors[h].length; j++)
 						hidden[terms2Ancestors[h][j]] = true;
 					/* Factor is always 0 */
