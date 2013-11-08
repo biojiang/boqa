@@ -37,8 +37,6 @@ package sonumina.boqa.calculation;
 
 import java.util.logging.Logger;
 
-import sonumina.boqa.calculation.BOQA.IntArray;
-
 public class DiffVectors
 {
 	/** Our logger */
