@@ -25,6 +25,7 @@ import org.junit.Test;
 import sonumina.boqa.InternalDatafiles;
 import sonumina.boqa.benchmark.Benchmark;
 import sonumina.boqa.calculation.BOQA;
+import sonumina.boqa.calculation.IntArray;
 import sonumina.boqa.calculation.Observations;
 import sonumina.boqa.calculation.BOQA.Result;
 import sonumina.math.graph.AbstractGraph.DotAttributesProvider;
@@ -456,7 +457,7 @@ public class BOQATest
 			int item = rnd.nextInt(boqa.getNumberOfItems());
 			
 			Observations obs = boqa.generateObservations(item, rnd);
-			BOQA.IntArray sparse = new BOQA.IntArray(obs.observations);
+			IntArray sparse = new IntArray(obs.observations);
 			int [] mst = boqa.mostSpecificTerms(sparse.get());
 
 			/* Get full observation according to mostSpecificTerms() */
