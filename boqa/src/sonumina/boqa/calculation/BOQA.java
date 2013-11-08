@@ -1499,41 +1499,6 @@ public class BOQA
 	}
 
 	/**
-	 * Calculates the set difference of a minus b.
-	 * 
-	 * @param a
-	 * @param b
-	 * @return
-	 */
-	static int [] setDiff(int [] a, int [] b)
-	{
-		int [] c = new int[a.length];
-		int cc = 0; /* current c */
-
-		/* Obviously, this could be optimized to linear time if a and b would be assumed to be sorted */
-		for (int i=0;i<a.length;i++)
-		{
-			boolean inB = false;
-
-			for (int j=0;j<b.length;j++)
-			{
-				if (a[i] == b[j])
-				{
-					inB = true;
-					break;
-				}
-			}
-			
-			if (!inB)
-				c[cc++] = a[i];
-		}
-		int [] nc = new int[cc];
-		for (int i=0;i<cc;i++)
-			nc[i] = c[i];
-		return nc;
-	}
-	
-	/**
 	 * Helper function to create sub array of length elements from
 	 * the given array.
 	 * 

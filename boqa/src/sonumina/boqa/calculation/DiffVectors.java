@@ -97,8 +97,8 @@ public class DiffVectors
 			int prevOnTerms[] = items2Terms[i-1];
 			int newOnTerms[] = items2Terms[i];
 
-			diffOnTerms[i] = BOQA.setDiff(newOnTerms, prevOnTerms);
-			diffOffTerms[i] = BOQA.setDiff(prevOnTerms, newOnTerms);
+			diffOnTerms[i] = Util.setDiff(newOnTerms, prevOnTerms);
+			diffOffTerms[i] = Util.setDiff(prevOnTerms, newOnTerms);
 
 			sum += diffOnTerms[i].length + diffOffTerms[i].length;
 		}
@@ -182,8 +182,8 @@ public class DiffVectors
 				IntArray newArray = new IntArray(hidden);
 
 				/* And record the difference */
-				diffOnTermsFreqs[item][config] = BOQA.setDiff(newArray.get(), prevArray.get());
-				diffOffTermsFreqs[item][config] = BOQA.setDiff(prevArray.get(), newArray.get());
+				diffOnTermsFreqs[item][config] = Util.setDiff(newArray.get(), prevArray.get());
+				diffOffTermsFreqs[item][config] = Util.setDiff(prevArray.get(), newArray.get());
 				factors[item][config] = factor;
 
 				prevArray = newArray;
