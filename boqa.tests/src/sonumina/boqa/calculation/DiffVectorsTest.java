@@ -1,8 +1,10 @@
 package sonumina.boqa.calculation;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import ontologizer.benchmark.Datafiles;
 import ontologizer.enumeration.GOTermEnumerator;
 import ontologizer.enumeration.ItemEnumerator;
 import ontologizer.go.Term;
@@ -18,10 +20,12 @@ import sonumina.math.graph.SlimDirectedGraphView;
 
 public class DiffVectorsTest
 {
-	@Test
-	public void testDiffVectors()
-	{
-		InternalDatafiles datafiles = new InternalDatafiles();
+	/**
+	 * Run the test for the given data files.
+	 *
+	 * @param datafiles
+	 */
+	private void testOnDatafiles(Datafiles datafiles) {
 		SlimDirectedGraphView<Term> slimGraph = datafiles.graph.getSlimGraphView();
 
 		PopulationSet allItems = new PopulationSet("all");
@@ -30,10 +34,10 @@ public class DiffVectorsTest
 		ItemEnumerator itemEnumerator = ItemEnumerator.createFromTermEnumerator(termEnumerator);
 		ArrayList<ByteString> itemList = new ArrayList<ByteString>();
 
-		int numberOfTerms = itemEnumerator.getAllTermIDs().size();
+		int numberOfTerms = slimGraph.getNumberOfVertices();
 		int numberOfItems = termEnumerator.getGenes().size();
 		int maxFrequencyTerms = 1;
-
+		
 		int [][] items2Terms = new int[numberOfItems][];
 		double [][] items2TermFrequencies = new double[numberOfItems][];
 		int [][] item2TermFrequenciesOrder = new int[numberOfItems][];
@@ -76,5 +80,19 @@ public class DiffVectorsTest
 			Arrays.sort(dv.diffOnTerms[i]);
 			Assert.assertArrayEquals(diff, dv.diffOnTerms[i]);
 		}
+	}
+
+	@Test
+	public void testDiffVectorsOnInternal()
+	{
+		InternalDatafiles datafiles = new InternalDatafiles();
+		testOnDatafiles(datafiles);
+	}
+
+	@Test
+	public void testDiffVectorsOnHPO() throws InterruptedException, IOException
+	{
+		Datafiles hpo = new Datafiles("../boqa/data/human-phenotype-ontology.obo.gz","../boqa/data/phenotype_annotation.omim.gz");
+		testOnDatafiles(hpo);
 	}
 }
