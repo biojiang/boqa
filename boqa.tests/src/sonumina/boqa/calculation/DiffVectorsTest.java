@@ -9,6 +9,7 @@ import ontologizer.go.TermID;
 import ontologizer.set.PopulationSet;
 import ontologizer.types.ByteString;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import sonumina.boqa.InternalDatafiles;
@@ -63,5 +64,8 @@ public class DiffVectorsTest
 		}
 
 		DiffVectors dv = DiffVectors.createDiffVectors(maxFrequencyTerms, numberOfTerms, items2Terms, items2TermFrequencies, item2TermFrequenciesOrder, items2DirectTerms, terms2Ancestors);
+		Assert.assertEquals(items2Terms[0].length, dv.diffOnTerms[0].length);
+		Assert.assertEquals(items2Terms.length,dv.diffOnTerms.length);
+		Assert.assertEquals(0, dv.diffOffTerms[0].length);
 	}
 }
