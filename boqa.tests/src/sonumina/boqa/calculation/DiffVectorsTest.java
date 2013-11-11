@@ -1,6 +1,7 @@
 package sonumina.boqa.calculation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import ontologizer.enumeration.GOTermEnumerator;
 import ontologizer.enumeration.ItemEnumerator;
@@ -67,5 +68,13 @@ public class DiffVectorsTest
 		Assert.assertEquals(items2Terms[0].length, dv.diffOnTerms[0].length);
 		Assert.assertEquals(items2Terms.length,dv.diffOnTerms.length);
 		Assert.assertEquals(0, dv.diffOffTerms[0].length);
+
+		for (int i=1; i<items2Terms.length; i++)
+		{
+			int [] diff = Util.setDiff(items2Terms[i], items2Terms[i-1]);
+			Arrays.sort(diff);
+			Arrays.sort(dv.diffOnTerms[i]);
+			Assert.assertArrayEquals(diff, dv.diffOnTerms[i]);
+		}
 	}
 }
