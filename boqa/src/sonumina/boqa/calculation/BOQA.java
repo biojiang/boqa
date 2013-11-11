@@ -139,7 +139,7 @@ public class BOQA
 	/** Map items to their index */
 	private HashMap<ByteString,Integer> item2Index;
 
-	/** Links items to terms */
+	/** Links items to terms. The contents of each row is sorted. */
 	private int [][] items2Terms;
 
 	/**
