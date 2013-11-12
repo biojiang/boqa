@@ -69,16 +69,35 @@ public class DiffVectorsTest
 		}
 
 		DiffVectors dv = DiffVectors.createDiffVectors(maxFrequencyTerms, numberOfTerms, items2Terms, items2TermFrequencies, item2TermFrequenciesOrder, items2DirectTerms, terms2Ancestors);
+
+		/* The non-frequency diffs */
 		Assert.assertEquals(items2Terms[0].length, dv.diffOnTerms[0].length);
 		Assert.assertEquals(items2Terms.length,dv.diffOnTerms.length);
 		Assert.assertEquals(0, dv.diffOffTerms[0].length);
-
 		for (int i=1; i<items2Terms.length; i++)
 		{
 			int [] diff = Util.setDiff(items2Terms[i], items2Terms[i-1]);
 			Arrays.sort(diff);
 			Arrays.sort(dv.diffOnTerms[i]);
 			Assert.assertArrayEquals(diff, dv.diffOnTerms[i]);
+		}
+
+		/* The frequency diffs */
+		for (int item=0; item<items2Terms.length; item++)
+		{
+			int numTerms = items2TermFrequencies[item].length;
+			int numTermsWithExplicitFrequencies = 0;
+			int numConfigs = 0;
+
+			/* Determine the number of terms that have non-1.0 frequency. We restrict them
+			 * to the top 6 (the less probable) due to complexity issues and hope that this
+			 * a good enough approximation. */
+			for (int i=0;i<numTerms && i<maxFrequencyTerms;i++)
+			{
+				if (items2TermFrequencies[i][item2TermFrequenciesOrder[i][i]] >= 1.0)
+					break;
+				numTermsWithExplicitFrequencies++;
+			}
 		}
 	}
 
