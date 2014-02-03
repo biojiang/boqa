@@ -37,6 +37,12 @@ package sonumina.boqa.calculation;
 
 import java.util.logging.Logger;
 
+/**
+ * Helper function to create all the diff vectors. A diff vector describes the differences
+ * between one vector and another with respect to one state change (i.e, 0->1 or 1->0).
+ * 
+ * @author Sebastian Bauer
+ */
 public class DiffVectors
 {
 	/** Our logger */
