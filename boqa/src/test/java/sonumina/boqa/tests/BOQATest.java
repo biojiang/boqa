@@ -188,6 +188,7 @@ public class BOQATest
 		Result linResult = boqa.linScore(obs, true, new Random(3));
 		Result jcResult = boqa.jcScore(obs, true, new Random(3));
 		Result boqaResult = boqa.assignMarginals(o, false);
+		Result boqaWithThreadsResult = boqa.assignMarginals(o, false, 2);
 
 		System.out.println("Resnik");
 		for (int i=0;i<boqa.getNumberOfItems();i++)
@@ -201,9 +202,13 @@ public class BOQATest
 		for (int i=0;i<boqa.getNumberOfItems();i++)
 			System.out.println(i + "  p=" + jcResult.getMarginal(i) + " score=" + jcResult.getScore(i));
 
-		System.out.println("FABN");
+		System.out.println("BOQA");
 		for (int i=0;i<boqa.getNumberOfItems();i++)
 			System.out.println(i + " marg=" + boqaResult.getMarginal(i) + " score=" + boqaResult.getScore(i));
+
+		System.out.println("BOQA with Threads");
+		for (int i=0;i<boqa.getNumberOfItems();i++)
+			System.out.println(i + " marg=" + boqaWithThreadsResult.getMarginal(i) + " score=" + boqaWithThreadsResult.getScore(i));
 
 		double [] resnikP = new double[] { 0.64384, 0.843968, 0.15518, 0.844376, 0.68832 };
 		double [] resnikScore = new double[] { 0.4581453659370775, 0.2231435513142097, 0.916290731874155, 0.2231435513142097, 0.11157177565710485 };
@@ -225,6 +230,8 @@ public class BOQATest
 			assertEquals(jcScore[i], jcResult.getScore(i), 0.0001);
 			assertEquals(boqaScores[i], boqaResult.getScore(i), 0.0001);
 			assertEquals(boqaMarginals[i], boqaResult.getMarginal(i), 0.0001);
+			assertEquals(boqaScores[i], boqaWithThreadsResult.getScore(i), 0.0001);
+			assertEquals(boqaMarginals[i], boqaWithThreadsResult.getMarginal(i), 0.0001);
 		}
 
 		/* Item 3 */
