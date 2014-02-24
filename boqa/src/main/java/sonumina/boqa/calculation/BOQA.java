@@ -715,13 +715,28 @@ public class BOQA
 		{
 			boolean [] hidden;
 			Configuration stats;
-			
-			if (previousHidden == null) hidden = new boolean[numTerms];
-			else hidden = previousHidden;
-			
-			if (previousStats == null) stats = new Configuration();
-			else stats = previousStats;
-			
+
+			if (previousHidden == null)
+			{
+				/* If no previous state was given, we have to explicitly generate the state of
+				 * the previous item. Obviously, this will be much slower.
+				 */
+				hidden = new boolean[numTerms];
+				stats = new Configuration();
+				if (item > 0)
+				{
+					int [] prevItemDirectTerms = items2DirectTerms[item-1]; 
+					for (int i=0; i < prevItemDirectTerms.length; i++)
+						for (int j=0; j < term2Ancestors[prevItemDirectTerms[i]].length; j++)
+							hidden[term2Ancestors[prevItemDirectTerms[i]][j]] = true;
+				}
+				determineCases(observed, hidden, stats);
+			} else
+			{
+				hidden = previousHidden;
+				stats = previousStats;
+			}
+
 			if (!takeFrequenciesIntoAccount)
 			{
 				/* New */
@@ -1946,14 +1961,16 @@ public class BOQA
 		for (i=0;i<allItemList.size();i++)
 		{
 			final int item = i;
-			
 			/* Construct the runnable suitable for the calculation for a single item */
 			Runnable run = new Runnable() {
 				
 				@Override
 				public void run() {
 					WeightedConfigurationList stats = determineCasesForItem(item,observations.observations,takeFrequenciesIntoAccount,numThreads>1?null:previousHidden,numThreads>1?null:previousStat);
-					
+					for (WeightedConfiguration conf : stats)
+					{
+						System.out.println("factor for item " + item + "  " + conf.factor + " conf " + conf.stat);
+					}
 					for (int a=0;a<ALPHA_GRID.length;a++)
 					{
 						for (int b=0;b<BETA_GRID.length;b++)
