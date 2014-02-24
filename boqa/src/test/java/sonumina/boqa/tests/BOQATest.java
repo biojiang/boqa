@@ -187,7 +187,7 @@ public class BOQATest
 		Result resnikResult = boqa.resnikScore(obs, true, new Random(3));
 		Result linResult = boqa.linScore(obs, true, new Random(3));
 		Result jcResult = boqa.jcScore(obs, true, new Random(3));
-		Result fabnResult = boqa.assignMarginals(o, false);
+		Result boqaResult = boqa.assignMarginals(o, false);
 
 		System.out.println("Resnik");
 		for (int i=0;i<boqa.getNumberOfItems();i++)
@@ -203,7 +203,7 @@ public class BOQATest
 
 		System.out.println("FABN");
 		for (int i=0;i<boqa.getNumberOfItems();i++)
-			System.out.println(i + " marg=" + fabnResult.getMarginal(i) + " score=" + fabnResult.getScore(i));
+			System.out.println(i + " marg=" + boqaResult.getMarginal(i) + " score=" + boqaResult.getScore(i));
 
 		double [] resnikP = new double[] { 0.64384, 0.843968, 0.15518, 0.844376, 0.68832 };
 		double [] resnikScore = new double[] { 0.4581453659370775, 0.2231435513142097, 0.916290731874155, 0.2231435513142097, 0.11157177565710485 };
@@ -211,8 +211,8 @@ public class BOQATest
 		double [] linP = new double[] {0.64384,0.754716,0.02238,0.823132,0.577072};
 		double [] jcScore = new double[] {0.44323653311493805, 0.4576751569317141, 0.9999999999999998,0.5552427170907795, 0.6003949092992065};
 		double [] jcP = new double[]{0.755548,0.866124,0.02238,0.667388,0.622036};
-		double [] fabnScores = new double[] { -0.9724346539489889, -1.3317577761951482, 2.2926928336673593, -0.6160410530454002, -0.6160410530454002 };
-		double [] fabnMarginals = new double[] { 0.032533088008779756, 0.022712933995512156, 0.8518284456000037, 0.046462766197852126, 0.046462766197852126 };
+		double [] boqaScores = new double[] { -0.9724346539489889, -1.3317577761951482, 2.2926928336673593, -0.6160410530454002, -0.6160410530454002 };
+		double [] boqaMarginals = new double[] { 0.032533088008779756, 0.022712933995512156, 0.8518284456000037, 0.046462766197852126, 0.046462766197852126 };
 
 		for (int i=0;i<boqa.getNumberOfItems();i++)
 		{
@@ -223,8 +223,8 @@ public class BOQATest
 			assertEquals(linScore[i], linResult.getScore(i), 0.0001);
 			assertEquals(jcP[i], jcResult.getMarginal(i), 0.05);
 			assertEquals(jcScore[i], jcResult.getScore(i), 0.0001);
-			assertEquals(fabnScores[i], fabnResult.getScore(i), 0.0001);
-			assertEquals(fabnMarginals[i], fabnResult.getMarginal(i), 0.0001);
+			assertEquals(boqaScores[i], boqaResult.getScore(i), 0.0001);
+			assertEquals(boqaMarginals[i], boqaResult.getMarginal(i), 0.0001);
 		}
 
 		/* Item 3 */
@@ -245,7 +245,7 @@ public class BOQATest
 		resnikResult = boqa.resnikScore(obs, true, new Random(3));
 		linResult = boqa.linScore(obs, true, new Random(3));
 		jcResult = boqa.jcScore(obs, true, new Random(3));
-		fabnResult = boqa.assignMarginals(o, false);
+		boqaResult = boqa.assignMarginals(o, false);
 		
 		System.out.println("Resnik");
 		for (int i=0;i<boqa.getNumberOfItems();i++)
@@ -261,7 +261,7 @@ public class BOQATest
 
 		System.out.println("FABN");
 		for (int i=0;i<boqa.getNumberOfItems();i++)
-			System.out.println(i + " marg=" + fabnResult.getMarginal(i) + " score=" + fabnResult.getScore(i));
+			System.out.println(i + " marg=" + boqaResult.getMarginal(i) + " score=" + boqaResult.getScore(i));
 
 		resnikScore = new double[]{0.11157177565710485,0.2231435513142097,0.2231435513142097,0.916290731874155,0.11157177565710485};
 		resnikP = new double[]{0.821472,0.843968,0.799752,0.200844,0.68832};
@@ -269,8 +269,8 @@ public class BOQATest
 		linP = new double[]{0.821472,0.754716,0.755148,0.044964,0.755296};
 		jcScore = new double[]{0.43712271203780284,0.4576751569317141,0.5552427170907795,0.9999999999999998,0.6003949092992065};
 		jcP = new double[]{0.889184,0.866124,0.6225,0.044964,0.622036};
-		fabnScores = new double[]{-1.633587994564142,-1.633587994564142,-1.3091882336053455,2.196264120323024,-1.3063742210362417};
-		fabnMarginals = new double[]{0.019674959868555657,0.019674959868555657,0.027214407363261438,0.9061445759999325,0.027291096899695524};
+		boqaScores = new double[]{-1.633587994564142,-1.633587994564142,-1.3091882336053455,2.196264120323024,-1.3063742210362417};
+		boqaMarginals = new double[]{0.019674959868555657,0.019674959868555657,0.027214407363261438,0.9061445759999325,0.027291096899695524};
 
 		for (int i=0;i<boqa.getNumberOfItems();i++)
 		{
@@ -281,8 +281,8 @@ public class BOQATest
 			assertEquals(linScore[i], linResult.getScore(i), 0.0001);
 			assertEquals(jcP[i], jcResult.getMarginal(i), 0.05);
 			assertEquals(jcScore[i], jcResult.getScore(i), 0.0001);
-			assertEquals(fabnScores[i], fabnResult.getScore(i), 0.0001);
-			assertEquals(fabnMarginals[i], fabnResult.getMarginal(i), 0.0001);
+			assertEquals(boqaScores[i], boqaResult.getScore(i), 0.0001);
+			assertEquals(boqaMarginals[i], boqaResult.getMarginal(i), 0.0001);
 		}
 	}
 	
