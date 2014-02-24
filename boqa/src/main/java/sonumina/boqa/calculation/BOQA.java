@@ -1967,10 +1967,6 @@ public class BOQA
 				@Override
 				public void run() {
 					WeightedConfigurationList stats = determineCasesForItem(item,observations.observations,takeFrequenciesIntoAccount,numThreads>1?null:previousHidden,numThreads>1?null:previousStat);
-					for (WeightedConfiguration conf : stats)
-					{
-						System.out.println("factor for item " + item + "  " + conf.factor + " conf " + conf.stat);
-					}
 					for (int a=0;a<ALPHA_GRID.length;a++)
 					{
 						for (int b=0;b<BETA_GRID.length;b++)
