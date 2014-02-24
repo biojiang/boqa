@@ -828,7 +828,7 @@ public class BOQA
 			while ((s = sg.next()) != null)
 			{
 				double factor = 0.0;
-				boolean [] hidden = new boolean[slimGraph.getNumberOfVertices()];
+				boolean [] hidden = new boolean[numTerms];
 				boolean [] taken = new boolean[numTermsWithExplicitFrequencies];
 	
 				/* first, activate variable terms according to the current selection */
