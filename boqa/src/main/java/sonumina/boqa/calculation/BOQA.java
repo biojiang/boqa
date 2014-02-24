@@ -1936,6 +1936,7 @@ public class BOQA
 		else
 			es = null;
 
+		/* Initialize values if no item is selected */
 		final boolean [] previousHidden = new boolean[slimGraph.getNumberOfVertices()];
 		final Configuration previousStat = new Configuration();
 		determineCases(observations.observations, previousHidden, previousStat);
