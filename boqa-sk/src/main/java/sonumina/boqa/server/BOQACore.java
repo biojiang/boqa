@@ -34,6 +34,8 @@ public class BOQACore {
 
 	static int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
+	public static String debugThis;
+
 	static final String DEFAULT_DEFINITIONS_PATH = "/home/sba/workspace/boqa/data/human-phenotype-ontology.obo.gz";
 	static final String DEFAULT_ASSOCIATIONS_PATH = "/home/sba/workspace/boqa/data/phenotype_annotation.omim.gz";
 

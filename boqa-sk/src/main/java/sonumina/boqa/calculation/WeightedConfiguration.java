@@ -40,8 +40,11 @@ package sonumina.boqa.calculation;
  * 
  * @author Sebastian Bauer
  */
-class WeightedConfiguration
-{
+class WeightedConfiguration {
 	public double factor;
 	public Configuration stat;
+
+	public void setDoPrint() {
+		this.stat.setDoPrint();
+	}
 }
