@@ -14,6 +14,7 @@ import ontologizer.association.AssociationContainer;
 import ontologizer.association.AssociationParser;
 import ontologizer.go.OBOParser;
 import ontologizer.go.OBOParserException;
+import ontologizer.go.OBOParserFileInput;
 import ontologizer.go.Ontology;
 import ontologizer.go.Term;
 import ontologizer.go.TermContainer;
@@ -84,8 +85,9 @@ public class BOQACore
 		
 		long start = System.currentTimeMillis();
 
-		OBOParser oboParser = new OBOParser(definitionPath,OBOParser.PARSE_DEFINITIONS);
+		OBOParser oboParser = null;
 		try {
+			oboParser = new OBOParser(new OBOParserFileInput(definitionPath),OBOParser.PARSE_DEFINITIONS);
 			oboParser.doParse();
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -101,7 +103,7 @@ public class BOQACore
 		/* Load associations */
 		AssociationContainer localAssociations;
 		try {
-			AssociationParser ap = new AssociationParser(associationPath,localOntology.getTermContainer(),null,null);
+			AssociationParser ap = new AssociationParser(new OBOParserFileInput(associationPath),localOntology.getTermContainer(),null,null);
 			localAssociations = new AssociationContainer(ap.getAssociations(), ap.getSynonym2gene(), ap.getDbObject2gene());
 		} catch (IOException e) {
 			e.printStackTrace();
