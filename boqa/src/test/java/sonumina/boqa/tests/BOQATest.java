@@ -14,6 +14,7 @@ import ontologizer.association.AssociationContainer;
 import ontologizer.benchmark.Datafiles;
 import ontologizer.go.OBOParser;
 import ontologizer.go.OBOParserException;
+import ontologizer.go.OBOParserFileInput;
 import ontologizer.go.Ontology;
 import ontologizer.go.Term;
 import ontologizer.go.TermContainer;
@@ -525,7 +526,7 @@ public class BOQATest
 
 		final BOQA boqa = new BOQA();
 
-		OBOParser hpoParser = new OBOParser("../boqa/data/human-phenotype-ontology.obo.gz");
+		OBOParser hpoParser = new OBOParser(new OBOParserFileInput("../boqa/data/human-phenotype-ontology.obo.gz"));
 		hpoParser.doParse();
 		TermContainer tc = new TermContainer(hpoParser.getTermMap(),hpoParser.getFormatVersion(),hpoParser.getDate());
 		Ontology ontology = new Ontology(tc);
