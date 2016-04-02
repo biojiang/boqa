@@ -1,5 +1,6 @@
 package sonumina.boqa.tests;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -130,6 +131,13 @@ public class BOQATest
 	 */
 	private void checkInternalSimValues(BOQA boqa)
 	{
+		/* Check if mapped order agrees with what we expect */
+		assertArrayEquals(boqa.getTermsDirectlyAnnotatedTo(0), new int[]{9, 12});
+		assertArrayEquals(boqa.getTermsDirectlyAnnotatedTo(1), new int[]{11, 12, 13});
+		assertArrayEquals(boqa.getTermsDirectlyAnnotatedTo(2), new int[]{3, 10});
+		assertArrayEquals(boqa.getTermsDirectlyAnnotatedTo(3), new int[]{6, 14});
+		assertArrayEquals(boqa.getTermsDirectlyAnnotatedTo(4), new int[]{5, 13});
+
 		/* Common ancestors */
 		assertEquals(7,boqa.getCommonAncestorWithMaxIC(11,12));
 		assertTrue(boqa.getCommonAncestorWithMaxIC(9,11) == 4 || boqa.getCommonAncestorWithMaxIC(9,11) == 6);
