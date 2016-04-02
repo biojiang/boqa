@@ -3175,5 +3175,15 @@ public class BOQA
 		return allItemList.get(itemIndex);
 	}
 
-	
+	/**
+	 * Return the index of the given item. The item must be known,
+	 * otherwise the behaviour is undefined.
+	 *
+	 * @param item
+	 * @return the index of the item
+	 */
+	public int getItemIndex(ByteString item)
+	{
+		return item2Index.get(item);
+	}
 }
