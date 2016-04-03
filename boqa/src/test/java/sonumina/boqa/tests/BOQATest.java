@@ -308,6 +308,15 @@ public class BOQATest
 		final InternalDatafiles data = new InternalDatafiles();
 		assertEquals(15,data.graph.getNumberOfTerms());
 
+		ByteString [] itemOrder = new ByteString[]
+		{
+			new ByteString("item2"),
+			new ByteString("item4"),
+			new ByteString("item1"),
+			new ByteString("item3"),
+			new ByteString("item5")
+		};
+
 		final BOQA boqa = new BOQA();
 		boqa.setConsiderFrequenciesOnly(false);
 		boqa.setPrecalculateItemMaxs(true);
@@ -316,6 +325,7 @@ public class BOQATest
 		boqa.setStoreScoreDistriubtion(false);
 		boqa.setTryLoadingScoreDistribution(false);
 		boqa.setMaxQuerySizeForCachedDistribution(4);
+		boqa.setItemDefaultOrder(itemOrder);
 		boqa.setup(data.graph, data.assoc);
 		
 		/* Write out the graph with ICs */
@@ -368,6 +378,7 @@ public class BOQATest
 		boqaNoPrecalc.setStoreScoreDistriubtion(false);
 		boqaNoPrecalc.setTryLoadingScoreDistribution(false);
 		boqaNoPrecalc.setMaxQuerySizeForCachedDistribution(4);
+		boqaNoPrecalc.setItemDefaultOrder(itemOrder);
 		boqaNoPrecalc.setup(data.graph, data.assoc);
 		
 		checkInternalSimValues(boqa);
