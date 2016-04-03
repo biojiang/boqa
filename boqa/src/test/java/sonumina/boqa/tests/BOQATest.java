@@ -302,20 +302,20 @@ public class BOQATest
 		}
 	}
 	
+	final static ByteString [] itemOrder = new ByteString[]
+	{
+		new ByteString("item2"),
+		new ByteString("item4"),
+		new ByteString("item1"),
+		new ByteString("item3"),
+		new ByteString("item5")
+	};
+
 	@Test
 	public void testBOQAOnInternalOntology() throws FileNotFoundException
 	{
 		final InternalDatafiles data = new InternalDatafiles();
 		assertEquals(15,data.graph.getNumberOfTerms());
-
-		ByteString [] itemOrder = new ByteString[]
-		{
-			new ByteString("item2"),
-			new ByteString("item4"),
-			new ByteString("item1"),
-			new ByteString("item3"),
-			new ByteString("item5")
-		};
 
 		final BOQA boqa = new BOQA();
 		boqa.setConsiderFrequenciesOnly(false);
