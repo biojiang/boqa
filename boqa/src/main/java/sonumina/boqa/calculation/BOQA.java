@@ -292,6 +292,12 @@ public class BOQA
 	/** Defines the maximal query size for the cached distribution */
 	private int MAX_QUERY_SIZE_FOR_CACHED_DISTRIBUTION = 20;
 
+	/**
+	 * Previously set items. Used when a special order of the items shall be
+	 * enforced
+	 */
+	private ByteString [] ITEM_DEFAULT_ORDER = null;
+
 	/** Some more verbose output */
 	private final boolean VERBOSE = false;
 
@@ -476,6 +482,16 @@ public class BOQA
 		SIZE_OF_SCORE_DISTRIBUTION = size;
 	}
 	
+	/**
+	 * Set an default order for the items.
+	 *
+	 * @param itemDefaultOrder
+	 */
+	public void setItemDefaultOrder(ByteString [] itemDefaultOrder)
+	{
+		ITEM_DEFAULT_ORDER = itemDefaultOrder;
+	}
+
 	/**
 	 * Returns the size of the score distribution.
 	 * @return
@@ -1597,11 +1613,23 @@ public class BOQA
 		allItemList = new ArrayList<ByteString>();
 		item2Index = new HashMap<ByteString,Integer>();
 		i = 0;
-		for (ByteString item : itemEnumerator)
+
+		if (ITEM_DEFAULT_ORDER != null)
 		{
-			allItemList.add(item);
-			item2Index.put(item, i);
-			i++;
+			for (ByteString item : ITEM_DEFAULT_ORDER)
+			{
+				allItemList.add(item);
+				item2Index.put(item, i);
+				i++;
+			}
+		} else
+		{
+			for (ByteString item : itemEnumerator)
+			{
+				allItemList.add(item);
+				item2Index.put(item, i);
+				i++;
+			}
 		}
 		
 		logger.info(i + " items passed criterias (supplied evidence codes)");
@@ -1609,7 +1637,7 @@ public class BOQA
 		/* Fill item matrix */
 		items2Terms = new int[allItemList.size()][];
 		i = 0;
-		for (ByteString item : itemEnumerator)
+		for (ByteString item : allItemList)
 		{
 			int j = 0;
 
@@ -1626,7 +1654,7 @@ public class BOQA
 		/* Fill direct item matrix */
 		items2DirectTerms = new int[allItemList.size()][];
 		i = 0;
-		for (ByteString item : itemEnumerator)
+		for (ByteString item : allItemList)
 		{
 			int j = 0;
 
