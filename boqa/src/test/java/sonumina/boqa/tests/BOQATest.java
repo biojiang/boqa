@@ -411,8 +411,19 @@ public class BOQATest
 	 */
 	private void checkHPOSimValues(final BOQA boqa)
 	{
-		assertEquals(0.006997929,boqa.resScoreMaxAvgVsItem(new int[]{10,12},4),0.000001);
-		assertEquals(0.162568779,boqa.resScoreMaxAvgVsItem(new int[]{101,1222,1300,2011},78),0.000001);
+		Ontology ont = boqa.getOntology();
+
+		int item1 = boqa.getItemIndex(new ByteString("CRAMPS, FAMILIAL ADOLESCENT"));
+		int t11 = boqa.getTermIndex(ont.getTerm("HP:0000011"));
+		int t12 = boqa.getTermIndex(ont.getTerm("HP:0000013"));
+		assertEquals(0.006997929,boqa.resScoreMaxAvgVsItem(new int[]{t11,t12},item1),0.000001);
+
+		int item2 = boqa.getItemIndex(new ByteString("HYPER-BETA-ALANINEMIA"));
+		int t21 = boqa.getTermIndex(ont.getTerm("HP:0000104"));
+		int t22 = boqa.getTermIndex(ont.getTerm("HP:0001495"));
+		int t23 = boqa.getTermIndex(ont.getTerm("HP:0001465"));
+		int t24 = boqa.getTermIndex(ont.getTerm("HP:0002486"));
+		assertEquals(0.162568779,boqa.resScoreMaxAvgVsItem(new int[]{t21,t22,t23,t24},item2),0.000001);
 	}
 
 
