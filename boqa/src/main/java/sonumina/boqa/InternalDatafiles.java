@@ -103,7 +103,7 @@ public class InternalDatafiles extends Datafiles
 		terms.add(c15);
 		TermContainer termContainer = new TermContainer(terms,"","");
 
-		graph = new Ontology(termContainer);
+		graph = Ontology.create(termContainer);
 
 		HashSet<TermID> tids = new HashSet<TermID>();
 		for (Term term : terms)
@@ -112,21 +112,21 @@ public class InternalDatafiles extends Datafiles
 		/* Associations */
 		assoc = new AssociationContainer();
 
-		assoc.addAssociation(new Association(new ByteString("item1"),4));
-		assoc.addAssociation(new Association(new ByteString("item1"),11));
+		assoc.addAssociation(new Association(new ByteString("item1"),new TermID("GO:0000004")));
+		assoc.addAssociation(new Association(new ByteString("item1"),new TermID("GO:0000011")));
 
-		assoc.addAssociation(new Association(new ByteString("item2"),10));
-		assoc.addAssociation(new Association(new ByteString("item2"),13));
+		assoc.addAssociation(new Association(new ByteString("item2"),new TermID("GO:0000010")));
+		assoc.addAssociation(new Association(new ByteString("item2"),new TermID("GO:0000013")));
 
-		assoc.addAssociation(new Association(new ByteString("item3"),7));
-		assoc.addAssociation(new Association(new ByteString("item3"),15));
+		assoc.addAssociation(new Association(new ByteString("item3"),new TermID("GO:0000007")));
+		assoc.addAssociation(new Association(new ByteString("item3"),new TermID("GO:0000015")));
 
-		assoc.addAssociation(new Association(new ByteString("item4"),12));
-		assoc.addAssociation(new Association(new ByteString("item4"),13));
-		assoc.addAssociation(new Association(new ByteString("item4"),14));
+		assoc.addAssociation(new Association(new ByteString("item4"),new TermID("GO:0000012")));
+		assoc.addAssociation(new Association(new ByteString("item4"),new TermID("GO:0000013")));
+		assoc.addAssociation(new Association(new ByteString("item4"),new TermID("GO:0000014")));
 
-		assoc.addAssociation(new Association(new ByteString("item5"),6));
-		assoc.addAssociation(new Association(new ByteString("item5"),14));
+		assoc.addAssociation(new Association(new ByteString("item5"),new TermID("GO:0000006")));
+		assoc.addAssociation(new Association(new ByteString("item5"),new TermID("GO:0000014")));
 
 		GODOTWriter.writeDOT(graph, new File("example.dot"), null, tids, new AbstractDotAttributesProvider() {
 			public String getDotNodeAttributes(TermID id) {
