@@ -36,10 +36,8 @@
 package sonumina.algorithms;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Collection;
-import java.util.Vector;
+import java.util.List;
 
 public class Algorithms
 {
