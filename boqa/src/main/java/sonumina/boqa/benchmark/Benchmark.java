@@ -54,9 +54,8 @@ import ontologizer.go.Ontology;
 import ontologizer.go.Term;
 import ontologizer.go.TermID;
 import sonumina.boqa.calculation.BOQA;
-import sonumina.boqa.calculation.BenchmarkObservations;
-import sonumina.boqa.calculation.Observations;
 import sonumina.boqa.calculation.BOQA.Result;
+import sonumina.boqa.calculation.BenchmarkObservations;
 import sonumina.math.graph.SlimDirectedGraphView;
 
 /**
