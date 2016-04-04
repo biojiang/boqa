@@ -302,7 +302,8 @@ public class BOQATest
 		}
 	}
 	
-	final static ByteString [] itemOrder = new ByteString[]
+	/** The order of internal items that some code assumes here */
+	private final static ByteString [] INTERNAL_ITEM_ORDER = new ByteString[]
 	{
 		new ByteString("item2"),
 		new ByteString("item4"),
@@ -325,7 +326,7 @@ public class BOQATest
 		boqa.setStoreScoreDistriubtion(false);
 		boqa.setTryLoadingScoreDistribution(false);
 		boqa.setMaxQuerySizeForCachedDistribution(4);
-		boqa.setItemDefaultOrder(itemOrder);
+		boqa.setItemDefaultOrder(INTERNAL_ITEM_ORDER);
 		boqa.setup(data.graph, data.assoc);
 		
 		/* Write out the graph with ICs */
@@ -378,7 +379,7 @@ public class BOQATest
 		boqaNoPrecalc.setStoreScoreDistriubtion(false);
 		boqaNoPrecalc.setTryLoadingScoreDistribution(false);
 		boqaNoPrecalc.setMaxQuerySizeForCachedDistribution(4);
-		boqaNoPrecalc.setItemDefaultOrder(itemOrder);
+		boqaNoPrecalc.setItemDefaultOrder(INTERNAL_ITEM_ORDER);
 		boqaNoPrecalc.setup(data.graph, data.assoc);
 		
 		checkInternalSimValues(boqa);
