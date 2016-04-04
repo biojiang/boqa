@@ -3227,4 +3227,49 @@ public class BOQA
 	{
 		return item2Index.get(item);
 	}
+
+	/* Simple builder interface */
+
+	public static interface RequiresAssociations
+	{
+		public Optional withAssociations(AssociationContainer associations);
+	}
+
+	public static interface Optional
+	{
+		/**
+		 * Build the boqa object.
+		 *
+		 * @return the boqa object.
+		 */
+		public BOQA build();
+	}
+
+	public static class BOQABuilder implements RequiresAssociations, Optional
+	{
+		private Ontology ontology;
+		private AssociationContainer associations;
+
+		@Override
+		public BOQA build()
+		{
+			BOQA boqa = new BOQA();
+			boqa.setup(ontology, associations);
+			return boqa;
+		}
+
+		@Override
+		public Optional withAssociations(AssociationContainer associations)
+		{
+			this.associations = associations;
+			return this;
+		}
+	}
+
+	public static RequiresAssociations onOntology(Ontology ontology)
+	{
+		BOQABuilder boqaBuilder = new BOQABuilder();
+		boqaBuilder.ontology = ontology;
+		return boqaBuilder;
+	}
 }
