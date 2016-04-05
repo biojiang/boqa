@@ -3237,6 +3237,18 @@ public class BOQA
 
 	public static interface Optional
 	{
+		public Optional considerOnlyFrequencies(boolean freqOnly);
+
+		public Optional precalculateMaxICs(boolean precalculateMaxICs);
+
+		public Optional precalculateScoreDistribution(boolean precalculateScoreDistribution);
+
+		public Optional cacheScoreDistribution(boolean cacheStoreDistribution);
+
+		public Optional storeScoreDistribution(boolean storeStoreDistribution);
+
+		public Optional tryLoadingScoreDistribution(boolean tryLoadingScoreDistribution);
+
 		/**
 		 * Build the boqa object.
 		 *
@@ -3249,11 +3261,23 @@ public class BOQA
 	{
 		private Ontology ontology;
 		private AssociationContainer associations;
+		private boolean freqOnly;
+		private boolean precalculateScoreDistribution;
+		private boolean cacheStoreDistribution;
+		private boolean storeStoreDistribution;
+		private boolean tryLoadingScoreDistribution;
+		private boolean precalculateMaxICs;
 
 		@Override
 		public BOQA build()
 		{
 			BOQA boqa = new BOQA();
+			boqa.setConsiderFrequenciesOnly(freqOnly);
+			boqa.setPrecalculateScoreDistribution(precalculateScoreDistribution);
+			boqa.setCacheScoreDistribution(cacheStoreDistribution);
+			boqa.setStoreScoreDistriubtion(storeStoreDistribution);
+			boqa.setTryLoadingScoreDistribution(tryLoadingScoreDistribution);
+			boqa.setPrecalculateMaxICs(precalculateMaxICs);
 			boqa.setup(ontology, associations);
 			return boqa;
 		}
@@ -3262,6 +3286,48 @@ public class BOQA
 		public Optional withAssociations(AssociationContainer associations)
 		{
 			this.associations = associations;
+			return this;
+		}
+
+		@Override
+		public Optional considerOnlyFrequencies(boolean freqOnly)
+		{
+			this.freqOnly = freqOnly;
+			return this;
+		}
+
+		@Override
+		public Optional precalculateScoreDistribution(boolean precalculateScoreDistribution)
+		{
+			this.precalculateScoreDistribution = precalculateScoreDistribution;
+			return this;
+		}
+
+		@Override
+		public Optional cacheScoreDistribution(boolean cacheStoreDistribution)
+		{
+			this.cacheStoreDistribution = cacheStoreDistribution;
+			return this;
+		}
+
+		@Override
+		public Optional storeScoreDistribution(boolean storeStoreDistribution)
+		{
+			this.storeStoreDistribution = storeStoreDistribution;
+			return this;
+		}
+
+		@Override
+		public Optional tryLoadingScoreDistribution(boolean tryLoadingScoreDistribution)
+		{
+			this.tryLoadingScoreDistribution = tryLoadingScoreDistribution;
+			return this;
+		}
+
+		@Override
+		public Optional precalculateMaxICs(boolean precalculateMaxICs)
+		{
+			this.precalculateMaxICs = precalculateMaxICs;
 			return this;
 		}
 	}
