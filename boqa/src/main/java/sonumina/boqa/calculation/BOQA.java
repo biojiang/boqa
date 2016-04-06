@@ -3268,22 +3268,6 @@ public class BOQA
 		public Optional cacheScoreDistribution(boolean cacheStoreDistribution);
 
 		/**
-		 * Set whether store distribution should be stored.
-		 *
-		 * @param storeStoreDistribution
-		 * @return
-		 */
-		public Optional storeScoreDistribution(boolean storeStoreDistribution);
-
-		/**
-		 * Set whether score distribution should be loaded if it has been stored before.
-		 *
-		 * @param tryLoadingScoreDistribution
-		 * @return
-		 */
-		public Optional tryLoadingScoreDistribution(boolean tryLoadingScoreDistribution);
-
-		/**
 		 * Build the boqa object.
 		 *
 		 * @return the boqa object.
@@ -3291,7 +3275,26 @@ public class BOQA
 		public BOQA build();
 	}
 
-	public static class BOQABuilder implements RequiresAssociations, Optional
+	public static interface PrecalculateScoreDistributionOptional extends Optional
+	{
+		/**
+		 * Set whether store distribution should be stored.
+		 *
+		 * @param storeStoreDistribution
+		 * @return
+		 */
+		public PrecalculateScoreDistributionOptional storeScoreDistribution(boolean storeStoreDistribution);
+
+		/**
+		 * Set whether score distribution should be loaded if it has been stored before.
+		 *
+		 * @param tryLoadingScoreDistribution
+		 * @return
+		 */
+		public PrecalculateScoreDistributionOptional tryLoadingScoreDistribution(boolean tryLoadingScoreDistribution);
+	}
+
+	public static class BOQABuilder implements RequiresAssociations, Optional, PrecalculateScoreDistributionOptional
 	{
 		private Ontology ontology;
 		private AssociationContainer associations;
@@ -3345,14 +3348,14 @@ public class BOQA
 		}
 
 		@Override
-		public Optional storeScoreDistribution(boolean storeStoreDistribution)
+		public PrecalculateScoreDistributionOptional storeScoreDistribution(boolean storeStoreDistribution)
 		{
 			this.storeStoreDistribution = storeStoreDistribution;
 			return this;
 		}
 
 		@Override
-		public Optional tryLoadingScoreDistribution(boolean tryLoadingScoreDistribution)
+		public PrecalculateScoreDistributionOptional tryLoadingScoreDistribution(boolean tryLoadingScoreDistribution)
 		{
 			this.tryLoadingScoreDistribution = tryLoadingScoreDistribution;
 			return this;
