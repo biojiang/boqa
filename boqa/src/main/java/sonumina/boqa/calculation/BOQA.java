@@ -3235,16 +3235,52 @@ public class BOQA
 
 	public static interface Optional
 	{
+		/**
+		 * Set whether only annotations with frequencies should be considered.
+		 *
+		 * @param freqOnly
+		 * @return
+		 */
 		public Optional considerOnlyFrequencies(boolean freqOnly);
 
+		/**
+		 * Precalculate maximal ics.
+		 *
+		 * @param precalculateMaxICs
+		 * @return
+		 */
 		public Optional precalculateMaxICs(boolean precalculateMaxICs);
 
+		/**
+		 * Set whether score distribution should be recalculated.
+		 *
+		 * @param precalculateScoreDistribution
+		 * @return
+		 */
 		public Optional precalculateScoreDistribution(boolean precalculateScoreDistribution);
 
+		/**
+		 * Set whether store distribution should be cached.
+		 *
+		 * @param cacheStoreDistribution
+		 * @return
+		 */
 		public Optional cacheScoreDistribution(boolean cacheStoreDistribution);
 
+		/**
+		 * Set whether store distribution should be stored.
+		 *
+		 * @param storeStoreDistribution
+		 * @return
+		 */
 		public Optional storeScoreDistribution(boolean storeStoreDistribution);
 
+		/**
+		 * Set whether score distribution should be loaded if it has been stored before.
+		 *
+		 * @param tryLoadingScoreDistribution
+		 * @return
+		 */
 		public Optional tryLoadingScoreDistribution(boolean tryLoadingScoreDistribution);
 
 		/**
