@@ -3014,7 +3014,6 @@ public class BOQA
 		if (FORBID_ILLEGAL_QUERIES)
 		{
 			boolean valid;
-			int tries = 0;
 			
 			do
 			{
@@ -3036,7 +3035,6 @@ public class BOQA
 						}
 					}
 				}
-				tries++;
 			} while (!valid);
 		} else
 		{
