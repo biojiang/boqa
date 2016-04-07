@@ -8,14 +8,14 @@ published in the [Bioinformatics journal](http://bioinformatics.oxfordjournals.o
 Usage
 -----
 
-In order to start the benchmark, just invoke the supplied
-makefile. You need Java, ant, and R for successfully
-completing the benchmark process. Look into the code for
-more details about the implementation and how to use it in
-your own research project. Remember that it also often helps
-to just read the supplied tests to understand how to use an 
-API. In particular, the BOQA implementation is tested in
-BOQATest class.
+In order to start the benchmark, invoke the ```makefile```
+within the ```boqa``` directory via ```make```. You need
+Java, Maven, and R for successfully completing the benchmark
+process. Look into the code for more details about the
+implementation and how to use it in your own research project.
+Remember that it also often helps to just read the supplied tests
+to understand how to use an API. In particular, the BOQA
+implementation is tested in BOQATest class.
 
 Patent
 ------
