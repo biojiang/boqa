@@ -36,8 +36,8 @@ benchmark: build
 
 .PHONY: build
 build: 
-	ant clean
-	ant build
+	mvn clean install -Dmaven.test.skip=true
+	cd ../boqa.benchmark && mvn package
 
 .PHONY: install
 install:
