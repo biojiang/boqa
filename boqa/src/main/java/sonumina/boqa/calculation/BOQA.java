@@ -3257,7 +3257,7 @@ public class BOQA
 		 * @param precalculateScoreDistribution
 		 * @return
 		 */
-		public Optional precalculateScoreDistribution(boolean precalculateScoreDistribution);
+		public PrecalculateScoreDistributionOptional precalculateScoreDistribution(boolean precalculateScoreDistribution);
 
 		/**
 		 * Set whether store distribution should be cached.
@@ -3334,7 +3334,7 @@ public class BOQA
 		}
 
 		@Override
-		public Optional precalculateScoreDistribution(boolean precalculateScoreDistribution)
+		public PrecalculateScoreDistributionOptional precalculateScoreDistribution(boolean precalculateScoreDistribution)
 		{
 			this.precalculateScoreDistribution = precalculateScoreDistribution;
 			return this;
