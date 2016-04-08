@@ -77,6 +77,7 @@ import ontologizer.go.TermID;
 import ontologizer.set.PopulationSet;
 import ontologizer.types.ByteString;
 import sonumina.algorithms.Algorithms;
+import sonumina.boqa.calculation.BOQA.Optional;
 import sonumina.math.distribution.ApproximatedEmpiricalDistribution;
 import sonumina.math.graph.SlimDirectedGraphView;
 
@@ -3236,6 +3237,14 @@ public class BOQA
 	public static interface Optional
 	{
 		/**
+		 * Specify the default order for the items.
+		 *
+		 * @param internalItemOrder
+		 * @return
+		 */
+		public Optional andItemDefaultOrder(ByteString[] internalItemOrder);
+
+		/**
 		 * Set whether only annotations with frequencies should be considered.
 		 *
 		 * @param freqOnly
@@ -3252,6 +3261,15 @@ public class BOQA
 		public Optional precalculateMaxICs(boolean precalculateMaxICs);
 
 		/**
+		 * Should the matrix that contains the max ic term of two given terms
+		 * be precalculated.
+		 *
+		 * @param precalculateItemMaxs
+		 * @return
+		 */
+		public Optional precalculateItemMaxs(boolean precalculateItemMaxs);
+
+		/**
 		 * Set whether score distribution should be recalculated.
 		 *
 		 * @param precalculateScoreDistribution
@@ -3266,6 +3284,16 @@ public class BOQA
 		 * @return
 		 */
 		public Optional cacheScoreDistribution(boolean cacheStoreDistribution);
+
+		/**
+		 * Sets the maximum query size of for a cached distribution.
+		 *
+		 * Also affects precalculation.
+		 *
+		 * @param maxQuerysizeForCachedDistribution
+		 * @return
+		 */
+		public Optional maxQuerySizeForCachedDistribution(int maxQuerysizeForCachedDistribution);
 
 		/**
 		 * Build the boqa object.
@@ -3304,6 +3332,9 @@ public class BOQA
 		private boolean storeStoreDistribution;
 		private boolean tryLoadingScoreDistribution;
 		private boolean precalculateMaxICs;
+		private boolean precalculateItemMaxs;
+		private int maxQuerySizeForCachedDistribution;
+		private ByteString[] itemDefaultOrder;
 
 		@Override
 		public BOQA build()
@@ -3315,6 +3346,9 @@ public class BOQA
 			boqa.setStoreScoreDistriubtion(storeStoreDistribution);
 			boqa.setTryLoadingScoreDistribution(tryLoadingScoreDistribution);
 			boqa.setPrecalculateMaxICs(precalculateMaxICs);
+			boqa.setPrecalculateItemMaxs(precalculateItemMaxs);
+			boqa.setMaxQuerySizeForCachedDistribution(maxQuerySizeForCachedDistribution);
+			boqa.setItemDefaultOrder(itemDefaultOrder);
 			boqa.setup(ontology, associations);
 			return boqa;
 		}
@@ -3365,6 +3399,27 @@ public class BOQA
 		public Optional precalculateMaxICs(boolean precalculateMaxICs)
 		{
 			this.precalculateMaxICs = precalculateMaxICs;
+			return this;
+		}
+
+		@Override
+		public Optional precalculateItemMaxs(boolean precalculateItemMaxs)
+		{
+			this.precalculateItemMaxs = precalculateItemMaxs;
+			return this;
+		}
+
+		@Override
+		public Optional maxQuerySizeForCachedDistribution(int maxQuerySizeForCachedDistribution)
+		{
+			this.maxQuerySizeForCachedDistribution = maxQuerySizeForCachedDistribution;
+			return this;
+		}
+
+		@Override
+		public Optional andItemDefaultOrder(ByteString[] itemDefaultOrder)
+		{
+			this.itemDefaultOrder = itemDefaultOrder;
 			return this;
 		}
 	}
