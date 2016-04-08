@@ -318,17 +318,18 @@ public class BOQATest
 		final InternalDatafiles data = new InternalDatafiles();
 		assertEquals(15,data.graph.getNumberOfTerms());
 
-		final BOQA boqa = new BOQA();
-		boqa.setConsiderFrequenciesOnly(false);
-		boqa.setPrecalculateItemMaxs(true);
-		boqa.setCacheScoreDistribution(true);
-		boqa.setPrecalculateScoreDistribution(true);
-		boqa.setStoreScoreDistriubtion(false);
-		boqa.setTryLoadingScoreDistribution(false);
-		boqa.setMaxQuerySizeForCachedDistribution(4);
-		boqa.setItemDefaultOrder(INTERNAL_ITEM_ORDER);
-		boqa.setup(data.graph, data.assoc);
-		
+		final BOQA boqa = BOQA.onOntology(data.graph).
+				withAssociations(data.assoc).
+				andItemDefaultOrder(INTERNAL_ITEM_ORDER).
+				considerOnlyFrequencies(false).
+				precalculateItemMaxs(true).
+				cacheScoreDistribution(true).
+				precalculateScoreDistribution(true).
+				storeScoreDistribution(false).
+				tryLoadingScoreDistribution(false).
+				maxQuerySizeForCachedDistribution(4).
+				build();
+
 		/* Write out the graph with ICs */
 		data.getGraphWithItems().writeDOT(new FileOutputStream("full-with-ics.dot"), new DotAttributesProvider<String>()
 				{
