@@ -77,7 +77,6 @@ import ontologizer.go.TermID;
 import ontologizer.set.PopulationSet;
 import ontologizer.types.ByteString;
 import sonumina.algorithms.Algorithms;
-import sonumina.boqa.calculation.BOQA.Optional;
 import sonumina.math.distribution.ApproximatedEmpiricalDistribution;
 import sonumina.math.graph.SlimDirectedGraphView;
 
@@ -1284,35 +1283,6 @@ public class BOQA
 		for (int j=0;j<term2Descendants[i].length;j++)
 			observations[term2Descendants[i][j]] = false;
 	}
-
-	/**
-	 * Extracts all items that have at least a single annotation
-	 * with a frequency.
-	 * 
-	 * @return
-	 */
-	private Set<ByteString> extractItemsWithFrequencies(AssociationContainer assoc)
-	{
-		HashSet<ByteString> items = new HashSet<ByteString>();
-
-		for (ByteString item : assoc.getAllAnnotatedGenes())
-		{
-			boolean take = false;
-
-			Gene2Associations item2Associations = assoc.get(item);
-			for (Association a : item2Associations)
-			{
-				if (a.getAspect().length()!=0)
-					take = true;
-			}
-			
-			if (take)
-				items.add(item);
-		}
-		
-		return items;
-	}
-
 	
 	/**
 	 * Calculates a "fingerprint" for the current data. Note that the fingerprint
@@ -1344,8 +1314,6 @@ public class BOQA
 	public void setup(Ontology ontology, AssociationContainer associations)
 	{
 		graph = ontology;
-
-//		graph.findRedundantISARelations();
 
 		if (micaMatrix != null)
 		{
@@ -2634,42 +2602,7 @@ public class BOQA
 	{
 		return scoreMaxAvgVsItem(tl1, item, jcTermSim);
 	}
-	
-	/**
-	 * Sim score avg using two lists of terms.
-	 * 
-	 * @param t1
-	 * @param t2
-	 * @return
-	 */
-	private double simScoreAvg(int[] t1, int[] t2)
-	{
-		double score = 0;
-		for (int to : t1)
-		{
-			for (int ti : t2)
-			{
-				int common = commonAncestorWithMaxIC(to, ti);
-				score += terms2IC[common];
-			}
-		}
-		score /= t1.length * t2.length;
-		return score;
-	}
 
-	/**
-	 * Score two list of terms.
-	 * 
-	 * @param t1
-	 * @param t2
-	 * @return
-	 */
-	private double simScore(int[] t1, int[] t2)
-	{
-		return resScoreMaxAvg(t1,t2);
-	}
-	
-	
 	/**
 	 * Score one list of terms vs. an item using the default method
 	 * and using the supplied term similarity measure.
