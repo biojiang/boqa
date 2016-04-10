@@ -561,7 +561,7 @@ public class BOQATest
 		OBOParser hpoParser = new OBOParser(new OBOParserFileInput("../boqa/data/human-phenotype-ontology.obo.gz"));
 		hpoParser.doParse();
 		TermContainer tc = new TermContainer(hpoParser.getTermMap(),hpoParser.getFormatVersion(),hpoParser.getDate());
-		Ontology ontology = new Ontology(tc);
+		Ontology ontology = Ontology.create(tc);
 		SlimDirectedGraphView<Term> slim = ontology.getSlimGraphView();
 		
 		AssociationContainer assocs = new AssociationContainer();
