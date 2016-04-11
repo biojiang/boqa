@@ -3211,6 +3211,23 @@ public class BOQA
 		public PrecalculateScoreDistributionOptional precalculateScoreDistribution(boolean precalculateScoreDistribution);
 
 		/**
+		 * Set the size of the score distributions.
+		 *
+		 * @param sizeOfScoreDistribution
+		 * @return
+		 */
+		public Optional sizeOfScoreDistribution(int sizeOfScoreDistribution);
+
+		/**
+		 * Sets the number of terms that can be selected to be
+		 * on during the simulation.
+		 *
+		 * @param simulationMaxTerms
+		 * @return
+		 */
+		public Optional setSimulationMaxTerms(int simulationMaxTerms);
+
+		/**
 		 * Set whether store distribution should be cached.
 		 *
 		 * @param cacheStoreDistribution
@@ -3267,6 +3284,8 @@ public class BOQA
 		private boolean precalculateMaxICs;
 		private boolean precalculateItemMaxs;
 		private int maxQuerySizeForCachedDistribution = -1;
+		private int sizeOfScoreDistribution = -1;
+		private int simulationMaxTerms = -1;
 		private ByteString[] itemDefaultOrder;
 
 		@Override
@@ -3275,6 +3294,8 @@ public class BOQA
 			BOQA boqa = new BOQA();
 			boqa.setConsiderFrequenciesOnly(freqOnly);
 			if (maxQuerySizeForCachedDistribution != -1) boqa.setMaxQuerySizeForCachedDistribution(maxQuerySizeForCachedDistribution);
+			if (sizeOfScoreDistribution != -1) boqa.setSizeOfScoreDistribution(sizeOfScoreDistribution);
+			if (simulationMaxTerms != -1) boqa.setSimulationMaxTerms(simulationMaxTerms);
 			boqa.setPrecalculateScoreDistribution(precalculateScoreDistribution);
 			boqa.setCacheScoreDistribution(cacheStoreDistribution);
 			boqa.setStoreScoreDistriubtion(storeStoreDistribution);
@@ -3354,6 +3375,20 @@ public class BOQA
 		public Optional andItemDefaultOrder(ByteString[] itemDefaultOrder)
 		{
 			this.itemDefaultOrder = itemDefaultOrder;
+			return this;
+		}
+
+		@Override
+		public Optional sizeOfScoreDistribution(int sizeOfScoreDistribution)
+		{
+			this.sizeOfScoreDistribution = sizeOfScoreDistribution;
+			return this;
+		}
+
+		@Override
+		public Optional setSimulationMaxTerms(int simulationMaxTerms)
+		{
+			this.simulationMaxTerms = simulationMaxTerms;
 			return this;
 		}
 	}
