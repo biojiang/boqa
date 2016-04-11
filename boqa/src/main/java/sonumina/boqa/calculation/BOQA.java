@@ -3266,7 +3266,7 @@ public class BOQA
 		private boolean tryLoadingScoreDistribution;
 		private boolean precalculateMaxICs;
 		private boolean precalculateItemMaxs;
-		private int maxQuerySizeForCachedDistribution;
+		private int maxQuerySizeForCachedDistribution = -1;
 		private ByteString[] itemDefaultOrder;
 
 		@Override
@@ -3274,6 +3274,7 @@ public class BOQA
 		{
 			BOQA boqa = new BOQA();
 			boqa.setConsiderFrequenciesOnly(freqOnly);
+			if (maxQuerySizeForCachedDistribution != -1) boqa.setMaxQuerySizeForCachedDistribution(maxQuerySizeForCachedDistribution);
 			boqa.setPrecalculateScoreDistribution(precalculateScoreDistribution);
 			boqa.setCacheScoreDistribution(cacheStoreDistribution);
 			boqa.setStoreScoreDistriubtion(storeStoreDistribution);
