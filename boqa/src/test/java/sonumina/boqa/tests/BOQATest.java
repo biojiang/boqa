@@ -372,17 +372,18 @@ public class BOQATest
 		for (int i=0;i<boqa.getNumberOfItems();i++)
 			System.out.println(i + " -> " +boqa.getItem(i));
 
-		BOQA boqaNoPrecalc = new BOQA();
-		boqaNoPrecalc.setConsiderFrequenciesOnly(false);
-		boqaNoPrecalc.setPrecalculateItemMaxs(false);
-		boqaNoPrecalc.setCacheScoreDistribution(false);
-		boqaNoPrecalc.setPrecalculateScoreDistribution(false);
-		boqaNoPrecalc.setStoreScoreDistriubtion(false);
-		boqaNoPrecalc.setTryLoadingScoreDistribution(false);
-		boqaNoPrecalc.setMaxQuerySizeForCachedDistribution(4);
-		boqaNoPrecalc.setItemDefaultOrder(INTERNAL_ITEM_ORDER);
-		boqaNoPrecalc.setup(data.graph, data.assoc);
-		
+		final BOQA boqaNoPrecalc = BOQA.onOntology(data.graph).
+				withAssociations(data.assoc).
+				andItemDefaultOrder(INTERNAL_ITEM_ORDER).
+				considerOnlyFrequencies(false).
+				precalculateItemMaxs(false).
+				cacheScoreDistribution(false).
+				precalculateScoreDistribution(false).
+				storeScoreDistribution(false).
+				tryLoadingScoreDistribution(false).
+				maxQuerySizeForCachedDistribution(4).
+				build();
+
 		checkInternalSimValues(boqa);
 		checkInternalSimValues(boqaNoPrecalc);
 	}
@@ -432,16 +433,16 @@ public class BOQATest
 	@Test
 	public void testVsOldItemMax() throws InterruptedException, IOException
 	{
-		final BOQA boqa = new BOQA();
-
 		Datafiles df = hpo;
 
-		boqa.setConsiderFrequenciesOnly(false);
-		boqa.setCacheScoreDistribution(false);
-		boqa.setPrecalculateScoreDistribution(false);
-		boqa.setStoreScoreDistriubtion(false);
-		boqa.setPrecalculateItemMaxs(true);
-		boqa.setup(df.graph, df.assoc);
+		final BOQA boqa = BOQA.onOntology(df.graph).
+				withAssociations(df.assoc).
+				considerOnlyFrequencies(false).
+				cacheScoreDistribution(false).
+				precalculateScoreDistribution(false).
+				storeScoreDistribution(false).
+				precalculateItemMaxs(true).
+				build();
 
 		/* This is older code which we keep for testing here */
 		int [][] micaForItem = new int[boqa.getNumberOfItems()][boqa.getSlimGraph().getNumberOfVertices()];
@@ -479,15 +480,15 @@ public class BOQATest
 	@Test
 	public void testMostSpecificOnHPO() throws InterruptedException, IOException
 	{
-		final BOQA boqa = new BOQA();
-
-		boqa.setConsiderFrequenciesOnly(false);
-		boqa.setCacheScoreDistribution(false);
-		boqa.setPrecalculateScoreDistribution(false);
-		boqa.setStoreScoreDistriubtion(false);
-		boqa.setPrecalculateItemMaxs(false);
-		boqa.setSimulationMaxTerms(-1);		
-		boqa.setup(hpo.graph, hpo.assoc);
+		final BOQA boqa = BOQA.onOntology(hpo.graph).
+				withAssociations(hpo.assoc).
+				considerOnlyFrequencies(false).
+				cacheScoreDistribution(false).
+				precalculateScoreDistribution(false).
+				storeScoreDistribution(false).
+				precalculateItemMaxs(false).
+				setSimulationMaxTerms(-1).
+				build();
 
 		/* Check, mostSpecifc function */
 		for (int i=0;i<5000;i++)
@@ -524,14 +525,16 @@ public class BOQATest
 	@Test
 	public void testAssignMarginals()
 	{
-		final InternalDatafiles data = new InternalDatafiles();
-		BOQA boqa = new BOQA();
-		boqa.setConsiderFrequenciesOnly(false);
-		boqa.setPrecalculateScoreDistribution(false);
-		boqa.setSizeOfScoreDistribution(1000);
-		boqa.setTryLoadingScoreDistribution(false);
-		boqa.setSimulationMaxTerms(3);
-		boqa.setMaxQuerySizeForCachedDistribution(6);
+		InternalDatafiles data = new InternalDatafiles();
+		BOQA boqa = BOQA.onOntology(data.graph).
+			withAssociations(data.assoc).
+			considerOnlyFrequencies(false).
+			precalculateScoreDistribution(false).
+			tryLoadingScoreDistribution(false).
+			sizeOfScoreDistribution(1000).
+			maxQuerySizeForCachedDistribution(6).
+			setSimulationMaxTerms(3).
+			build();
 
 		boqa.setup(data.graph, data.assoc);
 		
