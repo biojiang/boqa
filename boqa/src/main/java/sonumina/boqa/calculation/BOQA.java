@@ -1573,7 +1573,7 @@ public class BOQA
 		termsInTopologicalOrder = slimGraph.getVertexIndices(inducedGraph.getTermsInTopologicalOrder());
 
 		if (termsInTopologicalOrder.length != slimGraph.getNumberOfVertices())
-			throw new RuntimeException("The ontology graph contains cycles.");
+			throw new RuntimeException("The ontology graph contains cycles (" + termsInTopologicalOrder.length + " vs. " + slimGraph.getNumberOfVertices() + ")");
 		termsToplogicalRank = new int[termsInTopologicalOrder.length];
 		for (i=0;i<termsInTopologicalOrder.length;i++)
 			termsToplogicalRank[termsInTopologicalOrder[i]] = i; 
