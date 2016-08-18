@@ -2,8 +2,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>boqa</artifactId>
-	<groupId>boqa</groupId>
-	<version>0.2-SNAPSHOT</version>
+
+	<parent>
+		<groupId>de.sonumina.boqa</groupId>
+		<artifactId>boqa.parent</artifactId>
+		<version>0.3-SNAPSHOT</version>
+		<relativePath>../boqa.parent</relativePath>
+	</parent>
 
 	<repositories>
 		<repository>
@@ -94,7 +99,7 @@
 				</executions>
 			</plugin>
 			<plugin>
-  				<groupId>org.apache.maven.plugins</groupId>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.10.3</version>
 				<executions>
