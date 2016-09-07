@@ -1,0 +1,57 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>de.sonumina.boqa</groupId>
+		<artifactId>boqa.parent</artifactId>
+		<version>0.3-SNAPSHOT</version>
+		<relativePath>../boqa.parent</relativePath>
+	</parent>
+	<artifactId>boqa.web.parent</artifactId>
+	<packaging>pom</packaging>
+
+	<repositories>
+		<repository>
+			<id>sba1-mvn-repo</id>
+			<url>https://raw.githubusercontent.com/sba1/mvn-repo/master/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>sba1-mvn-repo</id>
+			<url>https://raw.githubusercontent.com/sba1/mvn-repo/master/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<properties>
+		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+		<teavm.version>0.4.4-SNAPSHOT</teavm.version>
+		<teavm.debug>true</teavm.debug>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<modules>
+	</modules>
+
+	<build>
+		<plugins>
+			<!-- Configure Java compiler to use Java 8 syntax -->
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.5.1</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
