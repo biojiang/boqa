@@ -26,6 +26,7 @@
 
   <modules>
    <module>../boqa</module>
+   <module>../boqa.rwt</module>
    <module>../boqa.web.parent</module>
   </modules>
 
