@@ -90,9 +90,9 @@ public class BOQACore
 			oboParser = new OBOParser(new OBOParserFileInput(definitionPath),OBOParser.PARSE_DEFINITIONS);
 			oboParser.doParse();
 		} catch (IOException e1) {
-			e1.printStackTrace();
+			throw new RuntimeException(e1);
 		} catch (OBOParserException e1) {
-			e1.printStackTrace();
+			throw new RuntimeException(e1);
 		}
 		TermContainer goTerms = new TermContainer(oboParser.getTermMap(), oboParser.getFormatVersion(), oboParser.getDate());
 		logger.info("OBO file \"" + definitionPath + "\" parsed");
