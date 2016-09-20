@@ -21,8 +21,37 @@
      <target>1.6</target>
      </configuration>
     </plugin>
+
+
+    <plugin>
+     <groupId>org.eclipse.jetty</groupId>
+     <artifactId>jetty-maven-plugin</artifactId>
+     <version>9.3.11.v20160721</version>
+     <configuration>
+      <scanIntervalSeconds>10</scanIntervalSeconds>
+      <webAppSourceDirectory>${project.basedir}/../boqa.rwt/WebContent</webAppSourceDirectory>
+      <classesDirectory>${project.basedir}/../boqa.rwt/target/classes</classesDirectory>
+      <webApp>
+       <extraClasspath>/home/bauer/boqa/boqa/target/classes</extraClasspath>
+      </webApp>
+      <scanTargets>
+       <scanTarget>../boqa/target/classes</scanTarget>
+      </scanTargets>
+     </configuration>
+    </plugin>
+
    </plugins>
   </build>
+
+  <dependencies>
+
+   <dependency>
+    <groupId>de.ontologizer</groupId>
+    <artifactId>ontologizer</artifactId>
+    <version>0.0.2-SNAPSHOT</version>
+   </dependency>
+
+  </dependencies>
 
   <modules>
    <module>../boqa</module>
